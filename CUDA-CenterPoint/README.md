@@ -17,7 +17,7 @@ Onnx model can be converted from checkpoint and config below using given script.
 
 ### Prerequisites
 
-To build the centerpoint inference, **CUDA**, **TensorRT** and **[libspconv](/3DSparseConvolution)** libraries are needed.
+To build the centerpoint inference, **CUDA**, **TensorRT** and **[libspconv](/libraries/3DSparseConvolution)** libraries are needed.
 Note that libspconv only supports sm_80 & sm_86 on Tesla Platform and sm_87 on Embedded Platform.
 
 ## Environments

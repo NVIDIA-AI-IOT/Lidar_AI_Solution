@@ -17,7 +17,7 @@ This repository contains sources and model for [BEVFusion](https://github.com/mi
 |         ResNet50-PTQ         |    TensorRT   |      FP16+INT8     |  67.66  |  70.81  |        25(on ORIN)        |
 - Note: The time we reported on ORIN is based on the average of nuScenes 6019 validation samples.
   - Since the number of lidar points is the main reason that affects the FPS. 
-  - Please refer to the readme of [3DSparseConvolution](../3DSparseConvolution/README.md) for more details.
+  - Please refer to the readme of [3DSparseConvolution](/libraries/3DSparseConvolution/README.md) for more details.
 
 ## Demonstration
 ![](../assets/cuda-bevfusion.gif)
