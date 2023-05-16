@@ -1,0 +1,13 @@
+objs
+tool/__pycache__/
+tool/deploy/__pycache__/
+workspace/lib
+workspace/*.pth
+workspace/pro
+nuscenes
+tool/*.so
+workspace/centerpoint/output.zyx.dense
+workspace/centerpoint/out_dense.py.fp16.tensor
+workspace/bevfusion/output.zyx.dense
+workspace/bevfusion/output.xyz.dense
+src/pybind11.hpp

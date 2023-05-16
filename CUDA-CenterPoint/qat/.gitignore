@@ -1,0 +1,26 @@
+**__pycache__**
+/det3d/ops/iou3d_nms/build
+data/
+*.pyc
+venv/
+*.idea/
+*.so
+*.yaml
+*.sh 
+*.pth
+*.pkl
+*.zip
+*.bin
+*.onnx
+*.log
+.vscode/
+/data/
+/docs/
+/spconv-scn/
+/workspace/
+/work_dirs/
+/deploy copy/
+/configs/
+/assets/
+
+ 

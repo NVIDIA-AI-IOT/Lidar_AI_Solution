@@ -1,0 +1,15 @@
+[submodule "CUDA-PointPillars"]
+	path = CUDA-PointPillars
+	url = https://github.com/NVIDIA-AI-IOT/CUDA-PointPillars.git
+[submodule "CUDA-BEVFusion/bevfusion"]
+	path = CUDA-BEVFusion/bevfusion
+	url = https://github.com/mit-han-lab/bevfusion.git
+[submodule "dependencies/pybind11"]
+	path = dependencies/pybind11
+	url = https://github.com/pybind/pybind11.git
+[submodule "dependencies/stb"]
+	path = dependencies/stb
+	url = https://github.com/nothings/stb.git
+[submodule "libraries/cuPCL"]
+	path = libraries/cuPCL
+	url = https://github.com/NVIDIA-AI-IOT/cuPCL.git

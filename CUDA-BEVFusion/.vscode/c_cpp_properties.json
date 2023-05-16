@@ -1,0 +1,23 @@
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "/root/.kiwi/lib/cuda-11.8/include/**",
+                "/root/.kiwi/lib/TensorRT-8.5.3.1-cuda11x/include/**",
+                "/opt/conda/include/python3.8/**",
+                "${workspaceFolder}/src/**",
+                "${workspaceFolder}/../dependencies/stb/**",
+                "${workspaceFolder}/../dependencies/pybind11/include/**",
+                "${workspaceFolder}/../cuOSD/src/**"
+            ],
+            "defines": [],
+            "compilerPath": "/usr/bin/gcc",
+            "cStandard": "c17",
+            "cppStandard": "gnu++14",
+            "intelliSenseMode": "linux-gcc-x64"
+        }
+    ],
+    "version": 4
+}

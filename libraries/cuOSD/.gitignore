@@ -1,0 +1,11 @@
+*.png
+*.jpg
+./cuosd
+libcuosd.so
+objs
+*.so
+__pycache__
+!imgs/input.png
+!imgs/faces.jpg
+!imgs/cuosd.png
+!imgs/blur-faces.jpg

@@ -1,0 +1,12 @@
+build/
+data/nuscenes
+data/nusc_tensor
+data/prediction
+tool/*.pyc
+tool/onnx-exporter/__pycache__/
+tool/__pycache__/
+*.plan
+*.log
+model
+example-data
+src/test

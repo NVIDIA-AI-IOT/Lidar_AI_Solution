@@ -1,0 +1,53 @@
+1280,720
+
+# type, left, top, right, bottom, thickness, name, confidence, font_size
+detbox,489,457,539,512,1,horse,0.95,5
+detbox,176,623,252,708,1,airplane,0.66,5
+detbox,553,271,609,347,1,vase,0.09,5
+detbox,501,131,552,227,1,fork,0.39,5
+detbox,872,279,951,341,1,toaster,0.06,5
+detbox,174,106,226,164,1,sandwich,0.03,5
+detbox,780,144,866,237,1,cake,0.73,5
+detbox,275,36,334,118,1,knife,0.29,5
+detbox,125,491,185,578,1,zebra,0.56,5
+detbox,356,117,452,208,1,motorcycle,0.92,5
+detbox,123,259,203,343,1,bottle,0.65,5
+detbox,542,531,641,590,1,chair,0.40,5
+detbox,336,555,388,640,1,cat,0.96,5
+detbox,1208,109,1268,167,1,truck,0.50,5
+detbox,1162,490,1248,574,1,sports ball,0.49,5
+detbox,1033,432,1122,529,1,toaster,0.45,5
+detbox,1029,264,1113,340,1,cell phone,0.19,5
+detbox,941,36,1005,104,1,cat,0.73,5
+detbox,1077,142,1137,204,1,bottle,0.54,5
+detbox,898,524,960,612,1,airplane,0.47,5
+detbox,642,291,733,354,1,banana,0.21,5
+detbox,872,163,923,235,1,cup,0.35,5
+detbox,576,13,650,77,1,person,0.28,5
+detbox,34,576,117,661,1,laptop,0.94,5
+detbox,675,148,744,231,1,hot dog,0.05,5
+detbox,1021,364,1117,425,1,traffic light,0.02,5
+detbox,1118,213,1170,291,1,orange,0.20,5
+detbox,1130,330,1228,419,1,wine glass,0.43,5
+detbox,419,632,488,693,1,pizza,0.77,5
+detbox,1085,570,1160,636,1,toilet,0.35,5
+detbox,83,392,167,466,1,wine glass,0.85,5
+detbox,401,463,466,515,1,hair drier,0.82,5
+detbox,614,389,698,450,1,zebra,0.26,5
+detbox,561,96,633,155,1,clock,0.36,5
+detbox,993,566,1051,620,1,spoon,0.57,5
+detbox,919,342,1017,415,1,donut,0.72,5
+detbox,288,424,361,492,1,baseball bat,0.97,5
+detbox,458,280,531,365,1,refrigerator,0.54,5
+detbox,671,10,745,86,1,mouse,0.69,5
+detbox,201,394,264,466,1,broccoli,0.19,5
+detbox,724,490,798,551,1,microwave,0.27,5
+detbox,857,393,908,489,1,bench,0.03,5
+detbox,816,72,885,124,1,bird,0.95,5
+detbox,468,553,521,609,1,skateboard,0.33,5
+detbox,739,600,830,668,1,bear,0.88,5
+detbox,192,11,246,89,1,cow,0.82,5
+detbox,767,287,832,341,1,wine glass,0.86,5
+detbox,309,233,384,312,1,mouse,0.44,5
+detbox,515,615,576,710,1,remote,0.28,5
+detbox,414,374,492,428,1,cow,0.64,5

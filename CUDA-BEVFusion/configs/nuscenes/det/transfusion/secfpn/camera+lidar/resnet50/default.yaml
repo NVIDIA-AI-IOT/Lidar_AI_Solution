@@ -1,0 +1,39 @@
+voxel_size: [0.075, 0.075, 0.2]
+point_cloud_range: [-54.0, -54.0, -5.0, 54.0, 54.0, 3.0]
+
+model:
+  encoders:
+    camera:
+      backbone:
+        type: ResNet
+        depth: 50
+        out_indices: [1, 2, 3]
+        init_cfg:
+          type: Pretrained
+          checkpoint: https://download.pytorch.org/models/resnet50-0676ba61.pth
+      neck:
+        in_channels: [512, 1024, 2048]
+      vtransform:
+        xbound: [-54.0, 54.0, 0.3]
+        ybound: [-54.0, 54.0, 0.3]
+    lidar:
+      voxelize:
+        point_cloud_range: ${point_cloud_range}
+        voxel_size: ${voxel_size}
+        max_voxels: [120000, 160000]
+      backbone:
+        sparse_shape: [1440, 1440, 41]
+
+  heads:
+    object:
+      train_cfg:
+        grid_size: [1440, 1440, 41]
+      test_cfg:
+        grid_size: [1440, 1440, 41]
+
+lr_config:
+  policy: CosineAnnealing
+  warmup: linear
+  warmup_iters: 500
+  warmup_ratio: 0.33333333
+  min_lr_ratio: 1.0e-3

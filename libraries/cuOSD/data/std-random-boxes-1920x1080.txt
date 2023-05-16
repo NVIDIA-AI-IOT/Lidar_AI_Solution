@@ -1,0 +1,53 @@
+1920,1080
+
+# type, left, top, right, bottom, thickness, name, confidence, font_size
+detbox,740,704,790,759,1,horse,0.95,5
+detbox,266,976,342,1061,1,airplane,0.66,5
+detbox,840,420,896,496,1,vase,0.09,5
+detbox,759,203,810,299,1,fork,0.39,5
+detbox,1335,429,1414,491,1,toaster,0.06,5
+detbox,260,159,312,217,1,sandwich,0.03,5
+detbox,1197,223,1283,316,1,cake,0.73,5
+detbox,415,50,474,132,1,knife,0.29,5
+detbox,1202,325,1280,399,1,tie,0.98,5
+detbox,564,182,663,271,1,toothbrush,0.94,5
+detbox,1752,680,1841,748,1,skateboard,0.91,5
+detbox,369,451,451,550,1,fork,0.44,5
+detbox,361,350,460,405,1,cow,0.48,5
+detbox,520,375,594,464,1,hair drier,0.49,5
+detbox,898,789,977,881,1,teddy bear,0.69,5
+detbox,471,761,569,849,1,dining table,0.35,5
+detbox,1617,60,1669,116,1,hair drier,0.89,5
+detbox,1587,680,1676,777,1,toaster,0.45,5
+detbox,1579,408,1663,484,1,cell phone,0.19,5
+detbox,1509,337,1589,402,1,apple,0.12,5
+detbox,1572,130,1650,188,1,donut,0.21,5
+detbox,388,878,450,972,1,bottle,0.54,5
+detbox,1368,822,1430,910,1,airplane,0.47,5
+detbox,985,447,1076,510,1,banana,0.21,5
+detbox,1324,249,1375,321,1,cup,0.35,5
+detbox,1417,76,1501,144,1,snowboard,0.88,5
+detbox,835,646,919,740,1,giraffe,0.42,5
+detbox,1510,852,1563,909,1,person,0.28,5
+detbox,1652,257,1715,321,1,bottle,0.40,5
+detbox,1112,864,1200,925,1,oven,0.77,5
+detbox,1296,30,1388,113,1,oven,0.49,5
+detbox,1743,268,1808,341,1,orange,0.40,5
+detbox,578,794,649,882,1,hot dog,0.23,5
+detbox,149,500,242,577,1,dining table,0.44,5
+detbox,1268,908,1342,981,1,knife,0.24,5
+detbox,660,943,759,1016,1,broccoli,0.91,5
+detbox,780,955,846,1024,1,couch,0.04,5
+detbox,742,824,828,896,1,keyboard,0.91,5
+detbox,1453,460,1524,537,1,horse,0.87,5
+detbox,371,645,436,730,1,bed,0.23,5
+detbox,786,314,853,411,1,baseball bat,0.60,5
+detbox,135,660,226,731,1,kite,0.81,5
+detbox,841,204,906,287,1,remote,0.09,5
+detbox,1022,766,1087,858,1,cat,0.69,5
+detbox,336,148,411,227,1,tennis racket,0.79,5
+detbox,1576,978,1655,1055,1,kite,0.75,5
+detbox,1267,154,1349,212,1,microwave,0.72,5
+detbox,1273,591,1331,666,1,orange,0.49,5
+detbox,34,380,93,454,1,backpack,0.72,5
+detbox,1740,143,1813,217,1,traffic light,0.75,5
