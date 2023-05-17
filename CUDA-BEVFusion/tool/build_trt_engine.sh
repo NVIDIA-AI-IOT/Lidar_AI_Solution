@@ -63,17 +63,23 @@ function compile_trt_model(){
 
     # $1: name
     # $2: precision_flags
+    # $3: number_of_input
+    # $4: number_of_output
     name=$1
     precision_flags=$2
+    number_of_input=$3
+    number_of_output=$4
     result_save_directory=$base/build
+    onnx=$base/$name.onnx
 
     if [ -f "${result_save_directory}/$name.plan" ]; then
         echo Model ${result_save_directory}/$name.plan already build 🙋🙋🙋.
         return
     fi
     
-    onnx=$base/$name.onnx
-    get_onnx_number_io $onnx
+    # Remove the onnx dependency
+    # get_onnx_number_io $onnx
+    # echo $number_of_input  $number_of_output
 
     input_flags="--inputIOFormats="
     output_flags="--outputIOFormats="
@@ -97,9 +103,9 @@ function compile_trt_model(){
 }
 
 # maybe int8 / fp16
-compile_trt_model "camera.backbone" "$trtexec_dynamic_flags"
-compile_trt_model "fuser" "$trtexec_dynamic_flags"
+compile_trt_model "camera.backbone" "$trtexec_dynamic_flags" 2 2
+compile_trt_model "fuser" "$trtexec_dynamic_flags" 2 1
 
 # fp16 only
-compile_trt_model "camera.vtransform" "$trtexec_fp16_flags"
-compile_trt_model "head.bbox" "$trtexec_fp16_flags"
+compile_trt_model "camera.vtransform" "$trtexec_fp16_flags" 1 1
+compile_trt_model "head.bbox" "$trtexec_fp16_flags" 1 6
