@@ -6,8 +6,8 @@ Draw all elements using a single CUDA kernel.
 
 <b>cuOSD</b> supports below pipeline process:
 
-- NV12 BL → In-place OSD (with alpha) → NV12 BL
-- NV12 PL → In-place OSD (with alpha) → NV12 PL
+- NV12 Block Linear → In-place OSD (with alpha) → NV12 Block Linear
+- NV12 Pitch Linear → In-place OSD (with alpha) → NV12 Pitch Linear
 - RGBA → In-place OSD (with alpha) → RGBA
 
 <b>cuOSD</b> supports to draw below elements with user provided attributes:
