@@ -9,3 +9,4 @@ __pycache__
 !imgs/faces.jpg
 !imgs/cuosd.png
 !imgs/blur-faces.jpg
+!data/image/output.png

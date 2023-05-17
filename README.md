@@ -26,7 +26,7 @@ A tiny inference engine for [3d sparse convolutional networks](https://github.co
 
 ## CUDA BEVFusion
 CUDA & TensorRT solution for [BEVFusion](https://arxiv.org/abs/2205.13542) inference, including:
-- **Camera Encoder**: Swin-Transformer and finetuned BEV pooling with TensorRT and onnx export solution.
+- **Camera Encoder**: ResNet50 and finetuned BEV pooling with TensorRT and onnx export solution.
 - **Lidar Encoder**: Tiny Lidar-Backbone inference independent of TensorRT and onnx export solution.
 - **Feature Fusion**: Camera & Lidar feature fuser with TensorRT and onnx export solution.
 - **Pre/Postprocess**: Interval precomputing, lidar voxelization, feature decoder with CUDA kernels.
