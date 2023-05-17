@@ -1,5 +1,5 @@
 # YUVToRGB
-Implemention of yuv -> RGB convertion with single cuda kernel.
+Implemention of YUV -> RGB batch convertion with single cuda kernel.
 ![title](/assets/yuvtorgb.png)
 
 ## 1. Supported Feature
