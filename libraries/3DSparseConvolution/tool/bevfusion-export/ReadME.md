@@ -1,2 +1,2 @@
 # Export ONNX (Deprecated)
-- Please refer to [here](/CUDA-BEVFusion/qat)
+- For more detail, please refer to [here](/CUDA-BEVFusion/qat).
