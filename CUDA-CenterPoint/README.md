@@ -13,7 +13,7 @@ This demo uses lidar data from [nuScenes Dataset](https://www.nuscenes.org/).
 Onnx model can be converted from checkpoint and config below using given script.
 |  Dataset  |  Checkpoint  | Config |
 | --------- | ------------ | ------ |
-|  nuScenes | [epoch_20.pth](https://drive.google.com/drive/folders/1q2PCnhXKZftL3FcxJzd6NGNKwON6uYO1) | [nusc_centerpoint_voxelnet_0075voxel_fix_bn_z](https://github.com/tianweiy/CenterPoint/blob/master/configs/nusc/voxelnet/nusc_centerpoint_voxelnet_0075voxel_fix_bn_z.py) |
+|  nuScenes | [epoch_20.pth](https://mitprod-my.sharepoint.com/:f:/g/personal/tianweiy_mit_edu/EhgzjwV2EghOnHFKyRgSadoBr2kUo7yPu52N-I3dG3c5dA?e=a9MdhX) | [nusc_centerpoint_voxelnet_0075voxel_fix_bn_z](https://github.com/tianweiy/CenterPoint/blob/master/configs/nusc/voxelnet/nusc_centerpoint_voxelnet_0075voxel_fix_bn_z.py) |
 
 ### Prerequisites
 
