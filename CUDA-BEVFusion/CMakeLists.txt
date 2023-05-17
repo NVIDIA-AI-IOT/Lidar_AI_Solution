@@ -28,6 +28,7 @@ set(CMAKE_BUILD_TYPE "Release")
 set(arch ${CMAKE_HOST_SYSTEM_PROCESSOR})
 
 find_package(CUDA REQUIRED)
+find_package(Protobuf REQUIRED)
 
 set(CMAKE_CXX_FLAGS_RELEASE "-std=c++14 -Wextra -Wall -Wno-missing-field-initializers -Wno-deprecated-declarations -O3 -DENABLE_TEXT_BACKEND_STB")
 set(CMAKE_CXX_FLAGS_DEBUG   "-std=c++14 -O0 -g -DENABLE_TEXT_BACKEND_STB")
@@ -40,6 +41,7 @@ set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS}
 )
 
 include_directories(
+  ${Protobuf_INCLUDE_DIRS}
   $ENV{CUDA_Inc}
   $ENV{TensorRT_Inc}
   $ENV{Python_Inc}
@@ -82,6 +84,7 @@ target_link_libraries(bevfusion_core
   libcublasLt.so
   libnvinfer.so
   libspconv.so
+  ${Protobuf_LIBRARIES}
   libnvinfer_plugin.so
 )
 #######################################################################
@@ -97,6 +100,7 @@ target_link_libraries(bevfusion
   bevfusion_core
   libnvinfer.so
   libspconv.so
+  ${Protobuf_LIBRARIES}
   libnvinfer_plugin.so
 )
 #######################################################################
@@ -112,6 +116,7 @@ if(${CMAKE_BUILD_PYTHON} STREQUAL "ON")
     bevfusion_core
     libnvinfer.so
     libspconv.so
+    ${Protobuf_LIBRARIES}
     libnvinfer_plugin.so
     $ENV{Python_Soname}
   )
