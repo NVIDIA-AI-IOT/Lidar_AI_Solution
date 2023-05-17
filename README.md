@@ -76,20 +76,25 @@ YUV to RGB conversion. Combine Resize/Padding/Conversion/Normalization into a si
     - It will give an exact result when the scaling factor is a rational number.
     - Better performance is usually achieved when the stride can divide by 4.
 - Supported Input Format:
-    1. **NV12BlockLinear**
-    2. **NV12PitchLinear**
-    3. **YUV422Packed_YUYV**
+    - **NV12BlockLinear**
+    - **NV12PitchLinear**
+    - **YUV422Packed_YUYV**
 - Supported Interpolation methods:
-    1. **Nearest**
-    2. **Bilinear**
+    - **Nearest**
+    - **Bilinear**
 - Supported Output Data Type:
-    1. **Uint8**
-    2. **Float32**
-    3. **Float16**
+    - **Uint8**
+    - **Float32**
+    - **Float16**
 - Supported Output Layout:
-    1. **CHW_RGB/BGR**
-    2. **HWC_RGB/BGR**
-    3. **CHW16/32/4/RGB/BGR for DLA input**
+    - **CHW_RGB/BGR**
+    - **HWC_RGB/BGR**
+    - **CHW16/32/4/RGB/BGR for DLA input**
+- Supported Features:
+    - **Resize**
+    - **Padding**
+    - **Conversion**
+    - **Normalization**
 
 ## Thanks
 This project makes use of a number of awesome open source libraries, including:
