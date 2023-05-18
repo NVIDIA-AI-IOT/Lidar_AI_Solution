@@ -39,7 +39,7 @@ from mmdet3d.core.bbox.structures import LiDARInstance3DBoxes
 def arg_parser():
     parser = argparse.ArgumentParser(description='For bevfusion evaluation on nuScenes dataset.')
     parser.add_argument('--config', dest='config', type=str, default='bevfusion/configs/nuscenes/det/transfusion/secfpn/camera+lidar/resnet50/convfuser.yaml')
-    parser.add_argument('--checkpoint', dest='checkpoint', type=str, default='model/resnet50/bevfusion-det.pth')
+    # parser.add_argument('--checkpoint', dest='checkpoint', type=str, default='model/resnet50/bevfusion-det.pth')
     args = parser.parse_args()
     return args
 
