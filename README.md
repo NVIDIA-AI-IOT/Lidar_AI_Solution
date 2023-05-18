@@ -40,7 +40,7 @@ CUDA & TensorRT solution for [CenterPoint](https://arxiv.org/abs/2006.11275) inf
 - **Neck & Header**: RPN & CenterHead with TensorRT and onnx export solution.
 - **Postprocess**: Decode & NMS with CUDA kernel
 - **Easy To Use**: Preparation, inference, evaluation all in one to reproduce torch Impl accuracy.
-- **QAT**: Quantization solutions for [traveller59/spconv](https://github.com/mit-han-lab/bevfusion/tree/main/mmdet3d/ops/spconv), Easy to understand.
+- **QAT**: Quantization solutions for [traveller59/spconv](https://github.com/traveller59/spconv), Easy to understand.
 
 ## CUDA PointPillars
 CUDA & TensorRT solution for [pointpillars](https://arxiv.org/abs/1812.05784) inference, including:
