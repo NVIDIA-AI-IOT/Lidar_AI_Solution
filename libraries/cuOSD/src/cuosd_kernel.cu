@@ -115,6 +115,10 @@ SegmentCommand::SegmentCommand() {
     this->type = CommandType::Segment;
 }
 
+PolyFillCommand::PolyFillCommand() {
+    this->type = CommandType::PolyFill;
+}
+
 RGBASourceCommand::RGBASourceCommand(int cx, int cy, int width, int height, void* d_src) {
     this->cx = cx;
     this->cy = cy;
@@ -342,6 +346,65 @@ static __device__ void sample_pixel_bilinear(
     _scr.w = d_ptr[x_high + y_high * width] > threshold ? 127 : 0;
 
     a = ( ((hy * ((hx * _scr.x + lx * _scr.y) >> 4)) >> 16) + ((ly * ((hx * _scr.z + lx * _scr.w) >> 4)) >> 16) + 2 )>>2;
+}
+
+static __device__ bool isRayIntersectsSegment(int p0, int p1, int s0, int s1, int e0, int e1) {
+	if (s1 == e1)
+		return false;
+	if (s1 > p1 && e1 > p1)
+		return false;
+	if (s1 < p1 && e1 < p1)
+		return false;
+	if (s1 == p1 && e1 > p1)
+		return false;
+	if (e1 == p1 && s1 > p1)
+		return false;
+	if (s0 < p0 && e1 < p1)
+		return false;
+	int xseg = e0 - (e0 - s0) * (e1 - p1) / (e1 - s1);
+	if (xseg < p0)
+		return false;
+	return true;
+}
+
+static __device__ void render_polyfill(
+    int ix, int iy, PolyFillCommand* p, uchar4 color[4]
+) {
+    if (ix + 1 < p->bounding_left || iy + 1 < p->bounding_top || ix >= p->bounding_right || iy >= p->bounding_bottom)
+        return;
+
+	int sinsc[4] = { 0, 0, 0, 0 };
+    for (int i=0; i<p->n_pts; i++)
+    {
+        if(i==0) {
+			if (isRayIntersectsSegment(ix, iy, p->d_pts[0], p->d_pts[1], p->d_pts[p->n_pts * 2 - 2], p->d_pts[p->n_pts * 2 - 1])) sinsc[0] += 1;
+			if (isRayIntersectsSegment(ix+1, iy, p->d_pts[0], p->d_pts[1], p->d_pts[p->n_pts * 2 - 2], p->d_pts[p->n_pts * 2 - 1])) sinsc[1] += 1;
+			if (isRayIntersectsSegment(ix, iy+1, p->d_pts[0], p->d_pts[1], p->d_pts[p->n_pts * 2 - 2], p->d_pts[p->n_pts * 2 - 1])) sinsc[2] += 1;
+			if (isRayIntersectsSegment(ix+1, iy+1, p->d_pts[0], p->d_pts[1], p->d_pts[p->n_pts * 2 - 2], p->d_pts[p->n_pts * 2 - 1])) sinsc[3] += 1;
+        }
+        else {
+			if (isRayIntersectsSegment(ix, iy, p->d_pts[i * 2 - 2], p->d_pts[i * 2 - 1], p->d_pts[i * 2], p->d_pts[i * 2 + 1])) sinsc[0] += 1;
+			if (isRayIntersectsSegment(ix+1, iy, p->d_pts[i * 2 - 2], p->d_pts[i * 2 - 1], p->d_pts[i * 2], p->d_pts[i * 2 + 1])) sinsc[1] += 1;
+			if (isRayIntersectsSegment(ix, iy+1, p->d_pts[i * 2 - 2], p->d_pts[i * 2 - 1], p->d_pts[i * 2], p->d_pts[i * 2 + 1])) sinsc[2] += 1;
+			if (isRayIntersectsSegment(ix+1, iy+1, p->d_pts[i * 2 - 2], p->d_pts[i * 2 - 1], p->d_pts[i * 2], p->d_pts[i * 2 + 1])) sinsc[3] += 1;
+        }
+    }
+
+    if(sinsc[0] %2 !=0) {
+        blend_single_color(color[0], p->c0, p->c1, p->c2, p->c3);
+    }
+
+    if(sinsc[1] %2 !=0) {
+        blend_single_color(color[1], p->c0, p->c1, p->c2, p->c3);
+    }
+
+    if(sinsc[2] %2 !=0) {
+        blend_single_color(color[2], p->c0, p->c1, p->c2, p->c3);
+    }
+
+    if(sinsc[3] %2 !=0) {
+        blend_single_color(color[3], p->c0, p->c1, p->c2, p->c3);
+    }
 }
 
 static __device__ void render_segment_bilinear(
@@ -754,6 +817,11 @@ static __global__ void render_elements_kernel(
             case CommandType::Segment:{
                 SegmentCommand* seg_cmd = (SegmentCommand*)pcommand;
                 render_segment_bilinear(ix, iy, seg_cmd, context_color);
+                break;
+            }
+            case CommandType::PolyFill:{
+                PolyFillCommand* poly_cmd = (PolyFillCommand*)pcommand;
+                render_polyfill(ix, iy, poly_cmd, context_color);
                 break;
             }
             case CommandType::RGBASource:{

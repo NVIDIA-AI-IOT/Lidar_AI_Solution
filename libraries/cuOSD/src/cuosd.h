@@ -119,7 +119,7 @@ void cuosd_draw_boxblur(
 // cuosd_draw_rotationbox: draw rotated rectangle element on given cuOSD context.
 // yaw: rotation angle from y-axis, clockwise +, unit in rad.
 void cuosd_draw_rotationbox(
-    cuOSDContext_t _context, int cx, int cy, int width, int height, float yaw, int thickness, cuOSDColor border_color, bool interpolation=false, cuOSDColor bg_color = {0, 0, 0, 0});
+    cuOSDContext_t _context, int cx, int cy, int width, int height, float yaw, int thickness, cuOSDColor border_color, bool interpolation = false, cuOSDColor bg_color = {0, 0, 0, 0});
 
 // cuosd_draw_segmentmask: draw segmentation mask on given cuOSD context.
 // d_seg: device pointer of segmentation mask, alpha in seg_color is ignored.
@@ -128,6 +128,15 @@ void cuosd_draw_rotationbox(
 //   2. set the alpha to 127 if mask value > threshold, else alpha = 0.
 void cuosd_draw_segmentmask(
     cuOSDContext_t context, int left, int top, int right, int bottom, int thickness, float* d_seg, int seg_width, int seg_height, float seg_threshold, cuOSDColor border_color, cuOSDColor seg_color = {0, 0, 0, 0});
+
+// cuosd_draw_polyline: draw polyline element on given cuOSD context.
+// h_pts: host point of polyline points in { int x, int y } data format.
+// d_pts: device point of polyline points, shall not be nullptr if fill_color.a != 0.
+// n_pts: number of polyline points, thickness: polyline thickness.
+// is_closed: if the end point shall be connected to start point.
+// border_color: polyline color, fill_color: polyfill color.
+void cuosd_draw_polyline(
+    cuOSDContext_t context, int* h_pts, int* d_pts, int n_pts, int thickness, bool is_closed, cuOSDColor border_color, bool interpolation = true, cuOSDColor fill_color = {0, 0, 0, 0});
 
 // cuosd_draw_rgba_source: draw color from rgba source image on given cuOSD context.
 // cx, cy stands for center point coordinate of the incoming rgba source image.

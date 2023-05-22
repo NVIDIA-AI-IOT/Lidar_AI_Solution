@@ -157,6 +157,33 @@ namespace gpu{
         segment->height = 0;
     }
 
+    Polyline* create_polyline() {
+        Polyline* output = new Polyline();
+        std::vector<Point> points;
+        points.push_back(Point({ 100, 100 }));
+        points.push_back(Point({ 600, 100 }));
+        points.push_back(Point({ 350, 300 }));
+        points.push_back(Point({ 600, 500 }));
+        points.push_back(Point({ 300, 500 }));
+
+        output->n_pts = points.size();
+        output->h_pts = (int *)malloc(output->n_pts * 2 * sizeof(int));
+        memcpy(output->h_pts, points.data(), output->n_pts * 2 * sizeof(int));
+        checkRuntime(cudaMalloc(&output->d_pts, output->n_pts * 2 * sizeof(int)));
+        checkRuntime(cudaMemcpy(output->d_pts, points.data(), output->n_pts * 2 * sizeof(int), cudaMemcpyHostToDevice));
+        return output;
+    }
+
+    void free_polyline(Polyline* polyline) {
+        if (polyline->d_pts) {
+            checkRuntime(cudaFree(polyline->d_pts));
+        }
+        if (polyline->h_pts) {
+            delete(polyline->h_pts);
+        }
+        polyline->n_pts = 0;
+    }
+
     static __global__ void set_yuv_pl_color(unsigned char* ydata, unsigned char* uvdata, int w, int line, int h, unsigned char y, unsigned char u, unsigned char v) {
 
         int ix = (blockDim.x * blockIdx.x + threadIdx.x) * 2;

@@ -51,6 +51,19 @@ namespace gpu{
         int height      = 0;
     };
 
+    struct Point
+    {
+        int x           = 0;
+        int y           = 0;
+    };
+
+    struct Polyline
+    {
+        int* h_pts      = nullptr;
+        int* d_pts      = nullptr;
+        int n_pts       = 0;
+    };
+
     // Get name of enumerate type
     const char* image_format_name(ImageFormat format);
 
@@ -59,6 +72,9 @@ namespace gpu{
 
     // Create segment with fixed size 10 x 10
     Segment* create_segment();
+
+    // Create polyline for test
+    Polyline* create_polyline();
 
     // Set image color
     void set_color(Image* image, unsigned char r, unsigned char g, unsigned char b, unsigned char a=255, void* stream=nullptr);
@@ -77,6 +93,9 @@ namespace gpu{
 
     // Free segment pointer
     void free_segment(Segment* segment);
+
+    // Free polyline pointer
+    void free_polyline(Polyline* segment);
 };
 
 #endif // GPU_IMAGE_H
