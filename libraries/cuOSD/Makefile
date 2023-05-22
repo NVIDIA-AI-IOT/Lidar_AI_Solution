@@ -107,7 +107,7 @@ endif
 
 all      : cuosd
 run      : cuosd
-	@./cuosd segment
+	@./cuosd polyline
 
 simple      : cuosd
 	@./cuosd simple

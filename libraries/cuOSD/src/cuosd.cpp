@@ -392,6 +392,50 @@ void cuosd_draw_rotationbox(
     context->commands.emplace_back(cmd);
 }
 
+void cuosd_draw_polyline(
+    cuOSDContext_t _context, int* h_pts, int* d_pts, int n_pts, int thickness, bool is_closed, cuOSDColor border_color, bool interpolation, cuOSDColor fill_color
+) {
+    cuOSDContextImpl* context = (cuOSDContextImpl*)_context;
+
+    if (n_pts < 2) return;
+
+    int bleft   = h_pts[0];
+    int bright  = h_pts[0];
+    int btop    = h_pts[1];
+    int bbottom = h_pts[1];
+    int nline   = 0;
+
+    for (int i = 1; i < n_pts; i++) {
+        int x = h_pts[2 * i];
+        int y = h_pts[2 * i + 1];
+
+        bleft   = min(x, bleft);
+        bright  = max(x, bright);
+        btop    = min(y, btop);
+        bbottom = max(y, bbottom);
+        cuosd_draw_line(context, h_pts[2 * i - 2], h_pts[2 * i - 1], x, y, thickness, border_color, interpolation); nline++;
+    }
+
+    if (n_pts > 2) {
+        if (is_closed) {
+            cuosd_draw_line(context, h_pts[0], h_pts[1], h_pts[2 * n_pts - 2], h_pts[2 * n_pts - 1], thickness, border_color, interpolation); nline++;
+        }
+
+        // Fill poly if alpha is not 0 and point num > 2
+        if (fill_color.a) {
+            auto cmd = make_shared<PolyFillCommand>();
+            cmd->d_pts = d_pts;
+            cmd->n_pts = n_pts;
+            cmd->bounding_left   = bleft;
+            cmd->bounding_right  = bright;
+            cmd->bounding_top    = btop;
+            cmd->bounding_bottom = bbottom;
+            cmd->c0 = fill_color.r; cmd->c1 = fill_color.g; cmd->c2 = fill_color.b; cmd->c3 = fill_color.a;
+            context->commands.insert(context->commands.end() - nline, cmd);
+        }
+    }
+}
+
 void cuosd_draw_segmentmask(
     cuOSDContext_t _context, int left, int top, int right, int bottom, int thickness, float* d_seg, int seg_width, int seg_height, float seg_threshold, cuOSDColor border_color, cuOSDColor seg_color
 ) {
@@ -731,6 +775,8 @@ void cuosd_apply(
                 byte_of_commands += sizeof(CircleCommand);
             else if (cmd->type == CommandType::Segment)
                 byte_of_commands += sizeof(SegmentCommand);
+            else if (cmd->type == CommandType::PolyFill)
+                byte_of_commands += sizeof(PolyFillCommand);
             else if (cmd->type == CommandType::RGBASource)
                 byte_of_commands += sizeof(RGBASourceCommand);
             else if (cmd->type == CommandType::NV12Source)
@@ -756,6 +802,8 @@ void cuosd_apply(
                 memcpy(pg_cmd, cmd.get(), sizeof(CircleCommand));
             else if (cmd->type == CommandType::Segment)
                 memcpy(pg_cmd, cmd.get(), sizeof(SegmentCommand));
+            else if (cmd->type == CommandType::PolyFill)
+                memcpy(pg_cmd, cmd.get(), sizeof(PolyFillCommand));
             else if (cmd->type == CommandType::RGBASource)
                 memcpy(pg_cmd, cmd.get(), sizeof(RGBASourceCommand));
             else if (cmd->type == CommandType::NV12Source)

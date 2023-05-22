@@ -210,6 +210,31 @@ static int simple_draw() {
     return 0;
 }
 
+static int polyline() {
+    cudaStream_t stream = nullptr;
+    checkRuntime(cudaStreamCreateWithFlags(&stream, cudaStreamNonBlocking));
+
+    printf("Test cuosd_draw_polyline.\n");
+    auto context = cuosd_context_create();
+    gpu::Image* image = gpu::create_image(1280, 720, gpu::ImageFormat::RGBA);
+    gpu::set_color(image, 255, 255, 255, 255, stream);
+    gpu::copy_yuvnv12_to(image, 0, 0, 1280, 720, "data/image/nv12_3840x2160.yuv", 3840, 2160, 180, stream);
+    gpu::save_image(image, "input.png", stream);
+
+    gpu::Polyline* polyline = gpu::create_polyline();
+
+    cuosd_draw_polyline(context, polyline->h_pts, polyline->d_pts, polyline->n_pts, 6, true, {0, 255, 0, 255}, true, {0, 0, 255, 120});
+
+    cuosd_apply(context, image, stream);
+    cuosd_context_destroy(context);
+
+    printf("Save to output.png\n");
+    gpu::save_image(image, "output.png", stream);
+    gpu::free_polyline(polyline);
+    checkRuntime(cudaStreamDestroy(stream));
+    return 0;
+}
+
 static int segment() {
     cudaStream_t stream = nullptr;
     checkRuntime(cudaStreamCreateWithFlags(&stream, cudaStreamNonBlocking));
@@ -715,6 +740,8 @@ int main(int argc, char **argv)
         return test();
     } else if (strcmp(cmd, "segment") == 0) {
         return segment();
+    } else if (strcmp(cmd, "polyline") == 0) {
+        return polyline();
     } else if (strcmp(cmd, "comp") == 0) {
         return comp(argc, argv);
     } else {

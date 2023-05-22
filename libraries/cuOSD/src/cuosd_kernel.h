@@ -38,9 +38,10 @@ enum class CommandType : int {
     Rectangle    = 2,
     Text         = 3,
     Segment      = 4,
-    RGBASource   = 5,
-    NV12Source   = 6,
-    BoxBlur      = 7
+    PolyFill     = 5,
+    RGBASource   = 6,
+    NV12Source   = 7,
+    BoxBlur      = 8
 };
 
 struct TextLocation{
@@ -112,6 +113,14 @@ struct SegmentCommand : cuOSDContextCommand{
     float seg_threshold;
 
     SegmentCommand();
+};
+
+// PolyFillCommand:
+struct PolyFillCommand : cuOSDContextCommand{
+    int* d_pts;
+    int n_pts;
+
+    PolyFillCommand();
 };
 
 // RGBASourceCommand:
