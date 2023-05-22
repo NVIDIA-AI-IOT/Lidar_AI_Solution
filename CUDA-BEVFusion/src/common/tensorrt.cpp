@@ -274,7 +274,7 @@ class EngineImplement : public Engine {
     for (int i = 0; i < num_output; ++i) {
       auto name = engine->getBindingName(i + num_input);
       auto dim = engine->getBindingDimensions(i + num_input);
-      auto dtype = engine->getBindingDataType(i);
+      auto dtype = engine->getBindingDataType(i + num_input);
       printf("\t%d.%s : {%s} [%s]\n", i, name, format_shape(dim).c_str(), data_type_string(dtype));
     }
     printf("------------------------------------------------------\n");
