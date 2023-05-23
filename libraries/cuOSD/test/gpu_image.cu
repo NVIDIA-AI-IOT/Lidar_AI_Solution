@@ -179,7 +179,7 @@ namespace gpu{
             checkRuntime(cudaFree(polyline->d_pts));
         }
         if (polyline->h_pts) {
-            delete(polyline->h_pts);
+            free(polyline->h_pts);
         }
         polyline->n_pts = 0;
     }

@@ -26,23 +26,23 @@ Draw all elements using a single CUDA kernel.
   </tr>
   <tr>
     <td>Line</td>
-    <td>start x, start y, end x, end y, line width, color, interpolation</td>
+    <td>start x, start y, end x, end y, thickness, color, interpolation</td>
   </tr>
   <tr>
     <td>Circle</td>
-    <td>center x, center y, radius, line width, border color, background color</td>
+    <td>center x, center y, radius, thickness, border color, background color</td>
   </tr>
   <tr>
     <td>Rectangle</td>
-    <td>left, top, right, bottom, line width, border color, background color</td>
+    <td>left, top, right, bottom, thickness, border color, background color</td>
   </tr>
   <tr>
     <td>Rotated Rectangle</td>
-    <td>center x, center y, width, height, yaw, line width, color</td>
+    <td>center x, center y, width, height, yaw, thickness, color</td>
   </tr>
   <tr>
     <td>Arrow</td>
-    <td>start x, start y, end x, end y, arrow size, line width, color, interpolation</td>
+    <td>start x, start y, end x, end y, arrow size, thickness, color, interpolation</td>
   </tr>
   <tr>
     <td>Text</td>
@@ -51,6 +51,18 @@ Draw all elements using a single CUDA kernel.
   <tr>
     <td>Clock</td>
     <td>left upper x, left upper y, format, time, font size, border color, background color</td>
+  </tr>
+  <tr>
+    <td>Box Blur</td>
+    <td>left, top, right, bottom, kernel size</td>
+  </tr>
+  <tr>
+    <td>Segment Mask</td>
+    <td>left, top, right, bottom, thickness, seg mask, seg width, seg height, seg threshold, border color, seg color</td>
+  </tr>
+  <tr>
+    <td>Polyline</td>
+    <td>line points, thickness, is closed, border color, interpolation, fill color</td>
   </tr>
   <tr>
     <td>rgba source</td>
