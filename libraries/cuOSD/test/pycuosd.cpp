@@ -137,6 +137,10 @@ class cuOSD {
     cuosd_draw_segmentmask(context_, left, top, right, bottom, thickness, d_seg, seg_width, seg_height, seg_threshold, pytocolor(border_color), pytocolor(seg_color));
   }
 
+  void polyline(int* h_pts, int* d_pts, int n_pts, int thickness, bool is_closed, py::tuple border_color, bool interpolation, py::tuple fill_color){
+    cuosd_draw_polyline(context_, h_pts, d_pts, n_pts, thickness, is_closed, pytocolor(border_color), interpolation, pytocolor(fill_color));
+  }
+
   void rgba_source(void* d_src, int cx, int cy, int w, int h){
     cuosd_draw_rgba_source(context_, d_src, cx, cy, w, h);
   }
@@ -258,6 +262,7 @@ PYBIND11_MODULE(pycuosd, m) {
       .def("boxblur", &cuOSD::boxblur)
       .def("rotationbox", &cuOSD::rotationbox)
       .def("segmentmask", &cuOSD::segmentmask)
+      .def("polyline", &cuOSD::polyline)
       .def("rgba_source", &cuOSD::rgba_source)
       .def("nv12_source", &cuOSD::nv12_source)
       .def("apply", &cuOSD::apply)
