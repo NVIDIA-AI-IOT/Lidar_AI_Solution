@@ -100,6 +100,11 @@ function compile_trt_model(){
     mkdir -p $result_save_directory
     echo Building the model: ${result_save_directory}/$name.plan, this will take several minutes. Wait a moment 🤗🤗🤗~.
     trtexec $cmd > ${result_save_directory}/$name.log 2>&1
+    if [ $? != 0 ]; then
+        echo 😥 Failed to build model ${result_save_directory}/$name.plan.
+        echo You can check the error message by ${result_save_directory}/$name.log 
+        exit 1
+    fi
 }
 
 # maybe int8 / fp16
