@@ -44,7 +44,7 @@ To build bevfusion, we need to depend on the following libraries:
 The data in the performance table was obtained by us on the Nvidia Orin platform, using TensorRT-8.6, cuda-11.4 and cudnn8.6 statistics.
 
 ## Quick Start for Inference
-- note: Please use `git clone --recursive` to pull this repository after installing `apt install git-lfs` to ensure the integrity of the dependencies.
+- note: Please use `git clone --recursive` to pull this repository to ensure the integrity of the dependencies.
 
 ### 1. Download models and datas to CUDA-BEVFusion directory
 - download model.zip from ( [Google Drive](https://drive.google.com/file/d/1bPt3D07yyVuSuzRAHySZVR2N15RqGHHN/view?usp=sharing) ) or ( [Baidu Drive](https://pan.baidu.com/s/1_6IJTzKlJ8H62W5cUPiSbA?pwd=g6b4) )
