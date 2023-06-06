@@ -130,7 +130,7 @@ def symbolic_sparse_convolution(self, ilayer, y, x):
             output_padding = self.output_padding,
             groups = self.groups,
             subm = self.subm,
-            rulebook = self.indice_key,
+            rulebook = self.indice_key if self.indice_key else "",
             activation = act_type_name[self.act_type],
             input_shape  = x.features.shape,
             output_shape = y.features.shape
@@ -193,7 +193,7 @@ def symbolic_sparse_convolution_quant(self, ilayer, y, x):
             output_padding = self.output_padding,
             groups = self.groups,
             subm = self.subm,
-            rulebook = self.indice_key,
+            rulebook = self.indice_key if self.indice_key else "",
             activation = act_type_name[self.act_type],
             input_shape  = x.features.shape,
             output_shape = y.features.shape,
