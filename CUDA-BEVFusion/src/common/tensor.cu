@@ -433,6 +433,75 @@ void Tensor::memset(unsigned char value, void* stream) {
   }
 }
 
+Tensor Tensor::loadbinary(const std::string& file, std::vector<int64_t> shape, DataType dtype, bool device) {
+  FILE* f = fopen(file.c_str(), "rb");
+  if (f == nullptr) return Tensor();
+
+  fseek(f, 0, SEEK_END);
+  size_t fsize = ftell(f);
+  fseek(f, 0, SEEK_SET);
+
+  int num_implicit_dim = 0;
+  size_t volumn_explicit_dim = 1;
+  int i_implicit_dim = 0;
+  for (size_t i = 0; i < shape.size(); ++i) {
+    if (shape[i] == -1) {
+      num_implicit_dim++;
+      i_implicit_dim = i;
+    } else
+      volumn_explicit_dim *= shape[i];
+  }
+
+  if (num_implicit_dim > 0) {
+    if (num_implicit_dim != 1) {
+      printf("%d implicit dimensions are found, Only one implicit dimension can be supported.\n",
+             num_implicit_dim);
+      fclose(f);
+      return Tensor();
+    }
+
+    size_t explicit_bytes = dtype_bytes(dtype) * volumn_explicit_dim;
+    if (fsize % explicit_bytes != 0) {
+      printf(
+          "Cannot be calculated the implicit dimension, and the file bytes[%ld] cannot be divided "
+          "by the size of the "
+          "explicit dimension bytes[%ld]\n",
+          fsize, explicit_bytes);
+      fclose(f);
+      return Tensor();
+    }
+    shape[i_implicit_dim] = fsize / explicit_bytes;
+    volumn_explicit_dim *= shape[i_implicit_dim];
+  }
+
+  size_t bytes = dtype_bytes(dtype) * volumn_explicit_dim;
+  if (bytes != fsize) {
+    printf(
+        "Cannot be loaded by the specified shape, The file has %ld byte and the shape requires %ld "
+        "byte\n",
+        fsize, bytes);
+    fclose(f);
+    return Tensor();
+  }
+
+  vector<unsigned char> host_data(bytes);
+  if (fread(host_data.data(), 1, bytes, f) != bytes) {
+    printf("Failed to read %ld bytes in file: %s\n", bytes, file.c_str());
+    fclose(f);
+    return Tensor();
+  }
+  fclose(f);
+
+  Tensor output = Tensor::create(shape, dtype, device);
+  if (device) {
+    checkRuntime(cudaMemcpy(output.ptr(), host_data.data(), bytes, cudaMemcpyHostToDevice));
+  } else {
+    checkRuntime(cudaMemcpy(output.ptr(), host_data.data(), bytes, cudaMemcpyHostToHost));
+  }
+  checkRuntime(cudaDeviceSynchronize());
+  return output;
+}
+
 Tensor Tensor::load(const std::string& file, bool device) {
   FILE* f = fopen(file.c_str(), "rb");
   if (f == nullptr) return Tensor();
