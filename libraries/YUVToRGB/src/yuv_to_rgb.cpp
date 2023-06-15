@@ -36,6 +36,7 @@ using namespace std;
 
 template<typename _T>struct AsDataType{};
 template<>struct AsDataType<uint8_t>{static const DataType type = DataType::Uint8;};
+template<>struct AsDataType<int8_t> {static const DataType type = DataType::Int8;};
 template<>struct AsDataType<float>  {static const DataType type = DataType::Float32;};
 template<>struct AsDataType<__half> {static const DataType type = DataType::Float16;};
 
@@ -43,6 +44,7 @@ template<DataType _T>struct AsPODType{};
 template<>struct AsPODType<DataType::Uint8>   {typedef uint8_t type;};
 template<>struct AsPODType<DataType::Float32> {typedef float   type;};
 template<>struct AsPODType<DataType::Float16> {typedef __half  type;};
+template<>struct AsPODType<DataType::Int8>    {typedef int8_t  type;};
 
 static bool __inline__ check_runtime(cudaError_t e, const char* call, int line, const char *file){
     if (e != cudaSuccess) {
@@ -57,6 +59,7 @@ size_t dtype_sizeof(DataType dtype){
     case DataType::Float32: return sizeof(AsPODType<DataType::Float32>::type);
     case DataType::Float16: return sizeof(AsPODType<DataType::Float16>::type);
     case DataType::Uint8:   return sizeof(AsPODType<DataType::Uint8>::type);
+    case DataType::Int8:    return sizeof(AsPODType<DataType::Int8>::type);
     default: return 0;
     }
 }
@@ -103,6 +106,7 @@ const char* dtype_name(DataType dtype){
     case DataType::Float32: return "Float32";
     case DataType::Float16: return "Float16";
     case DataType::Uint8:   return "Uint8";
+    case DataType::Int8:   return "Int8";
     default: return "UnknowDataType";
     }
 }

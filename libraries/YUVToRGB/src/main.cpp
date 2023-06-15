@@ -191,6 +191,7 @@ bool parse_output(const char* p, int& output_width, int& output_height, PixelLay
 
     unordered_map<string, DataType> dtype_map{
         {"uint8",   DataType::Uint8},
+        {"int8",   DataType::Int8},
         {"float32", DataType::Float32},
         {"float16", DataType::Float16}
     };
@@ -236,7 +237,7 @@ void help()
         "    --input:  Set input size and format, Syntax format is: [width]x[height]x[batch]/[format]\n"
         "              format can be 'BL' or 'PL' or 'YUYV' \n"
         "    --output: Set output size and layout, Syntax format is: [width]x[height]/[dtype]/[layout]\n"
-        "              dtype can be 'uint8', 'float16' or 'float32'\n"
+        "              dtype can be 'int8', 'uint8', 'float16' or 'float32'\n"
         "              layout can be one of the following: NCHW_RGB NCHW_BGR NHWC_RGB NHWC_BGR for GPU, NCHW16_RGB NCHW16_BGR for DLA\n"
         "    --interp: Set rescale mode. Here's the choice 'nearest' or 'bilinear', default is nearest\n"
         "    --save:   Sets the path of the output. default does not save the output\n"

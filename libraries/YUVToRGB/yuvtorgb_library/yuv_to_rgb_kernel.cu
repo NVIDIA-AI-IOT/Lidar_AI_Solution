@@ -35,16 +35,19 @@ template<typename _T>struct AsUnion4{};
 template<>struct AsUnion4<uint8_t>{typedef uchar4  type;};
 template<>struct AsUnion4<float>  {typedef float4  type;};
 template<>struct AsUnion4<__half> {typedef ushort4 type;};
+template<>struct AsUnion4<int8_t> {typedef char4   type;};
 
 template<typename _T>struct AsUnion3{};
 template<>struct AsUnion3<uint8_t>{typedef uchar3  type;};
 template<>struct AsUnion3<float>  {typedef float3  type;};
 template<>struct AsUnion3<__half> {typedef ushort3 type;};
+template<>struct AsUnion3<int8_t> {typedef char3   type;};
 
 template<DataType _T>struct AsPODType{};
 template<>struct AsPODType<DataType::Uint8>   {typedef uint8_t type;};
 template<>struct AsPODType<DataType::Float32> {typedef float   type;};
 template<>struct AsPODType<DataType::Float16> {typedef __half  type;};
+template<>struct AsPODType<DataType::Int8>    {typedef int8_t type;};
 
 enum class Parallel : unsigned int{
     None        = 0,
@@ -53,10 +56,12 @@ enum class Parallel : unsigned int{
 };
 
 static __device__ __forceinline__ uchar4 make4(uint8_t v0, uint8_t v1, uint8_t v2, uint8_t v3){return make_uchar4(v0, v1, v2, v3);}
+static __device__ __forceinline__ char4 make4(int8_t v0, int8_t v1, int8_t v2, int8_t v3){return make_char4(v0, v1, v2, v3);}
 static __device__ __forceinline__ float4 make4(float v0, float v1, float v2, float v3){return make_float4(v0, v1, v2, v3);}
 static __device__ __forceinline__ ushort4 make4(__half v0, __half v1, __half v2, __half v3){return make_ushort4(half2short(v0), half2short(v1), half2short(v2), half2short(v3)); }
 
 static __device__ __forceinline__ uchar3 make3(uint8_t v0, uint8_t v1, uint8_t v2){return make_uchar3(v0, v1, v2);}
+static __device__ __forceinline__ char3 make3(int8_t v0, int8_t v1, int8_t v2){return make_char3(v0, v1, v2);}
 static __device__ __forceinline__ float3 make3(float v0, float v1, float v2){return make_float3(v0, v1, v2);}
 static __device__ __forceinline__ ushort3 make3(__half v0, __half v1, __half v2){return make_ushort3(half2short(v0), half2short(v1), half2short(v2)); }
 
@@ -70,14 +75,20 @@ static __forceinline__ __device__ _T limit(_T value, _T low, _T high){
 }
 
 template<typename _T>
-static __host__ __device__ __forceinline__ uint8_t u8cast(_T value){
-    return value < 0 ? 0 : (value >= 255 ? 255 : value);
+static __device__ __forceinline__ uint8_t u8cast(_T value){
+    return value < 0 ? 0 : (value >= 255 ? 255 : uint8_t(value));
 }
 
 template<typename _T>
-static __host__ __device__ __forceinline__ _T fpcast(_T value){
-    return value < 0 ? 0 : (value >= 255 ? 255 : value);
+static __device__ __forceinline__ int8_t s8cast(_T value){
+    return value <= -128 ? -128 : (value >= 127 ? 127 : int8_t(value));
 }
+
+template<typename _T>struct Saturate{};
+template<>struct Saturate<int8_t>   {__device__ __forceinline__ static int8_t cast(float x){return s8cast(x);}};
+template<>struct Saturate<uint8_t>  {__device__ __forceinline__ static uint8_t cast(float x){return u8cast(x);}};
+template<>struct Saturate<float>    {__device__ __forceinline__ static float cast(float x){return x;}};
+template<>struct Saturate<__half>   {__device__ __forceinline__ static __half cast(float x){return __half(x);}};
 
 static bool __inline__ check_runtime(cudaError_t e, const char* call, int line, const char *file){
     if (e != cudaSuccess) {
@@ -342,9 +353,9 @@ static __device__ void __forceinline__ scale_rgb(
     uint8_t r0, uint8_t g0, uint8_t b0, _T& r, _T& g, _T& b,
     float mean0, float mean1, float mean2, float scale0, float scale1, float scale2
 ){
-    r = (r0 - mean0) * scale0;
-    g = (g0 - mean1) * scale1;
-    b = (b0 - mean2) * scale2;
+    r = Saturate<_T>::cast((r0 - mean0) * scale0);
+    g = Saturate<_T>::cast((g0 - mean1) * scale1);
+    b = Saturate<_T>::cast((b0 - mean2) * scale2);
 }
 
 static __device__ void __forceinline__ yuv2rgb(
@@ -700,7 +711,8 @@ typedef void(*batched_convert_yuv_to_rgb_impl_function)(
 #define DefineDType(...)                                              \
     DefineYUVFormat(DataType::Uint8, __VA_ARGS__)                    \
     DefineYUVFormat(DataType::Float32, __VA_ARGS__)                  \
-    DefineYUVFormat(DataType::Float16, __VA_ARGS__)                  
+    DefineYUVFormat(DataType::Float16, __VA_ARGS__)                  \
+    DefineYUVFormat(DataType::Int8, __VA_ARGS__)
 
 #define DefineLayout(...)                                            \
     DefineDType(PixelLayout::NCHW_RGB, __VA_ARGS__)                  \
@@ -726,7 +738,7 @@ typedef void(*batched_convert_yuv_to_rgb_impl_function)(
 
 template<typename T>struct EnumCount{};
 template<> struct EnumCount<YUVFormat>{static const unsigned int value = 3;};
-template<> struct EnumCount<DataType>{static const unsigned int value = 3;};
+template<> struct EnumCount<DataType>{static const unsigned int value = 4;};
 template<> struct EnumCount<PixelLayout>{static const unsigned int value = 10;};
 template<> struct EnumCount<Interpolation>{static const unsigned int value = 2;};
 

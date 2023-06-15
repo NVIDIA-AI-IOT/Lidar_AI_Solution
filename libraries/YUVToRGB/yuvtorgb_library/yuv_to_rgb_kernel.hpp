@@ -46,7 +46,8 @@ enum class DataType : unsigned int{
     NoneEnum         = 0,
     Uint8            = 1,
     Float32          = 2,
-    Float16          = 3
+    Float16          = 3,
+    Int8             = 4
 };
 
 enum class Interpolation : unsigned int{
