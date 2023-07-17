@@ -139,6 +139,15 @@ bash tool/run.sh
 2. Run `bash tool/run.sh` to build the libpybev.so.
 3. Run `python tool/pybev.py` to test the python interface.
 
+## For PyTorch BEVFusion
+- Use the following command to get a specific commit to avoid failure.
+```bash
+git clone https://github.com/mit-han-lab/bevfusion
+
+cd bevfusion
+git checkout db75150717a9462cb60241e36ba28d65f6908607
+```
+
 ## Further performance improvement
 - Since the number of point clouds fluctuates more, this has a significant impact on the FPS.
   - Consider using the ground removal or range filter algorithms provided in [cuPCL](https://github.com/NVIDIA-AI-IOT/cuPCL), which can decrease the inference time by lidar.
