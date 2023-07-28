@@ -44,7 +44,7 @@ To build bevfusion, we need to depend on the following libraries:
 The data in the performance table was obtained by us on the Nvidia Orin platform, using TensorRT-8.6, cuda-11.4 and cudnn8.6 statistics.
 
 ## Quick Start for Inference
-- note: Please use `git clone --recursive` to pull this repository after installing `apt install git-lfs` to ensure the integrity of the dependencies.
+- note: Please use `git clone --recursive` to pull this repository to ensure the integrity of the dependencies.
 
 ### 1. Download models and datas to CUDA-BEVFusion directory
 - download model.zip from ( [Google Drive](https://drive.google.com/file/d/1bPt3D07yyVuSuzRAHySZVR2N15RqGHHN/view?usp=sharing) ) or ( [Baidu Drive](https://pan.baidu.com/s/1_6IJTzKlJ8H62W5cUPiSbA?pwd=g6b4) )
@@ -138,6 +138,15 @@ bash tool/run.sh
 1. Modify `USE_Python=ON` in environment.sh to enable compilation of python.
 2. Run `bash tool/run.sh` to build the libpybev.so.
 3. Run `python tool/pybev.py` to test the python interface.
+
+## For PyTorch BEVFusion
+- Use the following command to get a specific commit to avoid failure.
+```bash
+git clone https://github.com/mit-han-lab/bevfusion
+
+cd bevfusion
+git checkout db75150717a9462cb60241e36ba28d65f6908607
+```
 
 ## Further performance improvement
 - Since the number of point clouds fluctuates more, this has a significant impact on the FPS.

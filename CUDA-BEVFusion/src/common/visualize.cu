@@ -173,6 +173,7 @@ class ImageArtistImplement : public ImageArtist {
 std::shared_ptr<ImageArtist> create_image_artist(const ImageArtistParameter& param) {
   std::shared_ptr<ImageArtistImplement> instance(new ImageArtistImplement());
   if (!instance->init(param)) {
+    printf("Failed to create ImageArtist\n");
     instance.reset();
   }
   return instance;
@@ -415,6 +416,7 @@ class BEVArtistImplement : public BEVArtist {
 std::shared_ptr<BEVArtist> create_bev_artist(const BEVArtistParameter& param) {
   std::shared_ptr<BEVArtistImplement> instance(new BEVArtistImplement());
   if (!instance->init(param)) {
+    printf("Failed to create BEVArtist\n");
     instance.reset();
   }
   return instance;
@@ -518,6 +520,7 @@ class SceneArtistImplement : public SceneArtist {
 std::shared_ptr<SceneArtist> create_scene_artist(const SceneArtistParameter& param) {
   std::shared_ptr<SceneArtistImplement> instance(new SceneArtistImplement());
   if (!instance->init(param)) {
+    printf("Failed to create SceneArtist\n");
     instance.reset();
   }
   return instance;

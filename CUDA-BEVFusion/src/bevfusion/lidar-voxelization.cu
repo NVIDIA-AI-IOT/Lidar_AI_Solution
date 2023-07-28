@@ -242,7 +242,7 @@ class VoxelizationImplement : public Voxelization {
       cuda_linear_launch(voxelization_kernel<CoordinateOrder::XYZ>, _stream, num_points, _points, param_, hash_table_,
                          d_voxel_num_, voxels_temp_, d_voxel_indices_);
       this->output_grid_size_ = {(int)param_.grid_size.x, (int)param_.grid_size.y, (int)param_.grid_size.z + 1};
-    } else if (output_order == CoordinateOrder::XYZ) {
+    } else if (output_order == CoordinateOrder::ZYX) {
       cuda_linear_launch(voxelization_kernel<CoordinateOrder::ZYX>, _stream, num_points, _points, param_, hash_table_,
                          d_voxel_num_, voxels_temp_, d_voxel_indices_);
       this->output_grid_size_ = {(int)param_.grid_size.z + 1, (int)param_.grid_size.y, (int)param_.grid_size.x};
