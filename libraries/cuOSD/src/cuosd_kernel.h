@@ -124,27 +124,27 @@ struct PolyFillCommand : cuOSDContextCommand{
 };
 
 // RGBASourceCommand:
-// cx, cy: center point coordinate of the incoming rgba source image
 // d_src: device pointer for incoming rgba source image
 struct RGBASourceCommand : cuOSDContextCommand{
-    int cx, cy, width, height;
     void* d_src;
+    int src_width, src_height;
+    float scale_x, scale_y;
 
-    RGBASourceCommand(int cx, int cy, int width, int height, void* d_src);
+    RGBASourceCommand();
 };
 
 // NV12SourceCommand:
-// cx, cy: center point coordinate of the incoming nv12 source image
 // d_src0: device pointer for Y plane of incoming nv12 source image
 // d_src1: device pointer for UV plane of incoming nv12 source image
 // block_linear: input device pointers are block linear or pitch linear
 struct NV12SourceCommand : cuOSDContextCommand{
-    int cx, cy, width, height;
     void* d_src0;
     void* d_src1;
+    int src_width, src_height;
+    float scale_x, scale_y;
     bool block_linear;
 
-    NV12SourceCommand(int cx, int cy, int width, int height, void* d_src0, void* d_src1, bool block_linear, unsigned char c0, unsigned char c1, unsigned char c2, unsigned char c3);
+    NV12SourceCommand();
 };
 
 void cuosd_launch_kernel(

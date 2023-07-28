@@ -592,15 +592,64 @@ void cuosd_draw_circle(
 }
 
 void cuosd_draw_rgba_source(
-    cuOSDContext_t _context, void* d_src, int cx, int cy, int w, int h) {
+    cuOSDContext_t _context, int left, int top, int right, int bottom, void* d_src, int src_w, int src_h) {
     cuOSDContextImpl* context = (cuOSDContextImpl*)_context;
-    context->commands.emplace_back(make_shared<RGBASourceCommand>(cx, cy, w, h, d_src));
+    int tl = min(left, right);
+    int tt = min(top, bottom);
+    int tr = max(left, right);
+    int tb = max(top, bottom);
+    left = tl; top = tt; right = tr; bottom = tb;
+
+    auto cmd = make_shared<RGBASourceCommand>();
+    auto width = right - left;
+    auto height = bottom - top;
+
+    cmd->d_src = d_src;
+    cmd->src_width = src_w;
+    cmd->src_height = src_h;
+
+    cmd->scale_x = src_w / (width + 1e-5);
+    cmd->scale_y = src_h / (height + 1e-5);
+
+    cmd->bounding_left  = left;
+    cmd->bounding_right = right;
+    cmd->bounding_top   = top;
+    cmd->bounding_bottom = bottom;
+
+    context->commands.emplace_back(cmd);
 }
 
 void cuosd_draw_nv12_source(
-    cuOSDContext_t _context, void* d_src0, void* d_src1, int cx, int cy, int w, int h, cuOSDColor mask_color, bool block_linear) {
+    cuOSDContext_t _context, int left, int top, int right, int bottom, void* d_src0, void* d_src1, int src_w, int src_h, unsigned char alpha, bool block_linear) {
     cuOSDContextImpl* context = (cuOSDContextImpl*)_context;
-    context->commands.emplace_back(make_shared<NV12SourceCommand>(cx, cy, w, h, d_src0, d_src1, block_linear, mask_color.r, mask_color.g, mask_color.b, mask_color.a));
+    int tl = min(left, right);
+    int tt = min(top, bottom);
+    int tr = max(left, right);
+    int tb = max(top, bottom);
+    left = tl; top = tt; right = tr; bottom = tb;
+
+    auto cmd = make_shared<NV12SourceCommand>();
+    auto width = right - left;
+    auto height = bottom - top;
+
+    cmd->d_src0 = d_src0;
+    cmd->d_src1 = d_src1;
+
+    cmd->src_width = src_w;
+    cmd->src_height = src_h;
+
+    cmd->scale_x = src_w / (width + 1e-5);
+    cmd->scale_y = src_h / (height + 1e-5);
+
+    cmd->block_linear = block_linear;
+    cmd->c3 = alpha;
+
+    cmd->bounding_left  = left;
+    cmd->bounding_right = right;
+    cmd->bounding_top   = top;
+    cmd->bounding_bottom = bottom;
+
+    context->commands.emplace_back(cmd);
 }
 
 //  elements:int = [num_element, e0 offset, e1 offset, e2 offset ,e3 offset, e offset.....]
