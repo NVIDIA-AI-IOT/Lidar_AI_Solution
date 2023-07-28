@@ -137,6 +137,10 @@ libcuosd.so : $(libcuosd_objs)
 	@echo Link $@
 	@$(cc) -fPIC -shared $^ -o $@ $(link_flags)
 
+libcuosd.a : $(libcuosd_objs)
+	@echo Link $@
+	ar rcs $@ $^
+
 objs/%.cpp.o : %.cpp
 	@echo Compile CXX $<
 	@mkdir -p $(dir $@)
@@ -158,7 +162,7 @@ objs/%.cu.mk : %.cu
 	@$(nvcc) -M $< -MF $@ -MT $(@:.cu.mk=.cu.o) $(cu_compile_flags)
 
 clean :
-	@rm -rf objs cuosd libcuosd.so test/cuosd/pycuosd.so
+	@rm -rf objs cuosd libcuosd.so libcuosd.a test/cuosd/pycuosd.so
 
 .PHONY : clean run cuosd pycuosd
 
