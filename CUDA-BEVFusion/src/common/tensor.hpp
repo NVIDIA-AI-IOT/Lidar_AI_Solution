@@ -138,6 +138,7 @@ struct Tensor {
   static Tensor from_data(void* data, std::vector<int64_t> shape, DataType dtype, bool device = true, void* stream = nullptr);
   static Tensor from_data(void* data, std::vector<int32_t> shape, DataType dtype, bool device = true, void* stream = nullptr);
   static Tensor load(const std::string& file, bool device = true);
+  static Tensor loadbinary(const std::string& file, std::vector<int64_t> shape, DataType dtype, bool device = true);
   static bool save(const Tensor& tensor, const std::string& file, void* stream = nullptr);
 };
 

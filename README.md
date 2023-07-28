@@ -9,7 +9,6 @@ It does a great job of speeding up sparse convolution/CenterPoint/BEVFusion/OSD/
 
 ## GetStart
 ```
-$ sudo apt-get install git-lfs
 $ git clone --recursive https://github.com/NVIDIA-AI-IOT/Lidar_AI_Solution
 $ cd Lidar_AI_Solution
 ```
