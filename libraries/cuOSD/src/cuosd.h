@@ -139,15 +139,17 @@ void cuosd_draw_polyline(
     cuOSDContext_t context, int* h_pts, int* d_pts, int n_pts, int thickness, bool is_closed, cuOSDColor border_color, bool interpolation = true, cuOSDColor fill_color = {0, 0, 0, 0});
 
 // cuosd_draw_rgba_source: draw color from rgba source image on given cuOSD context.
-// cx, cy stands for center point coordinate of the incoming rgba source image.
+//   1. resize incoming rgba source rect to target rect of given left, top, right, bottom.
+//   2. blend incoming rgba src on target image rect in bilinear interpolation manner.
 void cuosd_draw_rgba_source(
-    cuOSDContext_t context, void* d_src, int cx, int cy, int w, int h);
+    cuOSDContext_t _context, int left, int top, int right, int bottom, void* d_src, int src_w, int src_h);
 
 // cuosd_draw_nv12_source: draw color from nv12 source image on given cuOSD context.
-// cx, cy stands for center point coordinate of the incoming nv12 source image.
-// mask_color: pixel with mask Y-U-V to be considered as transparent, and apply uniform mask A for none-transparent pixels
+//   1. resize incoming nv12 source rect to target rect of given left, top, right, bottom.
+//   2. blend incoming nv12 src on target image rect in bilinear interpolation manner.
+//   note: use unified alpha and can support both PL and BL nv12 format.
 void cuosd_draw_nv12_source(
-    cuOSDContext_t context, void* d_src0, void* d_src1, int cx, int cy, int w, int h, cuOSDColor mask_color, bool block_linear= false);
+    cuOSDContext_t context, int left, int top, int right, int bottom, void* d_src0, void* d_src1, int src_w, int src_h, unsigned char alpha = 127, bool block_linear= false);
 
 // cuosd_apply: calculate bounding box of all elements and transfer drawing commands to GPU.
 // If format is RGBA, data0 is RGBA buffer, and data1 must be nullptr.

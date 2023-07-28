@@ -291,12 +291,11 @@ static int segment() {
     return 0;
 }
 
-static int test() {
-
+static int segment2() {
     std::vector<gpu::ImageFormat> format_vec{
-        gpu::ImageFormat::BlockLinearNV12,
+        // gpu::ImageFormat::BlockLinearNV12,
         // gpu::ImageFormat::PitchLinearNV12,
-        // gpu::ImageFormat::RGBA
+        gpu::ImageFormat::RGBA
     };
 
     for (int i = 0; i < (int)format_vec.size(); i++) {
@@ -308,24 +307,17 @@ static int test() {
         checkRuntime(cudaStreamCreateWithFlags(&stream, cudaStreamNonBlocking));
 
         auto context = cuosd_context_create();
-        gpu::Image* image = gpu::create_image(1932, 1200, format);
-        gpu::copy_yuvnv12_to(image, 0, 0, 1932, 1200, "data/assets/bg_1932x1200_nv12.yuv", 1932, 1200, 255, stream);
+        gpu::Image* image = gpu::create_image(1280, 720, format);
+        gpu::copy_yuvnv12_to(image, 0, 0, 1280, 720, "data/assets/sample.nv12", 1280, 720, 255, stream);
         gpu::save_image(image, "input.png", stream);
 
-        gpu::Image* asset_image = gpu::create_image(436, 600, format);
-        gpu::copy_yuvnv12_to(asset_image, 0, 0, 436, 600, "data/assets/dk_436x600_nv12.yuv", 436, 600, 255, stream);
-        if (asset_image->format == gpu::ImageFormat::RGBA) gpu::mask_rgba_alpha(asset_image, 0, 0, 0, 255, stream);
-        gpu::save_image(asset_image, "asset.png", stream);
+        gpu::Image* mask = gpu::create_image(1280, 720, format);
+        gpu::copy_yuvnv12_to(mask, 0, 0, 1280, 720, "data/assets/mask.nv12", 1280, 720, 10, stream);
+        gpu::save_image(mask, "mask.png", stream);
 
-        int count = 0;
-        for (int i=280; i<image->width; i+= 450) {
-            for (int j=300; j<image->height; j+= 600) {
-                if (asset_image->format == gpu::ImageFormat::RGBA) cuosd_draw_rgba_source(context, asset_image->data0, i, j, asset_image->width, asset_image->height);
-                if (asset_image->format == gpu::ImageFormat::BlockLinearNV12) cuosd_draw_nv12_source(context, asset_image->data0, asset_image->data1, i, j, asset_image->width, asset_image->height, {0,0,0,255}, true);
-                if (asset_image->format == gpu::ImageFormat::PitchLinearNV12) cuosd_draw_nv12_source(context, asset_image->data0, asset_image->data1, i, j, asset_image->width, asset_image->height, {0,0,0,255}, false);
-                count++;
-            }
-        }
+        if (mask->format == gpu::ImageFormat::RGBA) cuosd_draw_rgba_source(context, 0, 0, 1280, 720, mask->data0, mask->width, mask->height);
+        if (mask->format == gpu::ImageFormat::BlockLinearNV12) cuosd_draw_nv12_source(context, 0, 0, 1280, 720, mask->data0, mask->data1, mask->width, mask->height, 10, true);
+        if (mask->format == gpu::ImageFormat::PitchLinearNV12) cuosd_draw_nv12_source(context, 0, 0, 1280, 720, mask->data0, mask->data1, mask->width, mask->height, 10, false);
 
         cuosd_apply(context, image, stream, false);
 
@@ -346,7 +338,6 @@ static int test() {
         checkRuntime(cudaEventElapsedTime(&gpu_time, start, end));
 
         cuosd_context_destroy(context);
-        printf("Draw %d donkey on %dx%d/%s -> performance: %.2f us\n", count, image->width, image->height, gpu::image_format_name(format), gpu_time);
         gpu::save_image(image, "output.png", stream);
 
         checkRuntime(cudaEventDestroy(end));
@@ -736,10 +727,10 @@ int main(int argc, char **argv)
         return perf(argc, argv);
     } else if (strcmp(cmd, "simple") == 0) {
         return simple_draw();
-    } else if (strcmp(cmd, "test") == 0) {
-        return test();
     } else if (strcmp(cmd, "segment") == 0) {
         return segment();
+    } else if (strcmp(cmd, "segment2") == 0) {
+        return segment2();
     } else if (strcmp(cmd, "polyline") == 0) {
         return polyline();
     } else if (strcmp(cmd, "comp") == 0) {
