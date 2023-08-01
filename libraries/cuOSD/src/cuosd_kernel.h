@@ -127,7 +127,7 @@ struct PolyFillCommand : cuOSDContextCommand{
 // d_src: device pointer for incoming rgba source image
 struct RGBASourceCommand : cuOSDContextCommand{
     void* d_src;
-    int src_width, src_height;
+    int src_width, src_stride, src_height;
     float scale_x, scale_y;
 
     RGBASourceCommand();
@@ -140,7 +140,7 @@ struct RGBASourceCommand : cuOSDContextCommand{
 struct NV12SourceCommand : cuOSDContextCommand{
     void* d_src0;
     void* d_src1;
-    int src_width, src_height;
+    int src_width, src_stride, src_height;
     float scale_x, scale_y;
     bool block_linear;
 
