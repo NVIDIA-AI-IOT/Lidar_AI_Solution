@@ -111,12 +111,6 @@ static inline tuple<unsigned char, unsigned char, unsigned char> make_u83(unsign
     return tuple<unsigned char, unsigned char, unsigned char>(a, b, c);
 }
 
-static void rgb2yuv(unsigned char r, unsigned char g, unsigned char b, unsigned char& y, unsigned char& u, unsigned char& v) {
-    y = ((66 * r + 129 * g + 25 * b + 128) >> 8) + 16;
-    u = ((-38 * r - 74 * g + 112 * b + 128) >> 8) + 128;
-    v = ((112 * r - 94 * g - 18 * b + 128) >> 8) + 128;
-}
-
 cuOSDContext_t cuosd_context_create() {
     return new cuOSDContextImpl();
 }
@@ -592,7 +586,7 @@ void cuosd_draw_circle(
 }
 
 void cuosd_draw_rgba_source(
-    cuOSDContext_t _context, int left, int top, int right, int bottom, void* d_src, int src_w, int src_h) {
+    cuOSDContext_t _context, int left, int top, int right, int bottom, void* d_src, int src_width, int src_stride, int src_height) {
     cuOSDContextImpl* context = (cuOSDContextImpl*)_context;
     int tl = min(left, right);
     int tt = min(top, bottom);
@@ -605,11 +599,12 @@ void cuosd_draw_rgba_source(
     auto height = bottom - top;
 
     cmd->d_src = d_src;
-    cmd->src_width = src_w;
-    cmd->src_height = src_h;
+    cmd->src_width = src_width;
+    cmd->src_stride = src_stride;
+    cmd->src_height = src_height;
 
-    cmd->scale_x = src_w / (width + 1e-5);
-    cmd->scale_y = src_h / (height + 1e-5);
+    cmd->scale_x = src_width / (width + 1e-5);
+    cmd->scale_y = src_height / (height + 1e-5);
 
     cmd->bounding_left  = left;
     cmd->bounding_right = right;
@@ -620,7 +615,7 @@ void cuosd_draw_rgba_source(
 }
 
 void cuosd_draw_nv12_source(
-    cuOSDContext_t _context, int left, int top, int right, int bottom, void* d_src0, void* d_src1, int src_w, int src_h, unsigned char alpha, bool block_linear) {
+    cuOSDContext_t _context, int left, int top, int right, int bottom, void* d_src0, void* d_src1, int src_width, int src_stride, int src_height, unsigned char alpha, bool block_linear) {
     cuOSDContextImpl* context = (cuOSDContextImpl*)_context;
     int tl = min(left, right);
     int tt = min(top, bottom);
@@ -635,11 +630,12 @@ void cuosd_draw_nv12_source(
     cmd->d_src0 = d_src0;
     cmd->d_src1 = d_src1;
 
-    cmd->src_width = src_w;
-    cmd->src_height = src_h;
+    cmd->src_width = src_width;
+    cmd->src_stride = src_stride;
+    cmd->src_height = src_height;
 
-    cmd->scale_x = src_w / (width + 1e-5);
-    cmd->scale_y = src_h / (height + 1e-5);
+    cmd->scale_x = src_width / (width + 1e-5);
+    cmd->scale_y = src_height / (height + 1e-5);
 
     cmd->block_linear = block_linear;
     cmd->c3 = alpha;
@@ -793,11 +789,6 @@ void cuosd_apply(
     }
 
     if(!context->commands.empty()){
-        for (auto& cmd : context->commands) {
-            if (format == cuOSDImageFormat::BlockLinearNV12 || format == cuOSDImageFormat::PitchLinearNV12)
-                rgb2yuv(cmd->c0, cmd->c1, cmd->c2, cmd->c0, cmd->c1, cmd->c2);
-        }
-
         cuosd_text_perper(context, width, height, _stream);
 
         context->bounding_left   = width;

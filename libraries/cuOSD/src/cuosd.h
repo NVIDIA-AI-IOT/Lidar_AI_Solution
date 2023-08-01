@@ -142,14 +142,14 @@ void cuosd_draw_polyline(
 //   1. resize incoming rgba source rect to target rect of given left, top, right, bottom.
 //   2. blend incoming rgba src on target image rect in bilinear interpolation manner.
 void cuosd_draw_rgba_source(
-    cuOSDContext_t _context, int left, int top, int right, int bottom, void* d_src, int src_w, int src_h);
+    cuOSDContext_t _context, int left, int top, int right, int bottom, void* d_src, int src_width, int src_stride, int src_height);
 
 // cuosd_draw_nv12_source: draw color from nv12 source image on given cuOSD context.
 //   1. resize incoming nv12 source rect to target rect of given left, top, right, bottom.
 //   2. blend incoming nv12 src on target image rect in bilinear interpolation manner.
 //   note: use unified alpha and can support both PL and BL nv12 format.
 void cuosd_draw_nv12_source(
-    cuOSDContext_t context, int left, int top, int right, int bottom, void* d_src0, void* d_src1, int src_w, int src_h, unsigned char alpha = 127, bool block_linear= false);
+    cuOSDContext_t context, int left, int top, int right, int bottom, void* d_src0, void* d_src1, int src_width, int src_stride, int src_height, unsigned char alpha = 127, bool block_linear= false);
 
 // cuosd_apply: calculate bounding box of all elements and transfer drawing commands to GPU.
 // If format is RGBA, data0 is RGBA buffer, and data1 must be nullptr.

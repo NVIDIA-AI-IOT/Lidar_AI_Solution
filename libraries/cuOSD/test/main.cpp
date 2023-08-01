@@ -216,7 +216,7 @@ static int polyline() {
 
     printf("Test cuosd_draw_polyline.\n");
     auto context = cuosd_context_create();
-    gpu::Image* image = gpu::create_image(1280, 720, gpu::ImageFormat::RGBA);
+    gpu::Image* image = gpu::create_image(1280, 720, gpu::ImageFormat::PitchLinearNV12);
     gpu::set_color(image, 255, 255, 255, 255, stream);
     gpu::copy_yuvnv12_to(image, 0, 0, 1280, 720, "data/image/nv12_3840x2160.yuv", 3840, 2160, 180, stream);
     gpu::save_image(image, "input.png", stream);
@@ -292,58 +292,54 @@ static int segment() {
 }
 
 static int segment2() {
-    std::vector<gpu::ImageFormat> format_vec{
-        // gpu::ImageFormat::BlockLinearNV12,
-        // gpu::ImageFormat::PitchLinearNV12,
-        gpu::ImageFormat::RGBA
-    };
+    cudaStream_t stream = nullptr;
+    cudaEvent_t start, end;
+    checkRuntime(cudaEventCreate(&end));
+    checkRuntime(cudaEventCreate(&start));
+    checkRuntime(cudaStreamCreateWithFlags(&stream, cudaStreamNonBlocking));
 
-    for (int i = 0; i < (int)format_vec.size(); i++) {
-        gpu::ImageFormat format = format_vec[i];
-        cudaStream_t stream = nullptr;
-        cudaEvent_t start, end;
-        checkRuntime(cudaEventCreate(&end));
-        checkRuntime(cudaEventCreate(&start));
-        checkRuntime(cudaStreamCreateWithFlags(&stream, cudaStreamNonBlocking));
+    auto context = cuosd_context_create();
+    gpu::Image* image = gpu::create_image(1280, 720, gpu::ImageFormat::BlockLinearNV12);
+    gpu::copy_yuvnv12_to(image, 0, 0, 1280, 720, "data/assets/sample.nv12", 1280, 720, 255, stream);
+    gpu::save_image(image, "input.png", stream);
 
-        auto context = cuosd_context_create();
-        gpu::Image* image = gpu::create_image(1280, 720, format);
-        gpu::copy_yuvnv12_to(image, 0, 0, 1280, 720, "data/assets/sample.nv12", 1280, 720, 255, stream);
-        gpu::save_image(image, "input.png", stream);
+    gpu::Image* mask = gpu::create_image(1280, 720, gpu::ImageFormat::RGBA);
+    gpu::copy_yuvnv12_to(mask, 0, 0, 1280, 720, "data/assets/mask.nv12", 1280, 720, 10, stream);
+    gpu::save_image(mask, "mask.png", stream);
 
-        gpu::Image* mask = gpu::create_image(1280, 720, format);
-        gpu::copy_yuvnv12_to(mask, 0, 0, 1280, 720, "data/assets/mask.nv12", 1280, 720, 10, stream);
-        gpu::save_image(mask, "mask.png", stream);
+    if (mask->format == gpu::ImageFormat::RGBA) cuosd_draw_rgba_source(context, 0, 0, 1280, 720, mask->data0, mask->width, 4 * mask->width, mask->height);
+    if (mask->format == gpu::ImageFormat::BlockLinearNV12) cuosd_draw_nv12_source(context, 0, 0, 1280, 720, mask->data0, mask->data1, mask->width, mask->width, mask->height, 10, true);
+    if (mask->format == gpu::ImageFormat::PitchLinearNV12) cuosd_draw_nv12_source(context, 0, 0, 1280, 720, mask->data0, mask->data1, mask->width, mask->width, mask->height, 10, false);
 
-        if (mask->format == gpu::ImageFormat::RGBA) cuosd_draw_rgba_source(context, 0, 0, 1280, 720, mask->data0, mask->width, mask->height);
-        if (mask->format == gpu::ImageFormat::BlockLinearNV12) cuosd_draw_nv12_source(context, 0, 0, 1280, 720, mask->data0, mask->data1, mask->width, mask->height, 10, true);
-        if (mask->format == gpu::ImageFormat::PitchLinearNV12) cuosd_draw_nv12_source(context, 0, 0, 1280, 720, mask->data0, mask->data1, mask->width, mask->height, 10, false);
+    cuosd_apply(context, image, stream, false);
 
-        cuosd_apply(context, image, stream, false);
-
-        for (int i = 0; i < 1000; ++i) {
-            cuosd_launch(context, image, stream);
-        }
-
-        checkRuntime(cudaStreamSynchronize(stream));
-        checkRuntime(cudaEventRecord(start, stream));
-
-        for (int i = 0; i < 1000; ++i) {
-            cuosd_launch(context, image, stream);
-        }
-
-        float gpu_time;
-        checkRuntime(cudaEventRecord(end, stream));
-        checkRuntime(cudaEventSynchronize(end));
-        checkRuntime(cudaEventElapsedTime(&gpu_time, start, end));
-
-        cuosd_context_destroy(context);
-        gpu::save_image(image, "output.png", stream);
-
-        checkRuntime(cudaEventDestroy(end));
-        checkRuntime(cudaEventDestroy(start));
-        checkRuntime(cudaStreamDestroy(stream));
+    for (int i = 0; i < 1000; ++i) {
+        cuosd_launch(context, image, stream);
     }
+
+    checkRuntime(cudaStreamSynchronize(stream));
+    checkRuntime(cudaEventRecord(start, stream));
+
+    for (int i = 0; i < 1000; ++i) {
+        cuosd_launch(context, image, stream);
+    }
+
+    float gpu_time;
+    checkRuntime(cudaEventRecord(end, stream));
+    checkRuntime(cudaEventSynchronize(end));
+    checkRuntime(cudaEventElapsedTime(&gpu_time, start, end));
+
+    printf("draw [%dx%d-%s] mask on [%dx%d-%s] image -> performance: %.2f us\n",
+            mask->width, mask->height, gpu::image_format_name(mask->format),
+            image->width, image->height, gpu::image_format_name(image->format), gpu_time);
+
+    cuosd_context_destroy(context);
+    gpu::save_image(image, "output.png", stream);
+
+    checkRuntime(cudaEventDestroy(end));
+    checkRuntime(cudaEventDestroy(start));
+    checkRuntime(cudaStreamDestroy(stream));
+
     return 0;
 }
 

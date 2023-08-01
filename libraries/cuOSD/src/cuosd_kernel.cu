@@ -52,6 +52,26 @@ static __forceinline__ __device__ _T limit(_T value, _T low, _T high){
 #define INTER_RESIZE_COEF_BITS 11
 #define INTER_RESIZE_COEF_SCALE (1 << INTER_RESIZE_COEF_BITS)
 
+static __device__ void __forceinline__ yuv2rgb(
+    int y, int u, int v, uint8_t& r, uint8_t& g, uint8_t& b
+){
+    int iyval = 1220542*max(0, y - 16);
+    r = u8cast((iyval + 1673527*(v - 128)                      + (1 << 19)) >> 20);
+    g = u8cast((iyval - 852492*(v - 128) - 409993*(u - 128)    + (1 << 19)) >> 20);
+    b = u8cast((iyval                      + 2116026*(u - 128) + (1 << 19)) >> 20);
+}
+
+static __device__ void __forceinline__ rgb2yuv(
+    int r, int g, int b, uint8_t& y, uint8_t& u, uint8_t& v
+){
+    y = ((66 * r + 129 * g + 25 * b + 128) >> 8) + 16;
+    u = ((-38 * r - 74 * g + 112 * b + 128) >> 8) + 128;
+    v = ((112 * r - 94 * g - 18 * b + 128) >> 8) + 128;
+    // y = u8cast(0.299f * r + 0.587f * g + 0.114f * b);
+    // u = u8cast(-0.1687f * r - 0.3313 * g + 0.5f * b + 128);
+    // v = u8cast(0.5f * r - 0.4187f * g - 0.0813f * b + 128);
+}
+
 // inbox_single_pixel:
 // check if given coordinate is in box
 //      a --- d
@@ -437,7 +457,7 @@ static __device__ bool render_text(
 }
 
 static __device__ void blend_nv12_bilinear(
-    void* d_ptr0, void* d_ptr1, int x, int y, float sx, float sy, int width, int height, uchar4* color, unsigned char c3, bool block_linear
+    void* d_ptr0, void* d_ptr1, int x, int y, float sx, float sy, int width, int stride, int height, uchar4* color, unsigned char c3, bool block_linear
 ) {
     float src_x = (x + 0.5f) * sx - 0.5f;
     float src_y = (y + 0.5f) * sy - 0.5f;
@@ -472,11 +492,16 @@ static __device__ void blend_nv12_bilinear(
         _scr[3].z = surf2Dread<unsigned char>((cudaSurfaceObject_t)d_ptr1, 2 * (x_high >> 1) + 1, y_high >> 1);
     }
     else {
-        _scr[0] = make_uchar4(((unsigned char *)d_ptr0)[y_low * width + x_low], ((unsigned char *)d_ptr1)[(y_low >> 1)* width + 2 * (x_low >> 1)], ((unsigned char *)d_ptr1)[(y_low >> 1)* width + 2 * (x_low >> 1) + 1], c3);
-        _scr[1] = make_uchar4(((unsigned char *)d_ptr0)[y_low * width + x_high], ((unsigned char *)d_ptr1)[(y_low >> 1)* width + 2 * (x_high >> 1)], ((unsigned char *)d_ptr1)[(y_low >> 1)* width + 2 * (x_high >> 1) + 1], c3);
-        _scr[2] = make_uchar4(((unsigned char *)d_ptr0)[y_high * width + x_low], ((unsigned char *)d_ptr1)[(y_high >> 1)* width + 2 * (x_low >> 1)], ((unsigned char *)d_ptr1)[(y_high >> 1)* width + 2 * (x_low >> 1) + 1], c3);
-        _scr[3] = make_uchar4(((unsigned char *)d_ptr0)[y_high * width + x_high], ((unsigned char *)d_ptr1)[(y_high >> 1)* width + 2 * (x_high >> 1)], ((unsigned char *)d_ptr1)[(y_high >> 1)* width + 2 * (x_high >> 1) + 1], c3);
+        _scr[0] = make_uchar4(((unsigned char *)d_ptr0)[y_low * stride + x_low], ((unsigned char *)d_ptr1)[(y_low >> 1)* stride + 2 * (x_low >> 1)], ((unsigned char *)d_ptr1)[(y_low >> 1)* stride + 2 * (x_low >> 1) + 1], c3);
+        _scr[1] = make_uchar4(((unsigned char *)d_ptr0)[y_low * stride + x_high], ((unsigned char *)d_ptr1)[(y_low >> 1)* stride + 2 * (x_high >> 1)], ((unsigned char *)d_ptr1)[(y_low >> 1)* stride + 2 * (x_high >> 1) + 1], c3);
+        _scr[2] = make_uchar4(((unsigned char *)d_ptr0)[y_high * stride + x_low], ((unsigned char *)d_ptr1)[(y_high >> 1)* stride + 2 * (x_low >> 1)], ((unsigned char *)d_ptr1)[(y_high >> 1)* stride + 2 * (x_low >> 1) + 1], c3);
+        _scr[3] = make_uchar4(((unsigned char *)d_ptr0)[y_high * stride + x_high], ((unsigned char *)d_ptr1)[(y_high >> 1)* stride + 2 * (x_high >> 1)], ((unsigned char *)d_ptr1)[(y_high >> 1)* stride + 2 * (x_high >> 1) + 1], c3);
     }
+
+    yuv2rgb(_scr[0].x, _scr[0].y, _scr[0].z, _scr[0].x, _scr[0].y, _scr[0].z);
+    yuv2rgb(_scr[1].x, _scr[1].y, _scr[1].z, _scr[1].x, _scr[1].y, _scr[1].z);
+    yuv2rgb(_scr[2].x, _scr[2].y, _scr[2].z, _scr[2].x, _scr[2].y, _scr[2].z);
+    yuv2rgb(_scr[3].x, _scr[3].y, _scr[3].z, _scr[3].x, _scr[3].y, _scr[3].z);
 
     _scr[4].x = ( ((hy * ((hx * _scr[0].x + lx * _scr[1].x) >> 4)) >> 16) + ((ly * ((hx * _scr[2].x + lx * _scr[3].x) >> 4)) >> 16) + 2 )>>2;
     _scr[4].y = ( ((hy * ((hx * _scr[0].y + lx * _scr[1].y) >> 4)) >> 16) + ((ly * ((hx * _scr[2].y + lx * _scr[3].y) >> 4)) >> 16) + 2 )>>2;
@@ -502,24 +527,24 @@ static __device__ void render_nv12_src(
     int fy = iy - p->bounding_top;
 
     if(alpha0) {
-        blend_nv12_bilinear(p->d_src0, p->d_src1, fx, fy, p->scale_x, p->scale_y, p->src_width, p->src_height, &color[0], p->c3, p->block_linear);
+        blend_nv12_bilinear(p->d_src0, p->d_src1, fx, fy, p->scale_x, p->scale_y, p->src_width, p->src_stride, p->src_height, &color[0], p->c3, p->block_linear);
     }
 
     if(alpha1) {
-        blend_nv12_bilinear(p->d_src0, p->d_src1, fx+1, fy, p->scale_x, p->scale_y, p->src_width, p->src_height, &color[1], p->c3, p->block_linear);
+        blend_nv12_bilinear(p->d_src0, p->d_src1, fx+1, fy, p->scale_x, p->scale_y, p->src_width, p->src_stride, p->src_height, &color[1], p->c3, p->block_linear);
     }
 
     if(alpha2) {
-        blend_nv12_bilinear(p->d_src0, p->d_src1, fx, fy+1, p->scale_x, p->scale_y, p->src_width, p->src_height, &color[2], p->c3, p->block_linear);
+        blend_nv12_bilinear(p->d_src0, p->d_src1, fx, fy+1, p->scale_x, p->scale_y, p->src_width, p->src_stride, p->src_height, &color[2], p->c3, p->block_linear);
     }
 
     if(alpha3) {
-        blend_nv12_bilinear(p->d_src0, p->d_src1, fx+1, fy+1, p->scale_x, p->scale_y, p->src_width, p->src_height, &color[3], p->c3, p->block_linear);
+        blend_nv12_bilinear(p->d_src0, p->d_src1, fx+1, fy+1, p->scale_x, p->scale_y, p->src_width, p->src_stride, p->src_height, &color[3], p->c3, p->block_linear);
     }
 }
 
 static __device__ void blend_rgba_bilinear(
-    uchar4* d_ptr, int x, int y, float sx, float sy, int width, int height, uchar4* color
+    uint8_t* d_ptr, int x, int y, float sx, float sy, int width, int stride, int height, uchar4* color
 ) {
     float src_x = (x + 0.5f) * sx - 0.5f;
     float src_y = (y + 0.5f) * sy - 0.5f;
@@ -537,10 +562,10 @@ static __device__ void blend_rgba_bilinear(
 
     uchar4 _scr[5];
 
-    _scr[0] = d_ptr[x_low + y_low * width];
-    _scr[1] = d_ptr[x_high + y_low * width];
-    _scr[2] = d_ptr[x_low + y_high * width];
-    _scr[3] = d_ptr[x_high + y_high * width];
+    _scr[0] = *(uchar4 *)&d_ptr[4 * x_low + y_low * stride];
+    _scr[1] = *(uchar4 *)&d_ptr[4 * x_high + y_low * stride];
+    _scr[2] = *(uchar4 *)&d_ptr[4 * x_low + y_high * stride];
+    _scr[3] = *(uchar4 *)&d_ptr[4 * x_high + y_high * stride];
 
     _scr[4].x = ( ((hy * ((hx * _scr[0].x + lx * _scr[1].x) >> 4)) >> 16) + ((ly * ((hx * _scr[2].x + lx * _scr[3].x) >> 4)) >> 16) + 2 )>>2;
     _scr[4].y = ( ((hy * ((hx * _scr[0].y + lx * _scr[1].y) >> 4)) >> 16) + ((ly * ((hx * _scr[2].y + lx * _scr[3].y) >> 4)) >> 16) + 2 )>>2;
@@ -567,19 +592,19 @@ static __device__ void render_rgba_src(
     int fy = iy - p->bounding_top;
 
     if(alpha0) {
-        blend_rgba_bilinear((uchar4 *)p->d_src, fx, fy, p->scale_x, p->scale_y, p->src_width, p->src_height, &color[0]);
+        blend_rgba_bilinear((uint8_t *)p->d_src, fx, fy, p->scale_x, p->scale_y, p->src_width, p->src_stride, p->src_height, &color[0]);
     }
 
     if(alpha1) {
-        blend_rgba_bilinear((uchar4 *)p->d_src, fx+1, fy, p->scale_x, p->scale_y, p->src_width, p->src_height, &color[1]);
+        blend_rgba_bilinear((uint8_t *)p->d_src, fx+1, fy, p->scale_x, p->scale_y, p->src_width, p->src_stride, p->src_height, &color[1]);
     }
 
     if(alpha2) {
-        blend_rgba_bilinear((uchar4 *)p->d_src, fx, fy+1, p->scale_x, p->scale_y, p->src_width, p->src_height, &color[2]);
+        blend_rgba_bilinear((uint8_t *)p->d_src, fx, fy+1, p->scale_x, p->scale_y, p->src_width, p->src_stride, p->src_height, &color[2]);
     }
 
     if(alpha3) {
-        blend_rgba_bilinear((uchar4 *)p->d_src, fx+1, fy+1, p->scale_x, p->scale_y, p->src_width, p->src_height, &color[3]);
+        blend_rgba_bilinear((uint8_t *)p->d_src, fx+1, fy+1, p->scale_x, p->scale_y, p->src_width, p->src_stride, p->src_height, &color[3]);
     }
 }
 
@@ -643,30 +668,40 @@ struct BlendingPixel<ImageFormat::BlockLinearNV12>{
         unsigned char img_u = surf2Dread<unsigned char>((cudaSurfaceObject_t)image1, x,     y / 2);
         unsigned char img_v = surf2Dread<unsigned char>((cudaSurfaceObject_t)image1, x + 1, y / 2);
 
-        int alpha = (int)plot_colors[0].w + (int)plot_colors[1].w + (int)plot_colors[2].w + (int)plot_colors[3].w;
-        int meanu =
-            (
-                plot_colors[0].y*(int)plot_colors[0].w +
-                plot_colors[1].y*(int)plot_colors[1].w +
-                plot_colors[2].y*(int)plot_colors[2].w +
-                plot_colors[3].y*(int)plot_colors[3].w
-            ) / alpha;
-        int meanv =
-            (
-                plot_colors[0].z*(int)plot_colors[0].w +
-                plot_colors[1].z*(int)plot_colors[1].w +
-                plot_colors[2].z*(int)plot_colors[2].w +
-                plot_colors[3].z*(int)plot_colors[3].w
-            ) / alpha;
-        alpha >>= 2;
+        uchar3 rgb[4];
+        yuv2rgb(img_y0, img_u, img_v, rgb[0].x, rgb[0].y, rgb[0].z);
+        yuv2rgb(img_y1, img_u, img_v, rgb[1].x, rgb[1].y, rgb[1].z);
+        yuv2rgb(img_y2, img_u, img_v, rgb[2].x, rgb[2].y, rgb[2].z);
+        yuv2rgb(img_y3, img_u, img_v, rgb[3].x, rgb[3].y, rgb[3].z);
 
-        surf2Dwrite<unsigned char>((plot_colors[0].x * (int)plot_colors[0].w + (255 - plot_colors[0].w) * img_y0) >> 8, (cudaSurfaceObject_t)image0, x + 0, y);
-        surf2Dwrite<unsigned char>((plot_colors[1].x * (int)plot_colors[1].w + (255 - plot_colors[1].w) * img_y1) >> 8, (cudaSurfaceObject_t)image0, x + 1, y);
-        surf2Dwrite<unsigned char>((plot_colors[2].x * (int)plot_colors[2].w + (255 - plot_colors[2].w) * img_y2) >> 8, (cudaSurfaceObject_t)image0, x + 0, y + 1);
-        surf2Dwrite<unsigned char>((plot_colors[3].x * (int)plot_colors[3].w + (255 - plot_colors[3].w) * img_y3) >> 8, (cudaSurfaceObject_t)image0, x + 1, y + 1);
+        for (int i = 0; i < 4; ++i) {
+            uchar4& rcolor   = plot_colors[i];
+            uchar3& lcolor   = rgb[i];
+            int foreground_alpha = rcolor.w;
+            int background_alpha = 255;
+            int blend_alpha      = ((background_alpha * (255 - foreground_alpha)) >> 8) + foreground_alpha;
+            lcolor.x = u8cast((((lcolor.x * background_alpha * (255 - foreground_alpha))>>8) + (rcolor.x * foreground_alpha)) / blend_alpha);
+            lcolor.y = u8cast((((lcolor.y * background_alpha * (255 - foreground_alpha))>>8) + (rcolor.y * foreground_alpha)) / blend_alpha);
+            lcolor.z = u8cast((((lcolor.z * background_alpha * (255 - foreground_alpha))>>8) + (rcolor.z * foreground_alpha)) / blend_alpha);
+        }
 
-        surf2Dwrite<unsigned char>((alpha * meanu + (255 - alpha) * img_u) >> 8, (cudaSurfaceObject_t)image1, x    , y / 2);
-        surf2Dwrite<unsigned char>((alpha * meanv + (255 - alpha) * img_v) >> 8, (cudaSurfaceObject_t)image1, x + 1, y / 2);
+        uchar4 img_u4, img_v4;
+
+        rgb2yuv(rgb[0].x, rgb[0].y, rgb[0].z, img_y0, img_u4.x, img_v4.x);
+        rgb2yuv(rgb[1].x, rgb[1].y, rgb[1].z, img_y1, img_u4.y, img_v4.y);
+        rgb2yuv(rgb[2].x, rgb[2].y, rgb[2].z, img_y2, img_u4.z, img_v4.z);
+        rgb2yuv(rgb[3].x, rgb[3].y, rgb[3].z, img_y3, img_u4.w, img_v4.w);
+
+        int meanu = (img_u4.x + img_u4.y + img_u4.z + img_u4.w) / 4;
+        int meanv = (img_v4.x + img_v4.y + img_v4.z + img_v4.w) / 4;
+
+        surf2Dwrite<unsigned char>(img_y0, (cudaSurfaceObject_t)image0, x + 0, y);
+        surf2Dwrite<unsigned char>(img_y1, (cudaSurfaceObject_t)image0, x + 1, y);
+        surf2Dwrite<unsigned char>(img_y2, (cudaSurfaceObject_t)image0, x + 0, y + 1);
+        surf2Dwrite<unsigned char>(img_y3, (cudaSurfaceObject_t)image0, x + 1, y + 1);
+
+        surf2Dwrite<unsigned char>(u8cast(meanu), (cudaSurfaceObject_t)image1, x    , y / 2);
+        surf2Dwrite<unsigned char>(u8cast(meanv), (cudaSurfaceObject_t)image1, x + 1, y / 2);
     }
 };
 
@@ -685,29 +720,35 @@ struct BlendingPixel<ImageFormat::PitchLinearNV12>{
         unsigned char& img_u = img_uv_ptr[0];
         unsigned char& img_v = img_uv_ptr[1];
 
-        int alpha = (int)plot_colors[0].w + (int)plot_colors[1].w + (int)plot_colors[2].w + (int)plot_colors[3].w;
-        int meanu =
-            (
-                plot_colors[0].y*(int)plot_colors[0].w +
-                plot_colors[1].y*(int)plot_colors[1].w +
-                plot_colors[2].y*(int)plot_colors[2].w +
-                plot_colors[3].y*(int)plot_colors[3].w
-            ) / alpha;
-        int meanv =
-            (
-                plot_colors[0].z*(int)plot_colors[0].w +
-                plot_colors[1].z*(int)plot_colors[1].w +
-                plot_colors[2].z*(int)plot_colors[2].w +
-                plot_colors[3].z*(int)plot_colors[3].w
-            ) / alpha;
-        alpha >>= 2;
+        uchar3 rgb[4];
+        yuv2rgb(img_y0, img_u, img_v, rgb[0].x, rgb[0].y, rgb[0].z);
+        yuv2rgb(img_y1, img_u, img_v, rgb[1].x, rgb[1].y, rgb[1].z);
+        yuv2rgb(img_y2, img_u, img_v, rgb[2].x, rgb[2].y, rgb[2].z);
+        yuv2rgb(img_y3, img_u, img_v, rgb[3].x, rgb[3].y, rgb[3].z);
 
-        img_y0 = (plot_colors[0].x * (int)plot_colors[0].w + (255 - plot_colors[0].w) * img_y0) >> 8;
-        img_y1 = (plot_colors[1].x * (int)plot_colors[1].w + (255 - plot_colors[1].w) * img_y1) >> 8;
-        img_y2 = (plot_colors[2].x * (int)plot_colors[2].w + (255 - plot_colors[2].w) * img_y2) >> 8;
-        img_y3 = (plot_colors[3].x * (int)plot_colors[3].w + (255 - plot_colors[3].w) * img_y3) >> 8;
-        img_u = (alpha * meanu + (255 - alpha) * img_u) >> 8;
-        img_v = (alpha * meanv + (255 - alpha) * img_v) >> 8;
+        for (int i = 0; i < 4; ++i) {
+            uchar4& rcolor   = plot_colors[i];
+            uchar3& lcolor   = rgb[i];
+            int foreground_alpha = rcolor.w;
+            int background_alpha = 255;
+            int blend_alpha      = ((background_alpha * (255 - foreground_alpha)) >> 8) + foreground_alpha;
+            lcolor.x = u8cast((((lcolor.x * background_alpha * (255 - foreground_alpha))>>8) + (rcolor.x * foreground_alpha)) / blend_alpha);
+            lcolor.y = u8cast((((lcolor.y * background_alpha * (255 - foreground_alpha))>>8) + (rcolor.y * foreground_alpha)) / blend_alpha);
+            lcolor.z = u8cast((((lcolor.z * background_alpha * (255 - foreground_alpha))>>8) + (rcolor.z * foreground_alpha)) / blend_alpha);
+        }
+
+        uchar4 img_u4, img_v4;
+
+        rgb2yuv(rgb[0].x, rgb[0].y, rgb[0].z, img_y0, img_u4.x, img_v4.x);
+        rgb2yuv(rgb[1].x, rgb[1].y, rgb[1].z, img_y1, img_u4.y, img_v4.y);
+        rgb2yuv(rgb[2].x, rgb[2].y, rgb[2].z, img_y2, img_u4.z, img_v4.z);
+        rgb2yuv(rgb[3].x, rgb[3].y, rgb[3].z, img_y3, img_u4.w, img_v4.w);
+
+        int meanu = (img_u4.x + img_u4.y + img_u4.z + img_u4.w) / 4;
+        int meanv = (img_v4.x + img_v4.y + img_v4.z + img_v4.w) / 4;
+
+        img_u = u8cast(meanu);
+        img_v = u8cast(meanv);
     }
 };
 
@@ -821,26 +862,6 @@ static __global__ void render_elements_kernel(
         return;
 
     BlendingPixel<format>::call(image0, image1, ix, iy, stride, context_color);
-}
-
-static __device__ void __forceinline__ yuv2rgb(
-    int y, int u, int v, uint8_t& r, uint8_t& g, uint8_t& b
-){
-    int iyval = 1220542*max(0, y - 16);
-    r = u8cast((iyval + 1673527*(v - 128)                      + (1 << 19)) >> 20);
-    g = u8cast((iyval - 852492*(v - 128) - 409993*(u - 128)    + (1 << 19)) >> 20);
-    b = u8cast((iyval                      + 2116026*(u - 128) + (1 << 19)) >> 20);
-}
-
-static __device__ void __forceinline__ rgb2yuv(
-    int r, int g, int b, uint8_t& y, uint8_t& u, uint8_t& v
-){
-    y = ((66 * r + 129 * g + 25 * b + 128) >> 8) + 16;
-    u = ((-38 * r - 74 * g + 112 * b + 128) >> 8) + 128;
-    v = ((112 * r - 94 * g - 18 * b + 128) >> 8) + 128;
-    // y = u8cast(0.299f * r + 0.587f * g + 0.114f * b);
-    // u = u8cast(-0.1687f * r - 0.3313 * g + 0.5f * b + 128);
-    // v = u8cast(0.5f * r - 0.4187f * g - 0.0813f * b + 128);
 }
 
 template<ImageFormat format>
