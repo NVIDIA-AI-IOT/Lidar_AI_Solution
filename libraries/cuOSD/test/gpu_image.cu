@@ -160,7 +160,7 @@ namespace gpu{
     Polyline* create_polyline() {
         Polyline* output = new Polyline();
         std::vector<Point> points;
-        points.push_back(Point({ 100, 100 }));
+        points.push_back(Point({ 100, 200 }));
         points.push_back(Point({ 600, 100 }));
         points.push_back(Point({ 350, 300 }));
         points.push_back(Point({ 600, 500 }));

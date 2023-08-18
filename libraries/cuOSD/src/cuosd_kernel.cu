@@ -351,7 +351,7 @@ static __device__ bool isRayIntersectsSegment(int p0, int p1, int s0, int s1, in
 		return false;
 	if (e1 == p1 && s1 > p1)
 		return false;
-	if (s0 < p0 && e1 < p1)
+	if (s0 < p0 && e0 < p0)
 		return false;
 	int xseg = e0 - (e0 - s0) * (e1 - p1) / (e1 - s1);
 	if (xseg < p0)
