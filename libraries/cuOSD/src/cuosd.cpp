@@ -173,17 +173,82 @@ void cuosd_draw_text(
     font_size = context->text_backend->uniform_font_size(font_size);
     font_size = std::max(10, std::min(MAX_FONT_SIZE, font_size));
 
+    std::vector<shared_ptr<TextHostCommand>> commands;
     int xmargin = font_size * 0.5;
     int ymargin = font_size * 0.25;
+    int background_min_x = x;
+    int background_min_y = y;
+    int background_max_x = x;
+    int background_max_y = y;
+    bool need_background_fill = bg_color.a != 0;
+
+    auto precompute_line = [&](const std::vector<unsigned long>& line_words, const int ypos)->int{
+        int width, height, yoffset;
+        tie(width, height, yoffset) = context->text_backend->measure_text(line_words, font_size, font);
+
+        if (need_background_fill) {
+            background_max_x = std::max(x + width + 2 * xmargin - 1,     background_max_x);
+            background_max_y = std::max(ypos + height + 2 * ymargin - 1, background_max_y);
+        }
+        commands.emplace_back(make_shared<TextHostCommand>(line_words, font_size, font, x + xmargin, ypos + ymargin - yoffset, border_color.r, border_color.g, border_color.b, border_color.a));
+        return height;
+    };
+
+    bool need_split_lines = false;
+    for(size_t i = 0; i < words.size(); ++i){
+
+        // ignore the last charater \n
+        if((words[i] & 0xFF) == '\n'){
+            need_split_lines = true;
+        }
+    }
+    
+    if(!need_split_lines){
+        precompute_line(words, y);
+
+        // add rectangle cmd as background color if need to fill the background.
+        if(need_background_fill){
+            cuosd_draw_rectangle(_context, background_min_x, background_min_y, background_max_x, background_max_y, -1, bg_color);
+        }
+        context->commands.insert(context->commands.end(), commands.begin(), commands.end());
+        return;
+    }
+
+    // below needed to compute the special character \n height.
+    int line_text_y_pos = y;
+    size_t prev_break_pos = 0;
+    size_t icurrent_pos = 0;
 
     int width, height, yoffset;
-    tie(width, height, yoffset) = context->text_backend->measure_text(words, font_size, font);
+    tie(width, height, yoffset) = context->text_backend->measure_text(context->text_backend->split_utf8("a"), font_size, font);
+    int prev_break_line_height = height;
+    for(; icurrent_pos < words.size(); ++icurrent_pos){
 
-    // add rectangle cmd as background color
-    if (bg_color.a) {
-        cuosd_draw_rectangle(_context, x, y, x+width + 2 * xmargin - 1, y + height + 2 * ymargin - 1, -1, bg_color);
+        // ignore the last charater \n
+        if((words[icurrent_pos] & 0xFF) == '\n'){
+            if(icurrent_pos == prev_break_pos){
+                line_text_y_pos += prev_break_line_height;
+            }else{
+                std::vector<unsigned long> line(words.begin() + prev_break_pos, words.begin() + icurrent_pos);
+                int line_height = precompute_line(line, line_text_y_pos);
+                prev_break_line_height = line_height;
+                line_text_y_pos += line_height;
+            }
+            prev_break_pos = icurrent_pos + 1;
+        }
     }
-    context->commands.emplace_back(make_shared<TextHostCommand>(words, font_size, font, x + xmargin, y + ymargin - yoffset, border_color.r, border_color.g, border_color.b, border_color.a));
+
+    if(icurrent_pos > prev_break_pos){
+        std::vector<unsigned long> line(words.begin() + prev_break_pos, words.begin() + icurrent_pos);
+        precompute_line(line, line_text_y_pos);
+    }
+
+    if(!commands.empty()){
+        if(need_background_fill){
+            cuosd_draw_rectangle(_context, background_min_x, background_min_y, background_max_x, background_max_y, -1, bg_color);
+        }
+        context->commands.insert(context->commands.end(), commands.begin(), commands.end());
+    }
 }
 
 void cuosd_draw_clock(

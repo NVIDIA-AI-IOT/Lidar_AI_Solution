@@ -57,10 +57,10 @@ include_paths := src              \
 ifeq ($(build_pango_backend), yes)
 include_paths += 				  \
 	/usr/include/			      \
-	/mnt2/ds_6_1_1/3rdparty/pango/1.38.1   \
-	/mnt2/ds_6_1_1/3rdparty/pango/1.38.1/pre-generated-headers/x86_64    \
-	/mnt2/ds_6_1_1/3rdparty/cairo/1.14.6/src							 \
-	/mnt2/ds_6_1_1/3rdparty/cairo/1.14.6/pre-generated-headers/x86_64	 \
+	/mnt/deepstream/3rdparty/pango/1.38.1   \
+	/mnt/deepstream/3rdparty/pango/1.38.1/pre-generated-headers/x86_64    \
+	/mnt/deepstream/3rdparty/cairo/1.16.0/src							 \
+	/mnt/deepstream/3rdparty/cairo/1.16.0/pre-generated-headers/x86_64	 \
 	/usr/include/glib-2.0												 \
 	/usr/lib/aarch64-linux-gnu/glib-2.0/include
 endif

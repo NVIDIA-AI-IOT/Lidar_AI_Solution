@@ -201,6 +201,17 @@ static int simple_draw() {
         }
         nline++;
     }
+
+    cuosd_draw_text(context, 
+        "Shakespearean quotes:\n"
+        "\n"
+        "Words cannot express true love, loyalty behavior is the best explanation.\n"
+        "Love is a woman with the ears, and if the men will love, but love is to use your eyes.\n"
+        "The empty vessels make the greatest sound.\n"
+        "No man or woman is worth your tears, and the one who is, won’t make you cry.\n"
+        "For thy sweet love remember'd such wealth brings That then I scorn to change my state with kings.\n"
+        "A sad thing in life is when you meet someone who means a lot to you, only to find out in the \nend that it was never meant to be and you just have to let go."
+        , 13, "data/simhei.ttf", 10, 10, cuOSDColor{0, 255, 0, 255}, cuOSDColor{60, 60, 60, 200});
     cuosd_apply(context, image, stream);
     cuosd_context_destroy(context);
 
