@@ -29,21 +29,22 @@ custrict  := -Werror=all-warnings
 nvcc      := $(CUDA_HOME)/bin/nvcc
 cuda_arch := -gencode arch=compute_80,code=sm_80 \
 			 -gencode arch=compute_86,code=sm_86
+libspconv := libspconv-1.1.0
 
 ifeq ($(arch), aarch64)
 cuda_arch += -gencode arch=compute_87,code=sm_87
 endif
 
-include_paths     := -Isrc -Ilibspconv/include -I$(CUDA_HOME)/include
+include_paths     := -Isrc -I$(libspconv)/include -I$(CUDA_HOME)/include
 cpp_compile_flags := -std=$(stdcpp) $(strict) -g $(optimize) -fPIC -fopenmp -pthread $(include_paths)
 cu_compile_flags  := -std=$(stdcpp) $(custrict) -g $(optimize) $(cuda_arch) -Xcompiler "$(cpp_compile_flags)"
-link_flags        := -Llibspconv/lib/$(arch) -L$(CUDA_HOME)/lib64 -lcudart -lstdc++ -ldl -lspconv -pthread \
-					 -fopenmp -Wl,-rpath='$$ORIGIN' -Wl,-rpath=$(pwd)/libspconv/lib/$(arch)
+link_flags        := -L$(libspconv)/lib/$(arch) -L$(CUDA_HOME)/lib64 -lcudart -lstdc++ -ldl -lspconv -lprotobuf -pthread \
+					 -fopenmp -Wl,-rpath='$$ORIGIN' -Wl,-rpath=$(pwd)/$(libspconv)/lib/$(arch)
 
 ifeq ($(MAKECMDGOALS), pyscn)
-python_include := $(shell python -c "import sysconfig;print(sysconfig.get_path('include'))")
-python_soname  := $(shell python -c "import sysconfig;import re;print(re.sub('lib|.so|.a', '', sysconfig.get_config_var('LIBRARY')))")
-python_libpath := $(shell python -c "import sysconfig;print(sysconfig.get_config_var('LIBDIR'))")
+python_include := $(shell python3 -c "import sysconfig;print(sysconfig.get_path('include'))")
+python_soname  := $(shell python3 -c "import sysconfig;import re;print(re.sub('lib|.so|.a', '', sysconfig.get_config_var('LIBRARY')))")
+python_libpath := $(shell python3 -c "import sysconfig;print(sysconfig.get_config_var('LIBDIR'))")
 pybind_include := $(shell cd ../.. && pwd)/dependencies/pybind11/include
 $(info Use Python Include: $(python_include))
 $(info Use Python SO Name: $(python_soname))
@@ -70,12 +71,12 @@ memint8      : pro
 memfp16      : pro
 	@cd workspace && ./pro memfp16
 
-tool/pyscn.so : objs/pyscn.o
+tool/pyscn.so : objs/pyscn.o objs/onnx-parser.o objs/onnx/onnx-ml.pb.o objs/onnx/onnx-operators-ml.pb.o
 	@echo Link $@
 	@$(cc) -shared -o $@ $^ $(link_flags)
 	@echo You can run \"python tool/pytest.py\" to test
 
-workspace/pro : objs/main.o objs/voxelization.uo
+workspace/pro : objs/main.o objs/voxelization.uo objs/onnx-parser.o objs/onnx/onnx-ml.pb.o objs/onnx/onnx-operators-ml.pb.o
 	@echo Link $@
 	@$(cc) -o $@ $^ $(link_flags)
 

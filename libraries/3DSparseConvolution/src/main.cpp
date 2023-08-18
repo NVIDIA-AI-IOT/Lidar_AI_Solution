@@ -36,6 +36,7 @@
 #include <string>
 #include <unordered_map>
 
+#include "onnx-parser.hpp"
 #include "spconv/engine.hpp"
 #include "spconv/tensor.hpp"
 #include "spconv/timer.hpp"
@@ -114,9 +115,10 @@ void do_memory_usage_test(spconv::Precision precision) {
   spconv::set_verbose(false);
 
   auto forward = [&]() {
-    task.engine->forward(task.features.shape, spconv::DType::Float16, task.features.ptr(),
-                         task.indices.shape, spconv::DType::Int32, task.indices.ptr(), 1,
-                         {41, 1440, 1440}, stream);
+    task.engine->input(0)->set_data(task.features.shape, spconv::DataType::Float16, task.features.ptr(),
+                         task.indices.shape, spconv::DataType::Int32, task.indices.ptr(),
+                         {41, 1440, 1440});
+    task.engine->forward(stream);
   };
 
   // sudo cat /sys/kernel/debug/nvmap/iovmm/clients
@@ -144,15 +146,13 @@ void do_simple_run(spconv::Precision precision) {
   // auto task = load_task("bevfusionZYX", precision);
   // auto task = load_task("bevfusionXYZ", precision);
 
-  auto result = task.engine->forward(task.features.shape, spconv::DType::Float16,
-                                     task.features.ptr(), task.indices.shape, spconv::DType::Int32,
-                                     task.indices.ptr(), 1, task.grid_size, stream);
-  checkRuntime(cudaStreamSynchronize(stream));
+  task.engine->input(0)->set_data(task.features.shape, spconv::DataType::Float16, task.features.ptr(),
+                        task.indices.shape, spconv::DataType::Int32, task.indices.ptr(),
+                        task.grid_size);
+  task.engine->forward(stream);
 
-  auto out_features =
-      spconv::Tensor::from_data_reference(result->features_data(), result->features_shape(),
-                                          (spconv::DataType)result->features_dtype());
-  auto grid_size = result->grid_size();
+  auto out_features = task.engine->output(0)->features();
+  auto grid_size = task.engine->output(0)->grid_size();
 
   printf("🙌 Output.shape: %s\n", spconv::format_shape(out_features.shape).c_str());
   out_features.save(task.save_dense, stream);
@@ -187,15 +187,17 @@ void do_e2e_run(spconv::Precision precision) {
   int num_valid = voxelization.getOutput(&features, &indices, grid_size);
 
   timer.start(stream);
-  auto result =
-      task.engine->forward({num_valid, 5}, spconv::DType::Float16, features, {num_valid, 4},
-                           spconv::DType::Int32, indices, 1, grid_size, stream);
+
+  task.engine->input(0)->set_data(
+    {num_valid, 5}, spconv::DataType::Float16, features, {num_valid, 4},
+    spconv::DataType::Int32, indices, grid_size);
+  task.engine->forward(stream);
+  auto result = task.engine->output(0);
+
   timer.stop("SCNForward");
   checkRuntime(cudaStreamSynchronize(stream));
 
-  auto out_features =
-      spconv::Tensor::from_data_reference(result->features_data(), result->features_shape(),
-                                          (spconv::DataType)result->features_dtype());
+  auto out_features = result->features();
   printf("🙌 Output.shape: %s\n", spconv::format_shape(out_features.shape).c_str());
 
   task.engine.reset();

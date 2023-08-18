@@ -30,6 +30,8 @@
 #include <fstream>
 #include <memory>
 #include <numeric>
+
+#include "onnx-parser.hpp"
 #include <spconv/engine.hpp>
 #include <spconv/memory.hpp>
 #include <spconv/tensor.hpp>
@@ -80,15 +82,15 @@ class SCNModel {
     checkRuntime(cudaMemcpyAsync(indices_.ptr(), indices.data(0), indices_.bytes(),
                                  cudaMemcpyHostToDevice, stream));
 
-    auto result = instance_->forward({num, ndim}, spconv::DType::Float16, features_.ptr(), {num, 4},
-                                     spconv::DType::Int32, indices_.ptr(), 1, grid_size, stream);
+    instance_->input(0)->set_data(
+      {num, ndim}, spconv::DataType::Float16, features_.ptr(), {num, 4},
+      spconv::DataType::Int32, indices_.ptr(), grid_size
+    );
 
-    spconv::Tensor out_features =
-        spconv::Tensor::from_data_reference(result->features_data(), result->features_shape(),
-                                            (spconv::DataType)result->features_dtype());
-    spconv::Tensor out_indices = spconv::Tensor::from_data_reference(
-        result->indices_data(), result->indices_shape(), (spconv::DataType)result->indices_dtype());
-
+    instance_->forward(stream);
+    auto result = instance_->output(0);
+    auto out_features = result->features();
+    auto out_indices = result->indices();
     if (output_features_bytes_ < out_features.bytes()) {
       if (output_features_) checkRuntime(cudaFreeHost(output_features_));
       output_features_bytes_ = out_features.bytes();
