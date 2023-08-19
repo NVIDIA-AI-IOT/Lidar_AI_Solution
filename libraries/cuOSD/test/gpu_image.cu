@@ -407,7 +407,7 @@ namespace gpu{
         if (ix >= dst_w || iy >= dst_h) return;
 
         int nx = ix * nv12_w / (float)dst_w;
-        int ny = iy * nv12_h / (float)dst_w;
+        int ny = iy * nv12_h / (float)dst_h;
         unsigned char value_y = nv12_y [(ny + 0) * nv12_w + nx    ];
         unsigned char value_u = nv12_uv[(ny / 2) * nv12_w + round_down2(nx) + 0];
         unsigned char value_v = nv12_uv[(ny / 2) * nv12_w + round_down2(nx) + 1];
