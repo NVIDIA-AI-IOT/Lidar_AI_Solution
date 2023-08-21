@@ -340,41 +340,6 @@ static __device__ void sample_pixel_bilinear(
     a = ( ((hy * ((hx * _scr.x + lx * _scr.y) >> 4)) >> 16) + ((ly * ((hx * _scr.z + lx * _scr.w) >> 4)) >> 16) + 2 )>>2;
 }
 
-// Below is another implementation for ray & line intersects.
-/*
-// line1 = p0, q0, p1, q1
-// line2 = x0, y0, x1, y1
-// p0 + t * (p1 - p0) = x0 + s * (x1 - x0)
-// q0 + t * (q1 - q0) = y0 + s * (y1 - y0)
-// s * (x0 - x1) + t * (p1 - p0) = x0 - p0
-// s * (y0 - y1) + t * (q1 - q0) = y0 - q0
-// where:
-// | x0 - x1, p1 - p0 |   | s |   | x0 - p0 |
-// |                  | @ |   | = |         |
-// | y0 - y1, q1 - q0 |   | t |   | y0 - q0 |
-// 
-// then:
-// | s |   | x0 - x1, p1 - p0 |^-1    | x0 - p0 |
-// |   | = |                  |    @  |         |
-// | t |   | y0 - y1, q1 - q0 |       | y0 - q0 |
-//
-// for especial: the ray is 0, 0, p1, q1, that's shows p0, q0 is zero.
-// | s |   | x0 - x1, p1 |^-1    | x0 |
-// |   | = |             |    @  |    |
-// | t |   | y0 - y1, q1 |       | y0 |
-//
-// Notes: Use s > 0 instead of s >= 0 to avoid overlap start point that can lead to crossover number counter error.
-//
-static __device__ bool isRayIntersectsSegment2(int x, int y, int x0, int y0, int x1, int y1) {
-    int a = x0 - x1;
-    int c = y0 - y1;
-    float det = a * y - x * c + 1e-5;
-    float s =  (y * x0 - x * y0) / det;
-    float t = (-c * x0 + a * y0) / det;
-    return s > 0 && s <= 1 && t >= 0 && t <= 1;
-}
-*/
-
 static __device__ bool isRayIntersectsSegment(int p0, int p1, int s0, int s1, int e0, int e1) {
 	if (s1 == e1)
 		return false;
