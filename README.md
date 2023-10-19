@@ -61,7 +61,7 @@ Draw all elements using a single CUDA kernel.
 - **Clock:** Time plotting based on text support
 
 ## cuPCL(CUDA Point Cloud Library)
-Provide several GPU accelerated Point Cloud operations with high accuracy and high perfomrance at the same time: cuICP, cuFilter, cuSegmentation, cuOctree, cuCluster, cuNDT, Voxelization(incoming).
+Provide several GPU accelerated Point Cloud operations with high accuracy and high performance at the same time: cuICP, cuFilter, cuSegmentation, cuOctree, cuCluster, cuNDT, Voxelization(incoming).
 - **cuICP:** CUDA accelerated iterative corresponding point vertex cloud(point-to-point) registration implementation.
 - **cuFilter:** Support CUDA accelerated features: PassThrough and VoxelGrid.
 - **cuSegmentation:** Support CUDA accelerated features: RandomSampleConsensus with a plane model.
