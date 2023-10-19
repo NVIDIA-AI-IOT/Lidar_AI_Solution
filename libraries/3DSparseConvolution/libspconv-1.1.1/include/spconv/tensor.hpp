@@ -85,11 +85,11 @@ struct Tensor {
                           bool device = true);
   Exported void to_device_(void *stream = nullptr);
   Exported void to_host_(void *stream = nullptr);
-  Exported Tensor to_device(void *stream = nullptr);
-  Exported Tensor to_host(void *stream = nullptr);
-  Exported Tensor clone(void *stream = nullptr);
-  Exported Tensor to_half(void *stream = nullptr);
-  Exported float absmax(void *stream = nullptr);
+  Exported Tensor to_device(void *stream = nullptr) const;
+  Exported Tensor to_host(void *stream = nullptr) const;
+  Exported Tensor clone(void *stream = nullptr) const;
+  Exported Tensor to_half(void *stream = nullptr) const;
+  Exported float absmax(void *stream = nullptr) const;
   Exported void print(const std::string &prefix = "Tensor", size_t offset = 0,
                       size_t num_per_line = 10, size_t lines = 1, void* stream = nullptr) const;
   Exported void memset(unsigned char value = 0, void *stream = nullptr);

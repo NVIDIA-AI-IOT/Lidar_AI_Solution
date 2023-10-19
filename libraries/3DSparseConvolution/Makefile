@@ -29,7 +29,7 @@ custrict  := -Werror=all-warnings
 nvcc      := $(CUDA_HOME)/bin/nvcc
 cuda_arch := -gencode arch=compute_80,code=sm_80 \
 			 -gencode arch=compute_86,code=sm_86
-libspconv := libspconv-1.1.0
+libspconv := libspconv-1.1.1
 
 ifeq ($(arch), aarch64)
 cuda_arch += -gencode arch=compute_87,code=sm_87

@@ -26,21 +26,21 @@ class GPUData {
   inline void *ptr() const { return ptr_; }
   inline size_t bytes() const { return bytes_; }
   inline bool empty() const { return ptr_ == nullptr; }
-  virtual ~GPUData() { free_memory(); }
+  virtual ~GPUData() { free_memory(nullptr); }
   GPUData() = default;
   GPUData(const std::string &name) { this->name_ = name; }
 
-  void alloc_or_resize_to(size_t nbytes) {
+  void alloc_or_resize_to(size_t nbytes, cudaStream_t stream) {
     if (capacity_ < nbytes) {
-      dprintf("%s Free old %d, malloc new %d bytes.\n", name_.c_str(), capacity_, nbytes);
-      free_memory();
+      // dprintf("%s Free old %d, malloc new %d bytes.\n", name_.c_str(), capacity_, nbytes);
+      free_memory(stream);
       checkRuntime(cudaMalloc(&ptr_, nbytes));
       capacity_ = nbytes;
     }
     bytes_ = nbytes;
   }
 
-  void alloc(size_t nbytes) { alloc_or_resize_to(nbytes); }
+  void alloc(size_t nbytes, cudaStream_t stream) { alloc_or_resize_to(nbytes, stream); }
 
   void resize(size_t nbytes) {
     if (capacity_ < nbytes) {
@@ -50,9 +50,13 @@ class GPUData {
     bytes_ = nbytes;
   }
 
-  void free_memory() {
+  void free_memory(cudaStream_t stream) {
     if (ptr_) {
-      checkRuntime(cudaFree(ptr_));
+      if(stream){
+        checkRuntime(cudaFreeAsync(ptr_, (cudaStream_t)stream));
+      }else{
+        checkRuntime(cudaFree(ptr_));
+      }
       ptr_ = nullptr;
       capacity_ = 0;
       bytes_ = 0;
@@ -78,16 +82,16 @@ class GPUMemory {
   virtual ~GPUMemory() { data_.reset(); }
   void set_gpudata(std::shared_ptr<GPUData> data) { this->data_ = data; }
 
-  void alloc_or_resize_to(size_t size) {
+  void alloc_or_resize_to(size_t size, cudaStream_t stream) {
     if (data_) {
       size_ = size;
-      data_->alloc_or_resize_to(size * sizeof(T));
+      data_->alloc_or_resize_to(size * sizeof(T), stream);
     } else {
       Asserts(false, "Failed to alloc or resize memory that because data is nullptr.");
     }
   }
 
-  void alloc(size_t size) { alloc_or_resize_to(size); }
+  void alloc(size_t size, cudaStream_t stream) { alloc_or_resize_to(size, stream); }
 
   void resize(size_t size) {
     if (data_) {
@@ -105,18 +109,16 @@ class GPUMemory {
 
 class GPUDataManager {
  public:
-  std::shared_ptr<GPUData> query_or_alloc(const std::string &tensor_id,
-                                          const std::string &subname = "default") {
-    std::shared_ptr<GPUData> &output = data_dict_[tensor_id][subname];
+  std::shared_ptr<GPUData> query_or_alloc(const std::string &tensor_id) {
+    std::shared_ptr<GPUData> &output = data_dict_[tensor_id];
     if (output == nullptr) {
-      output.reset(new GPUData(tensor_id + "." + subname));
+      output.reset(new GPUData(tensor_id));
     }
     return output;
   }
 
  private:
-  std::unordered_map<std::string, std::unordered_map<std::string, std::shared_ptr<GPUData>>>
-      data_dict_;
+  std::unordered_map<std::string, std::shared_ptr<GPUData>> data_dict_;
 };
 
 };  // namespace spconv

@@ -17,29 +17,16 @@
 #include <cuda_runtime.h>
 #include <stdarg.h>
 #include <stdio.h>
-
 #include <string>
 
 namespace spconv {
 
-#if DEBUG
-#define checkRuntime(call) spconv::check_runtime(call, #call, __LINE__, __FILE__)
-#define checkKernel(...)                                                                \
-  [&] {                                                                                 \
-    __VA_ARGS__;                                                                        \
-    checkRuntime(cudaStreamSynchronize(nullptr));                                       \
-    return spconv::check_runtime(cudaGetLastError(), #__VA_ARGS__, __LINE__, __FILE__); \
-  }()
-#define dprintf printf
-#else
 #define checkRuntime(call) spconv::check_runtime(call, #call, __LINE__, __FILE__)
 #define checkKernel(...)                                                            \
   do {                                                                              \
     __VA_ARGS__;                                                                    \
     spconv::check_runtime(cudaPeekAtLastError(), #__VA_ARGS__, __LINE__, __FILE__); \
   } while (0)
-#define dprintf(...)
-#endif
 
 #define Assertf(cond, fmt, ...)                                                                 \
   do {                                                                                          \

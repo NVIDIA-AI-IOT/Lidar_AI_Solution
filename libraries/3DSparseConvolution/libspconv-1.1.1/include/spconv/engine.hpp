@@ -29,8 +29,8 @@ enum class Precision : int { None = 0, Float16 = 1, Int8 = 2 };
 **/
 class SparseDTensor {
  public:
-  virtual Tensor features() const = 0;
-  virtual Tensor indices() const  = 0;
+  virtual const Tensor& features() const = 0;
+  virtual const Tensor& indices() const  = 0;
 
   virtual std::vector<int> grid_size() const = 0;
   virtual int device() const = 0;
@@ -68,20 +68,6 @@ class Engine {
   Exported virtual SparseDTensor* input(unsigned int index) = 0;
   Exported virtual size_t num_output() const = 0;
   Exported virtual SparseDTensor* output(unsigned int index) = 0;
-
-  // If you change the precision of a node after loading the model, you should call this function to
-  // reconfigure it
-  Exported virtual void reconfigure(void* stream = nullptr) = 0;
-
-  // If you want to execute an implicit PTQ calibration, you can enable int8calibration by marking
-  // it and collecting the maximum value of the tensor in the next forward.
-  Exported virtual void set_int8_calibration(bool enable, void* stream = nullptr) = 0;
-
-  // You can modify the precision of a node with this function, but don't forget to call reconfigure
-  Exported virtual void set_node_precision_byname(const char* name, Precision compute_precision,
-                                                  Precision output_precision) = 0;
-  Exported virtual void set_node_precision_byoptype(const char* optype, Precision compute_precision,
-                                                    Precision output_precision) = 0;
 };
 
 class ITensor{
@@ -173,6 +159,7 @@ Exported std::shared_ptr<EngineBuilder> create_engine_builder();
   false
 */
 Exported void set_verbose(bool enable);
+Exported bool get_verbose();
 Exported const char* get_precision_string(Precision precision);
 
 };  // namespace spconv

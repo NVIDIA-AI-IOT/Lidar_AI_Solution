@@ -3,6 +3,8 @@ A tiny inference engine for [3d sparse convolutional networks](https://github.co
 ![title](/assets/3dsparse_conv.png)
 
 ## News
+- (10/19/2023) The libspconv.so 1.1.1 is released now!
+  - Fix an issue with wrong indices for intermediate output.
 - (8/18/2023) The libspconv.so 1.1.0 is released now!
   - Open sourced the onnx parser part. libprotobuf will be configured by yourself.
   - Multiple outputs are supported.

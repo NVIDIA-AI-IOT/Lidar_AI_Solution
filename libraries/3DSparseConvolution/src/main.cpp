@@ -106,10 +106,7 @@ void print_done(const string& cmd) {
       cmd.c_str());
 }
 
-void do_memory_usage_test(spconv::Precision precision) {
-  cudaStream_t stream;
-  checkRuntime(cudaStreamCreate(&stream));
-
+void do_memory_usage_test(spconv::Precision precision, cudaStream_t stream) {
   spconv::set_verbose(true);
   auto task = load_task("centerpointZYX", precision);
   spconv::set_verbose(false);
@@ -134,13 +131,9 @@ void do_memory_usage_test(spconv::Precision precision) {
   }
 
   task.engine.reset();
-  checkRuntime(cudaStreamDestroy(stream));
 }
 
-void do_simple_run(spconv::Precision precision) {
-  cudaStream_t stream;
-  cudaStreamCreate(&stream);
-
+void do_simple_run(spconv::Precision precision, cudaStream_t stream) {
   spconv::set_verbose(true);
   auto task = load_task("centerpointZYX", precision);
   // auto task = load_task("bevfusionZYX", precision);
@@ -157,14 +150,10 @@ void do_simple_run(spconv::Precision precision) {
   printf("🙌 Output.shape: %s\n", spconv::format_shape(out_features.shape).c_str());
   out_features.save(task.save_dense, stream);
   task.engine.reset();
-
-  checkRuntime(cudaStreamDestroy(stream));
   print_done(task.compare_cmd);
 }
 
-void do_e2e_run(spconv::Precision precision) {
-  cudaStream_t stream;
-  cudaStreamCreate(&stream);
+void do_e2e_run(spconv::Precision precision, cudaStream_t stream) {
 
   // spconv::set_verbose(true);
   spconv::EventTimer timer;
@@ -201,16 +190,18 @@ void do_e2e_run(spconv::Precision precision) {
   printf("🙌 Output.shape: %s\n", spconv::format_shape(out_features.shape).c_str());
 
   task.engine.reset();
-  checkRuntime(cudaStreamDestroy(stream));
 }
 
 int main(int argc, char** argv) {
   const char* cmd = "fp16";
   if (argc > 1) cmd = argv[1];
 
-  if (strcmp(cmd, "memint8") == 0) do_memory_usage_test(spconv::Precision::Int8);
-  if (strcmp(cmd, "memfp16") == 0) do_memory_usage_test(spconv::Precision::Float16);
-  if (strcmp(cmd, "int8") == 0) do_simple_run(spconv::Precision::Int8);
-  if (strcmp(cmd, "fp16") == 0) do_simple_run(spconv::Precision::Float16);
+  cudaStream_t stream = nullptr;
+  checkRuntime(cudaStreamCreate(&stream));
+  if (strcmp(cmd, "memint8") == 0) do_memory_usage_test(spconv::Precision::Int8, stream);
+  if (strcmp(cmd, "memfp16") == 0) do_memory_usage_test(spconv::Precision::Float16, stream);
+  if (strcmp(cmd, "int8") == 0) do_simple_run(spconv::Precision::Int8, stream);
+  if (strcmp(cmd, "fp16") == 0) do_simple_run(spconv::Precision::Float16, stream);
+  checkRuntime(cudaStreamDestroy(stream));
   return 0;
 }
