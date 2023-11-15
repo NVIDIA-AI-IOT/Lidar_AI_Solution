@@ -24,12 +24,12 @@
 
 export TensorRT_Lib=/path/to/TensorRT/lib
 export TensorRT_Inc=/path/to/TensorRT/include
-export TensorRT_Bin=/path/to/TensorRT/bin
+export TensorRT_Bin=/usr/src/tensorrt/bin
 
-export CUDA_Lib=/path/to/cuda/lib64
-export CUDA_Inc=/path/to/cuda/include
-export CUDA_Bin=/path/to/cuda/bin
-export CUDA_HOME=/path/to/cuda
+export CUDA_Lib=/usr/local/cuda/lib64
+export CUDA_Inc=/usr/local/cuda/include
+export CUDA_Bin=/usr/local/cuda/bin
+export CUDA_HOME=/usr/local/cuda
 
 export CUDNN_Lib=/path/to/cudnn/lib
 

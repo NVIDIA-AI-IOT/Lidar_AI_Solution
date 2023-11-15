@@ -40,7 +40,7 @@ cat > .vscode/c_cpp_properties.json <<- EOF
                 "\${workspaceFolder}/src/**",
                 "\${workspaceFolder}/../dependencies/stb/**",
                 "\${workspaceFolder}/../dependencies/pybind11/include/**",
-                "\${workspaceFolder}/../cuOSD/src/**"
+                "\${workspaceFolder}/../libraries/cuOSD/src/**"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/gcc",

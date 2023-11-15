@@ -61,7 +61,7 @@ static __global__ void bevpool_half_pack10_kernel(const half* camera_feature, co
 #pragma unroll
     for (int j = 0; j < tile_size; j++) {
       // Using fma instead of __hfma can avoids cumulative errors and gives more accurate results.
-      accumulate[j] = fma(__half2float(((half*)&feature)[j]), depth_weight, accumulate[j]);
+      accumulate[j] = fma(__half2float(feature.val[j]), depth_weight, accumulate[j]);
     }
   }
 
