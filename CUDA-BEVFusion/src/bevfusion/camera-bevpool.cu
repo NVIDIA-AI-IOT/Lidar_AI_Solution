@@ -34,8 +34,9 @@ namespace camera {
 
 #define tile_size 10
 
-typedef struct {
-  unsigned int val[5];
+// The __align__(4) flag can help the compiler get more efficient instructions.
+typedef struct __align__(4){
+  half val[tile_size];
 } combined_half;
 
 static __global__ void bevpool_half_pack10_kernel(const half* camera_feature, const half* depth_weights, unsigned int nchannel,
@@ -47,26 +48,27 @@ static __global__ void bevpool_half_pack10_kernel(const half* camera_feature, co
 
   if (interval_index >= n_intervals) return;
   int3 interval = intervals[interval_index];
-  half accumulate[tile_size] = {0.};
+  float accumulate[tile_size] = {0.0f};
 
   for (int i = interval.x; i < interval.y; i++) {
     int indice = indices[i];
     int camera_index = indice / (ndepth * farea);
     int fm_inner_index = indice % farea;
-    half depth_weight = depth_weights[indice];
+    float depth_weight = __half2float(depth_weights[indice]);
     unsigned int camera_feature_offset = (camera_index * farea + fm_inner_index) * nchannel + feature_block;
     combined_half feature = *(combined_half*)(camera_feature + camera_feature_offset);
 
 #pragma unroll
     for (int j = 0; j < tile_size; j++) {
-      accumulate[j] = __hfma(((half*)&feature)[j], depth_weight, accumulate[j]);
+      // Using fma instead of __hfma can avoids cumulative errors and gives more accurate results.
+      accumulate[j] = fma(__half2float(((half*)&feature)[j]), depth_weight, accumulate[j]);
     }
   }
 
 #pragma unroll
   for (int j = 0; j < tile_size; j++) {
     unsigned int output_offset = interval.z + (feature_block + j) * out_h * out_w;
-    output_bevfeat[output_offset] = accumulate[j];
+    output_bevfeat[output_offset] = __float2half(accumulate[j]);
   }
 }
 
