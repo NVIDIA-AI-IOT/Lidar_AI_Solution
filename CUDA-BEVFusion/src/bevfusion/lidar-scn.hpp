@@ -25,7 +25,7 @@
 #define __LIDAR_SCN_HPP__
 
 #include <vector>
-
+#include <string>
 #include "lidar-voxelization.hpp"
 
 namespace bevfusion {
