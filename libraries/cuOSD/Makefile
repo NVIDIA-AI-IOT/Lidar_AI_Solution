@@ -19,6 +19,7 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 # DEALINGS IN THE SOFTWARE.
 
+CUDA_HOME :=/usr/local/cuda
 cc        := g++
 stdcpp    := c++17
 nvcc      := $(CUDA_HOME)/bin/nvcc -ccbin=$(cc)
@@ -84,8 +85,16 @@ cpp_compile_flags := -std=$(stdcpp) -g -O0 -fPIC -fopenmp -pthread $(cppdefine) 
 cu_compile_flags  := -std=$(stdcpp) -g -O0 -Xcompiler "$(cpp_compile_flags)"
 link_flags        := -pthread -fopenmp -Wl,-rpath='$$ORIGIN'
 
+# CUDA code generation flags
+GENCODE_SM53 := -gencode arch=compute_53,code=sm_53
+GENCODE_SM62 := -gencode arch=compute_62,code=sm_62
+GENCODE_SM72 := -gencode arch=compute_72,code=sm_72
+GENCODE_SM87 := -gencode arch=compute_87,code=sm_87
+GENCODE_SM_PTX := -gencode arch=compute_72,code=compute_72
+GENCODE_FLAGS := $(GENCODE_SM53) $(GENCODE_SM62) $(GENCODE_SM72) $(GENCODE_SM87) $(GENCODE_SM_PTX)
+
 cpp_compile_flags += $(include_paths)
-cu_compile_flags  += $(include_paths)
+cu_compile_flags  += $(include_paths) $(GENCODE_FLAGS)
 link_flags        += $(library_paths) $(link_librarys) $(run_paths)
 
 ifeq ($(MAKECMDGOALS), pycuosd)
