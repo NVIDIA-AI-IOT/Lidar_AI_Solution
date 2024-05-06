@@ -1,0 +1,82 @@
+dataset_type: V2XDataset
+dataset_root: /dset/V2X/v2x/dair-v2x
+dataset_kitti_root: /dset/V2X/v2x/dair-v2x-i-kitti/training/label_2
+result_root: outputs
+
+point_cloud_range: [0, -51.2, -5, 102.4, 51.2, 3]
+voxel_size: [0.2, 0.2, 8]
+image_size: [864, 1536]
+
+object_classes:
+  - car
+  - truck
+  - construction_vehicle
+  - bus
+  - trailer
+  - barrier
+  - motorcycle
+  - bicycle
+  - pedestrian
+  - traffic_cone
+
+data:
+  samples_per_gpu: 4
+  workers_per_gpu: 4
+  train:
+    type: V2XDataset
+    dataset:
+      dataset_root: ${dataset_root}
+      dataset_kitti_root: ${dataset_kitti_root}
+      result_root: ${result_root}
+      ann_file: ${dataset_root + "/dair_12hz_infos_train.pkl"}
+      final_dim:  ${image_size}
+      object_classes: ${object_classes}
+      H: 1080
+      W: 1920
+      is_train: true
+      use_cbgs: false
+      num_sweeps: 1
+      img_mean: [123.675, 116.28, 103.53]
+      img_std: [58.395, 57.12, 57.375]
+      to_rgb: true
+      return_depth: false
+  val:
+    type: ${dataset_type}
+    dataset:
+      dataset_root: ${dataset_root}
+      dataset_kitti_root: ${dataset_kitti_root}
+      result_root: ${result_root}
+      ann_file: ${dataset_root + "/dair_12hz_infos_val.pkl"}
+      final_dim:  ${image_size}
+      object_classes: ${object_classes}
+      H: 1080
+      W: 1920
+      is_train: false
+      use_cbgs: false
+      num_sweeps: 1
+      img_mean: [123.675, 116.28, 103.53]
+      img_std: [58.395, 57.12, 57.375]
+      to_rgb: true
+      return_depth: false
+
+  test:
+    type: ${dataset_type}
+    dataset:
+      dataset_root: ${dataset_root}
+      dataset_kitti_root: ${dataset_kitti_root}
+      result_root: ${result_root}
+      ann_file: ${dataset_root + "/dair_12hz_infos_val.pkl"}
+      final_dim:  ${image_size}
+      object_classes: ${object_classes}
+      H: 1080
+      W: 1920
+      is_train: false
+      use_cbgs: false
+      num_sweeps: 1
+      img_mean: [123.675, 116.28, 103.53]
+      img_std: [58.395, 57.12, 57.375]
+      to_rgb: true
+      return_depth: false
+
+evaluation:
+  interval: 100
