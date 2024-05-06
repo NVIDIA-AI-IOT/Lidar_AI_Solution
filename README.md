@@ -55,7 +55,7 @@ Training and inference solutions for V2XFusion.
 - **Feature Fusion**: Camera & Lidar feature fuser and onnx export solution.
 - **PTQ**: Quantization solutions for V2XFusion, easy to understand.
 - **Sparsity**: 4:2 structural sparsity support. 
-- **Deepstream sample**:Sample inference using CUDA， TensorRT/Triton in NVIDIA DeepStream SDK 7.0.
+- **Deepstream sample**: Sample inference using CUDA, TensorRT/Triton in NVIDIA DeepStream SDK 7.0.
 
 ## cuOSD(CUDA On-Screen Display Library)
 Draw all elements using a single CUDA kernel.
