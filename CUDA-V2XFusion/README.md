@@ -1,8 +1,9 @@
 # V2XFusion
-V2XFusion is a multi-sensor fusion 3D object detection solution for roadside scenarios. Utilizing the relative concentration of object heights in the roadside scenarios and the more information brought by multi-sensor fusion, V2XFusion achieved a good performance on the DAIR-V2X-I Dataset. This repository contains training, quantization, and ONNX exportation for V2XFusion.
+V2XFusion is a multi-sensor fusion 3D object detection solution for roadside scenarios. Utilizing the relative concentration of object heights in the roadside scenarios and the more information brought by multi-sensor fusion, V2XFusion achieved a good performance on the DAIR-V2X-I Dataset. This repository contains training, quantization, and ONNX exportation for V2XFusion. The pictures below show the camera and LiDAR installation locations and the characteristics of the roadside scenarios.
 
+![](assets/Roadside_Scenarios.png)
 ## Architecture
-![](assets/BEVFusion-R_Network_Architecture.png)
+![](assets/V2XFusion_Network_Architecture.png)
 
 The architecture image takes batch size of 4 as an example. The data input of each batch consists of a camera data and the corresponding lidar data.
 
@@ -17,10 +18,11 @@ cd ..
 
 git clone https://github.com/ADLab-AutoDrive/BEVHeight.git
 cd BEVHeight
-cp -r evaluators/* bevfusion/
-cp -r scripts/* bevfusion/
+cp -r evaluators ../bevfusion/
+cp -r scripts ../bevfusion/
+cd ..
 
-cp -r v2xfusion/* bevfusion/ 
+cp -r Lidar_AI_Solution/CUDA-V2XFusion/* bevfusion/ 
 ```
 ## Prerequisites
 - [Installation guide](docs/install.md)
