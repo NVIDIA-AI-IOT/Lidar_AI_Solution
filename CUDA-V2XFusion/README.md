@@ -79,6 +79,7 @@ dbound = [-2, 0, 90]
 ```
 ## Experimental Results
 - DAIR-V2X-I Dataset  
+
     <div align=left>
     <table>
         <tr align=center>
@@ -107,7 +108,7 @@ dbound = [-2, 0, 90]
             <td>Hard</td>
         </tr>
         <tr align=center>
-            <td rowspan="4">V2XFusion (R34 + PointPlillars)</td> 
+            <td rowspan="4">V2XFusion</td> 
             <td>sparsity</td>
             <td>FP16</td> 
             <td>82.08</td>
@@ -163,10 +164,10 @@ dbound = [-2, 0, 90]
             <td>58.52</td>
             <td><a href="https://nvidia.box.com/shared/static/0u9ax27szfbxdsjkf4oawyxvssg8p8xw">ptq.pth</a></td>
         </tr>
-
-
     <table>
     </div>
+V2XFusion Backbone: **ResNet34 + PointPillars**
+
 Note:  
 To make the model more robust, the sequence dataset V2X-Seq-SPD also can be added to the training phase. We provide a pre-trained [model](https://nvidia.app.box.com/s/xqj7ob2sa3betojf1084juyrlr1eek1a) (**dbound=[-1.5, 3.0, 180]**)  that is used in the Deepstream demo for reference. Please refer to the script [dataset_merge](scripts/dataset_merge.py) for data merge.
 
