@@ -67,7 +67,7 @@ INT8 configuration provides optimal TensorRT performance but sub-optimal predict
     $ python scripts/export_v2xfusion.py configs/V2X-I/det/centerhead/lssfpn/camera+pointpillar/resnet34/default.yaml ptq.pth --precision int8
     ```
 ### 5. Deployment on DeepStream
-Please refer to the V2XFusion inference case provided by DeepStream. The configuration parameters can be adjusted during training to adapt to different datasets, especially the **dbound** parameter. Before inference, you need to confirm that the parameters in the precomputation script in DeepStream are the same with the training setup.
+Please refer to the V2XFusion inference sample provided by DeepStream. The configuration parameters can be adjusted during training to adapt to different datasets, especially the **dbound** parameter. Before inference, you need to confirm that the parameters in the precomputation script in DeepStream are the same with the training setup.
 ```bash
 image_size = [864, 1536]
 downsample_factor = 16
@@ -78,13 +78,11 @@ zbound = [-5, 3, 8]
 dbound = [-2, 0, 90]   
 ```
 ## Experimental Results
-- DAIR-V2X-I Dataset
+- DAIR-V2X-I Dataset  
     <div align=left>
     <table>
         <tr align=center>
             <td rowspan="3">Method</td> 
-            <td rowspan="3" align=center>Config File</td> 
-            <td rowspan="3" align=center>Modality</td> 
             <td rowspan="3" align=center>Sparsity/Dense</td> 
             <td rowspan="3" align=center>FP16/INT8</td> 
             <td colspan="3" align=center>Car</td>
@@ -109,9 +107,7 @@ dbound = [-2, 0, 90]
             <td>Hard</td>
         </tr>
         <tr align=center>
-            <td rowspan="4">V2XFusion</td> 
-            <td>R34</td>
-            <td>C + L</td>
+            <td rowspan="4">V2XFusion (R34 + PointPlillars)</td> 
             <td>sparsity</td>
             <td>FP16</td> 
             <td>82.08</td>
@@ -126,8 +122,6 @@ dbound = [-2, 0, 90]
             <td><a href="https://nvidia.box.com/shared/static/gakymhr1e0wc17s7ksswa7409nfhg6zn">model</a></td>
         </tr>
         <tr align=center>
-            <td>R34</td>
-            <td>C + L</td>
             <td>sparsity</td>
             <td>INT8-PTQ</td> 
             <td>82.06</td>
@@ -142,8 +136,6 @@ dbound = [-2, 0, 90]
             <td><a href="https://nvidia.box.com/shared/static/5s2zjfelbhsmrfmme8g1cm49wuh2y7q3">ptq.pth</a></td>
         </tr>
         <tr align=center>
-            <td>R34</td>
-            <td>C + L</td>
             <td>Dense</td>
             <td>FP16</td> 
             <td>82.30</td>
@@ -158,8 +150,6 @@ dbound = [-2, 0, 90]
             <td><a href="https://nvidia.box.com/shared/static/o5u4tryaeasgu5k0q92106h9wcyn0t7n">model</a></td>
         </tr>
         <tr align=center>
-            <td>R34</td>
-            <td>C + L</td>
             <td>Dense</td>
             <td>INT8-PTQ</td> 
             <td>82.33</td>
@@ -187,10 +177,12 @@ To make the model more robust, the sequence dataset V2X-Seq-SPD also can be adde
 | ------ | ------| --------   | ------- |
 | 49.3| 42.2  |  31.6       | 25.3   | 
 
-- Device: NVIDIA Jetson AGX Orin Developer Kit
+- Device: NVIDIA Jetson AGX Orin Developer Kit (MAXN power mode)
 - Version: Jetpack 6.0 DP
-- Resolution: 4 x 864 x 1536
-- Modality: Camera + Lidar
+- Modality: Camera + LiDAR
+- Image Resolution: 864 x 1536
+- Batch size: 4
+
 
 ## References
 - V2X-DAIR Dataset: https://thudair.baai.ac.cn/coop-forecast
