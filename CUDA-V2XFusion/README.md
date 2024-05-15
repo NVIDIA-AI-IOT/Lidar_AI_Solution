@@ -69,7 +69,7 @@ INT8 configuration provides optimal TensorRT performance but sub-optimal predict
     $ python scripts/export_v2xfusion.py configs/V2X-I/det/centerhead/lssfpn/camera+pointpillar/resnet34/default.yaml ptq.pth --precision int8
     ```
 ### 5. Deployment on DeepStream
-Please refer to the V2XFusion inference sample provided by DeepStream. The configuration parameters can be adjusted during training to adapt to different datasets, especially the **dbound** parameter. Before inference, you need to confirm that the parameters in the precomputation script in DeepStream are the same with the training setup.
+Please refer to the V2XFusion inference sample provided by [DeepStream](https://docs.nvidia.com/metropolis/deepstream/dev-guide/text/DS_3D_Custom_Manual.html). The configuration parameters can be adjusted during training to adapt to different datasets, especially the **dbound** parameter. Before inference, you need to confirm that the parameters in the precomputation script in DeepStream are the same with the training setup.
 ```bash
 image_size = [864, 1536]
 downsample_factor = 16
