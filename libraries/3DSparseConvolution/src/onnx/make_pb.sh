@@ -9,7 +9,16 @@
 # without an express license agreement from NVIDIA CORPORATION or
 # its affiliates is strictly prohibited.
 
+project_folder=$(realpath $(dirname ${BASH_SOURCE[-1]}))
+cd $project_folder
+
 protoc=protoc
-mkdir pbout
+mkdir -p pbout
 $protoc onnx-ml.proto --cpp_out=pbout
 $protoc onnx-operators-ml.proto --cpp_out=pbout
+
+mv pbout/onnx-ml.pb.cc onnx-ml.pb.cpp
+mv pbout/onnx-operators-ml.pb.cc onnx-operators-ml.pb.cpp
+mv pbout/*.h ./
+
+rm -rf pbout
