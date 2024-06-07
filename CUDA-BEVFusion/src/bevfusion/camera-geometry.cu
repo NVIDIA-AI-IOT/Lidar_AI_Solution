@@ -80,7 +80,7 @@ static __global__ void collect_starts_kernel(unsigned int num, unsigned int rema
 
   int3 val;
   val.x = interval_starts[i] + remain;
-  val.y = i < num - 1 ? interval_starts[i + 1] + remain : numel_geometry - interval_starts[i];
+  val.y = i < num - 1 ? interval_starts[i + 1] + remain : numel_geometry - 1;
   val.z = geometry[indices[interval_starts[i] + remain]];
   intervals[i] = val;
 }
