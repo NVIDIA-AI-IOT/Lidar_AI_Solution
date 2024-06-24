@@ -1,24 +1,13 @@
 /*
  * SPDX-FileCopyrightText: Copyright (c) 2023 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
- * SPDX-License-Identifier: MIT
+ * SPDX-License-Identifier: LicenseRef-NvidiaProprietary
  *
- * Permission is hereby granted, free of charge, to any person obtaining a
- * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
- * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
- * DEALINGS IN THE SOFTWARE.
+ * NVIDIA CORPORATION, its affiliates and licensors retain all intellectual
+ * property and proprietary rights in and to this material, related
+ * documentation and any modifications thereto. Any use, reproduction,
+ * disclosure or distribution of this material and related documentation
+ * without an express license agreement from NVIDIA CORPORATION or
+ * its affiliates is strictly prohibited.
  */
  
 #ifndef __SPCONV_MEMORY_HPP__
@@ -31,6 +20,51 @@
 #include "check.hpp"
 
 namespace spconv {
+
+class PinnedMemoryData {
+ public:
+  inline void *ptr() const { return ptr_; }
+  inline size_t bytes() const { return bytes_; }
+  inline bool empty() const { return ptr_ == nullptr; }
+  virtual ~PinnedMemoryData() { free_memory(nullptr); }
+  PinnedMemoryData() = default;
+  PinnedMemoryData(const std::string &name) { this->name_ = name; }
+
+  void alloc_or_resize_to(size_t nbytes, cudaStream_t stream) {
+    if (capacity_ < nbytes) {
+      // dprintf("%s Free old %d, malloc new %d bytes.\n", name_.c_str(), capacity_, nbytes);
+      free_memory(stream);
+      checkRuntime(cudaMallocHost(&ptr_, nbytes));
+      capacity_ = nbytes;
+    }
+    bytes_ = nbytes;
+  }
+
+  void alloc(size_t nbytes, cudaStream_t stream) { alloc_or_resize_to(nbytes, stream); }
+
+  void resize(size_t nbytes) {
+    if (capacity_ < nbytes) {
+      Assertf(false, "%s Failed to resize memory to %ld bytes. capacity = %ld", name_.c_str(),
+              nbytes, capacity_);
+    }
+    bytes_ = nbytes;
+  }
+
+  void free_memory(cudaStream_t stream) {
+    if (ptr_) {
+      checkRuntime(cudaFreeHost(ptr_));
+      ptr_ = nullptr;
+      capacity_ = 0;
+      bytes_ = 0;
+    }
+  }
+
+ private:
+  void *ptr_ = nullptr;
+  size_t bytes_ = 0;
+  size_t capacity_ = 0;
+  std::string name_;
+};
 
 class GPUData {
  public:
@@ -63,11 +97,17 @@ class GPUData {
 
   void free_memory(cudaStream_t stream) {
     if (ptr_) {
+
+#ifdef __WITH_QNX
       if(stream){
         checkRuntime(cudaFreeAsync(ptr_, (cudaStream_t)stream));
       }else{
         checkRuntime(cudaFree(ptr_));
       }
+#else
+      checkRuntime(cudaFree(ptr_));
+#endif // __WITH_QNX
+
       ptr_ = nullptr;
       capacity_ = 0;
       bytes_ = 0;

@@ -14,8 +14,8 @@
 #define __SPCONV_VERSION_HPP__
 
 #define NVSPCONV_MAJOR 1
-#define NVSPCONV_MINOR 0
-#define NVSPCONV_REL 1
+#define NVSPCONV_MINOR 1
+#define NVSPCONV_REL 5
 #define NVSPCONV_STR(v) #v
 #define NVSPCONV_VERSION_COMBIN(major, minor, rel) \
   (NVSPCONV_STR(major) "." NVSPCONV_STR(minor) "." NVSPCONV_STR(rel))

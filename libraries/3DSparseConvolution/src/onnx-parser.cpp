@@ -84,7 +84,7 @@ static onnx::AttributeProto get_attribute(const onnx::NodeProto& node, const std
         if (attr.name() == name) 
             return attr;
     }
-    LOGV("Can not find attribute '%s' in node '%s', it will use the default value of.",
+    LOGV("Can not find the attribute '%s' in the node '%s', the default value will be used.",
         name.c_str(), node.name().c_str());
     return onnx::AttributeProto();
 };
@@ -143,7 +143,8 @@ std::shared_ptr<Engine> load_engine_from_onnx(const std::string& onnx_file, Prec
                 get_attribute(node, "rulebook").s(),
                 get_attribute(node, "precision").s() == "int8" ? Precision::Int8 : Precision::Float16,
                 get_attribute(node, "output_precision").s() == "int8" ? Precision::Int8 : Precision::Float16,
-                node.output(0)
+                node.output(0),
+                get_attribute(node, "inverse").i()
             );
 
             if(mark_all_output){
