@@ -24,7 +24,7 @@
 
 export TensorRT_Lib=/path/to/TensorRT/lib
 export TensorRT_Inc=/path/to/TensorRT/include
-export TensorRT_Bin=/usr/src/tensorrt/bin
+export TensorRT_Bin=/path/to/TensorRT/bin
 
 export CUDA_Lib=/usr/local/cuda/lib64
 export CUDA_Inc=/usr/local/cuda/include

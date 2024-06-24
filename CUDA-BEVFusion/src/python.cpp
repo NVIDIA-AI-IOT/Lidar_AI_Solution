@@ -28,6 +28,7 @@
 #include <pybind11/stl.h>
 #include <stdio.h>
 #include <string.h>
+#include <dlfcn.h>
 
 #include <algorithm>
 #include <chrono>
@@ -224,4 +225,5 @@ PYBIND11_MODULE(libpybev, m) {
       .def("update", &BEVFusion::update);
 
   m.def("load_bevfusion", BEVFusion::load_instance);
+  dlopen("libcustom_layernorm.so", RTLD_NOW);
 };

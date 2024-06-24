@@ -24,11 +24,11 @@ def single_cuda_test(data_loader):
     print(f"Model: {model}, Precision: {precision}")
     
     core = libpybev.load_bevfusion(
-        f"../model/{model}/build/camera.backbone.plan",
-        f"../model/{model}/build/camera.vtransform.plan",
-        f"../model/{model}/lidar.backbone.xyz.onnx",
-        f"../model/{model}/build/fuser.plan",
-        f"../model/{model}/build/head.bbox.plan",
+        f"model/{model}/build/camera.backbone.plan",
+        f"model/{model}/build/camera.vtransform.plan",
+        f"model/{model}/lidar.backbone.xyz.onnx",
+        f"model/{model}/build/fuser.plan",
+        f"model/{model}/build/head.bbox.plan",
         precision
     )
     
@@ -178,7 +178,6 @@ def main():
 
     configs.load(args.config, recursive=True)
     cfg = Config(recursive_eval(configs), filename=args.config)
-    # print(cfg)
 
     if args.cfg_options is not None:
         cfg.merge_from_dict(args.cfg_options)

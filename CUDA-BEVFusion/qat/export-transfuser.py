@@ -239,12 +239,42 @@ class SubclassFuser(nn.Module):
         x = self.parent.decoder["neck"](x)
         return x[0]
 
+class CustomLayerNormImpl(torch.autograd.Function):
+    @staticmethod
+    def forward(ctx, input, normalized_shape, weight, bias, eps, x_shape):
+        return F.layer_norm(input, normalized_shape, weight, bias, eps)
+
+    @staticmethod
+    def symbolic(g, input, normalized_shape, weight, bias, eps, x_shape):
+        y = g.op("nv::CustomLayerNormalization", input, weight, bias, axis_i=-1, epsilon_f=eps)
+        y.setType(input.type().with_sizes(x_shape))
+        return y
+
+class CustomLayerNorm(nn.LayerNorm):
+    def forward(self, input: torch.Tensor) -> torch.Tensor:
+        return CustomLayerNormImpl.apply(
+            input, self.normalized_shape, self.weight, self.bias, self.eps, input.size())
+
+    @staticmethod
+    def convert(old: nn.LayerNorm):
+        Custom_layernorm = CustomLayerNorm(old.normalized_shape, old.eps, old.elementwise_affine)
+        if Custom_layernorm.weight is not None:
+            Custom_layernorm.weight.data = old.weight.data
+            Custom_layernorm.bias.data   = old.bias.data
+        return Custom_layernorm
+
+def replace_layernorm(model):
+    for name, module in model.named_modules():
+        if isinstance(module, nn.LayerNorm):
+            parent, child = name.rsplit(".", 1)
+            parent = model.get_submodule(parent)
+            setattr(parent, child, CustomLayerNorm.convert(module))
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Export transfusion to onnx file")
     parser.add_argument("--ckpt", type=str, default="qat/ckpt/bevfusion_ptq.pth", help="Pretrain model")
     parser.add_argument('--fp16', action= 'store_true')
     args = parser.parse_args()
-
     model = torch.load(args.ckpt).module
     
     suffix = "int8"
@@ -254,11 +284,12 @@ if __name__ == "__main__":
     
     save_root = f"qat/onnx_{suffix}"
     os.makedirs(save_root, exist_ok=True)
-        
+
     model.eval()
     fuser    = SubclassFuser(model).cuda()
     headbbox = SubclassHeadBBox(model).cuda()
-    
+    replace_layernorm(headbbox)
+
     TensorQuantizer.use_fb_fake_quant = True
     with torch.no_grad():
         camera_features = torch.randn(1, 80, 180, 180).cuda()

@@ -23,7 +23,7 @@
 
 #include <cuda_runtime.h>
 #include <string.h>
-
+#include <dlfcn.h>
 #include <vector>
 
 #define STB_IMAGE_IMPLEMENTATION
@@ -225,6 +225,7 @@ int main(int argc, char** argv) {
   if (argc > 1) data      = argv[1];
   if (argc > 2) model     = argv[2];
   if (argc > 3) precision = argv[3];
+  dlopen("libcustom_layernorm.so", RTLD_NOW);
 
   auto core = create_core(model, precision);
   if (core == nullptr) {

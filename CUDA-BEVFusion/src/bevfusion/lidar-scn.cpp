@@ -24,6 +24,7 @@
 #include "lidar-scn.hpp"
 
 #include <spconv/engine.hpp>
+#include "lidar-scn-onnx-parser.hpp"
 
 namespace bevfusion {
 namespace lidar {
@@ -41,22 +42,22 @@ class SCNImplement : public SCN {
 
   virtual const nvtype::half* forward(const nvtype::half* points, unsigned int num_points, void* stream) override {
     voxelization_->forward(points, num_points, stream, param_.order);
-    native_scn_output_ = native_scn_->forward(
-        std::vector<int64_t>{voxelization_->num_voxels(), voxelization_->voxel_dim()}, spconv::DType::Float16,
-        (void*)voxelization_->features(), std::vector<int64_t>{voxelization_->num_voxels(), voxelization_->indices_dim()},
-        spconv::DType::Int32, (void*)voxelization_->indices(), 1, voxelization_->grid_size(), stream);
-    return native_scn_output_ == nullptr ? nullptr : (nvtype::half*)native_scn_output_->features_data();
+    native_scn_->input(0)->set_data(
+      std::vector<int64_t>{voxelization_->num_voxels(), voxelization_->voxel_dim()}, spconv::DataType::Float16, voxelization_->features(),
+      std::vector<int64_t>{voxelization_->num_voxels(), voxelization_->indices_dim()}, spconv::DataType::Int32, voxelization_->indices(), voxelization_->grid_size()
+    );
+    native_scn_->forward(stream);
+    return native_scn_->output(0)->features().ptr<nvtype::half>();
   }
 
   virtual std::vector<int64_t> shape() override {
-    return native_scn_output_ == nullptr ? std::vector<int64_t>() : native_scn_output_->features_shape();
+    return native_scn_->output(0)->features().shape;
   }
 
  private:
   SCNParameter param_;
   std::shared_ptr<Voxelization> voxelization_;
   std::shared_ptr<spconv::Engine> native_scn_;
-  spconv::DTensor* native_scn_output_ = nullptr;
 };
 
 std::shared_ptr<SCN> create_scn(const SCNParameter& param) {

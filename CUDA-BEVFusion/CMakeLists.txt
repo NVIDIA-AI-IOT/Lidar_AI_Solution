@@ -33,12 +33,12 @@ find_package(Protobuf REQUIRED)
 # For cuda-12
 # set(CMAKE_CXX_FLAGS_RELEASE "-std=c++17 -Wextra -Wall -Wno-missing-field-initializers -Wno-deprecated-declarations -O3 -DENABLE_TEXT_BACKEND_STB")
 # set(CMAKE_CXX_FLAGS_DEBUG   "-std=c++17 -O0 -g -DENABLE_TEXT_BACKEND_STB")
+# set(spconv_root ../libraries/3DSparseConvolution/libspconv_cuda12)
 
+# For cuda-11
 set(CMAKE_CXX_FLAGS_RELEASE "-std=c++14 -Wextra -Wall -Wno-missing-field-initializers -Wno-deprecated-declarations -O3 -DENABLE_TEXT_BACKEND_STB")
 set(CMAKE_CXX_FLAGS_DEBUG   "-std=c++14 -O0 -g -DENABLE_TEXT_BACKEND_STB")
-
-set(CUDA_NVCC_FLAGS_RELEASE "-Werror=all-warnings -Xcompiler -std=c++14,-Wextra,-Wall,-Wno-deprecated-declarations,-O3 -DENABLE_TEXT_BACKEND_STB")
-set(CUDA_NVCC_FLAGS_DEBUG   "-std=c++14 -O0 -g -DENABLE_TEXT_BACKEND_STB")
+set(spconv_root ../libraries/3DSparseConvolution/libspconv_cuda11)
 
 set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS} 
   -gencode arch=compute_$ENV{CUDASM},code=compute_$ENV{CUDASM}
@@ -52,7 +52,7 @@ include_directories(
   ../dependencies/stb
   ../dependencies/pybind11/include
   ../libraries/cuOSD/src
-  ../libraries/3DSparseConvolution/libspconv/include
+  ${spconv_root}/include
   src/common
   src/
 )
@@ -60,7 +60,7 @@ include_directories(
 link_directories(
   $ENV{CUDA_Lib}
   $ENV{TensorRT_Lib}
-  ../libraries/3DSparseConvolution/libspconv/lib/${arch}
+  ${spconv_root}/lib/${arch}
   build
   $ENV{Python_Lib}
 )
@@ -68,6 +68,7 @@ link_directories(
 file(GLOB_RECURSE CORE_FILES 
   src/bevfusion/*.cu 
   src/bevfusion/*.cpp
+  src/onnx/*.cpp
   src/common/tensor.cu
   src/common/tensorrt.cpp
 )
@@ -105,6 +106,18 @@ target_link_libraries(bevfusion
   libnvinfer.so
   libspconv.so
   ${Protobuf_LIBRARIES}
+  libnvinfer_plugin.so
+)
+#######################################################################
+
+
+########################## custom_layernorm.so ################################
+cuda_add_library(custom_layernorm SHARED
+  src/plugins/custom_layernorm.cu
+)
+
+target_link_libraries(custom_layernorm
+  libnvinfer.so
   libnvinfer_plugin.so
 )
 #######################################################################

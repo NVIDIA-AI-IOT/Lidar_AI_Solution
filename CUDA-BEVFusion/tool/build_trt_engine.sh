@@ -54,8 +54,8 @@ function get_onnx_number_io(){
         return
     fi
 
-    number_of_input=`python -c "import onnx;m=onnx.load('$model');print(len(m.graph.input), end='')"`
-    number_of_output=`python -c "import onnx;m=onnx.load('$model');print(len(m.graph.output), end='')"`
+    number_of_input=`python3 -c "import onnx;m=onnx.load('$model');print(len(m.graph.input), end='')"`
+    number_of_output=`python3 -c "import onnx;m=onnx.load('$model');print(len(m.graph.output), end='')"`
     # echo The model [$model] has $number_of_input inputs and $number_of_output outputs.
 }
 
@@ -65,10 +65,12 @@ function compile_trt_model(){
     # $2: precision_flags
     # $3: number_of_input
     # $4: number_of_output
+    # $5: extra_flags
     name=$1
     precision_flags=$2
     number_of_input=$3
     number_of_output=$4
+    extra_flags=$5
     result_save_directory=$base/build
     onnx=$base/$name.onnx
 
@@ -91,7 +93,7 @@ function compile_trt_model(){
         output_flags+=fp16:chw,
     done
 
-    cmd="--onnx=$base/$name.onnx ${precision_flags} ${input_flags} ${output_flags} \
+    cmd="--onnx=$base/$name.onnx ${precision_flags} ${input_flags} ${output_flags} ${extra_flags} \
         --saveEngine=${result_save_directory}/$name.plan \
         --memPoolSize=workspace:2048 --verbose --dumpLayerInfo \
         --dumpProfile --separateProfileRun \
@@ -113,4 +115,4 @@ compile_trt_model "fuser" "$trtexec_dynamic_flags" 2 1
 
 # fp16 only
 compile_trt_model "camera.vtransform" "$trtexec_fp16_flags" 1 1
-compile_trt_model "head.bbox" "$trtexec_fp16_flags" 1 6
+compile_trt_model "head.bbox" "$trtexec_fp16_flags" 1 6 "--plugins=libcustom_layernorm.so"

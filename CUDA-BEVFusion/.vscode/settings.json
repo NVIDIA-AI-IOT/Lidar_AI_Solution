@@ -83,6 +83,8 @@
         "stop_token": "cpp",
         "queue": "cpp",
         "stack": "cpp",
-        "__locale": "cpp"
+        "__locale": "cpp",
+        "charconv": "cpp",
+        "span": "cpp"
     }
 }
