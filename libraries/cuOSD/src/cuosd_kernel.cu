@@ -1014,7 +1014,7 @@ static __global__ void render_blur_kernel(
                 if(sx < 32 && sy < 32){
                     auto& pix = crop[sy][sx];
                     // *(uchar3*)((char*)image0 + fy * stride + fx * 3) = crop[sy][sx];
-                    save_pixel<format>(image0, image1, fx, fy, round_down2(sx), image_width, stride, pix.x, pix.y, pix.z);
+                    save_pixel<format>(image0, image1, fx, fy, round_down2(fx), image_width, stride, pix.x, pix.y, pix.z);
                 }
             }
         }
