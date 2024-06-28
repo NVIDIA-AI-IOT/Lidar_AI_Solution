@@ -30,6 +30,9 @@ fi
 
 set -e
 
+# generate the protobuf code.
+# bash src/onnx/make_pb.sh
+
 mkdir -p build
 
 cd build

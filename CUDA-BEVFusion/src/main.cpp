@@ -202,6 +202,9 @@ std::shared_ptr<bevfusion::Core> create_core(const std::string& model, const std
   transbbox.post_center_range_end = {61.2, 61.2, 10.0};
   transbbox.voxel_size = {0.075, 0.075};
   transbbox.model = nv::format("model/%s/build/head.bbox.plan", model.c_str());
+
+  // if you got an inaccurate boundingbox result please turn on the layernormplugin plan.
+  // transbbox.model = nv::format("model/%s/build/head.bbox.layernormplugin.plan", model.c_str());
   transbbox.confidence_threshold = 0.12f;
   transbbox.sorted_bboxes = true;
 
@@ -267,5 +270,7 @@ int main(int argc, char** argv) {
   // destroy memory
   free_images(images);
   checkRuntime(cudaStreamDestroy(stream));
+
+  printf("[Warning]: If you got an inaccurate boundingbox result please turn on the layernormplugin plan. (main.cpp:207)\n");
   return 0;
 }

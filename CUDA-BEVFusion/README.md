@@ -27,7 +27,7 @@ This repository contains sources and model for [BEVFusion](https://github.com/mi
   1. Camera images in 6 directions.
   2. Transformation matrix of camera/lidar/ego.
   3. Use for bevfusion-pytorch data of example-data.pth, allow export onnx only without depending on the full dataset.
-- All models (model.zip) can be downloaded from ( [Google Drive](https://drive.google.com/file/d/1bPt3D07yyVuSuzRAHySZVR2N15RqGHHN/view?usp=sharing) ) or ( [Baidu Drive](https://pan.baidu.com/s/1_6IJTzKlJ8H62W5cUPiSbA?pwd=g6b4) ). It contains the following:
+- All models (model.zip) can be downloaded from ( [Google Drive](https://drive.google.com/file/d/1bPt3D07yyVuSuzRAHySZVR2N15RqGHHN/view?usp=sharing) ) or ( [Baidu Drive](https://pan.baidu.com/s/1BiAoQ8L7nC45vEwkN3bSGQ?pwd=8jb6) ). It contains the following:
   1. swin-tiny onnx models.
   2. resnet50 onnx and pytorch models.
   3. resnet50 int8 onnx and PTQ models.
@@ -128,6 +128,10 @@ bash tool/build_trt_engine.sh
 
 2. Compile and run the program
 ```bash
+# Generate the protobuf code
+bash src/onnx/make_pb.sh
+
+# Compile and run
 bash tool/run.sh
 ```
 

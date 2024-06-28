@@ -20,27 +20,26 @@ void __global__ layernorm_kernel<float>(const float* x, const float* weight, con
     // weight: C
     // bias:   C
     const float* px = x + idx * C;
-    float* py       = y + idx * C;
+    float*       py = y + idx * C;
 
     // reduce sum
-    float sum = 0.0f;
-    for(int ic = threadIdx.x; ic < C; ic += warpSize) 
-        sum += px[ic];
+    float sq = 0.0f;
+    float s  = 0.0f;
+    float diver = 1.0f / C;
+    for(int ic = threadIdx.x; ic < C; ic += warpSize){
+        float x = px[ic];
+        s += x;
+        sq = fmaf(x, x * diver, sq);
+    }
 
     for (int mask = 16; mask > 0; mask /= 2)
-        sum += __shfl_xor_sync(0xffffffff, sum, mask);
-
-    // variance
-    float mean = sum / C;
-    float var_sum = 0.0f;
-    for(int ic = threadIdx.x; ic < C; ic += warpSize) 
-        // var_sum += powf(px[ic] - mean, 2.0f);
-        var_sum = fmaf(px[ic] - mean, px[ic] - mean, var_sum);
+        s += __shfl_xor_sync(0xffffffff, s, mask);
 
     for (int mask = 16; mask > 0; mask /= 2)
-        var_sum += __shfl_xor_sync(0xffffffff, var_sum, mask);
+        sq += __shfl_xor_sync(0xffffffff, sq, mask);
 
-    float rstd = rsqrtf(var_sum / C + epsilon);
+    float mean = s / C;
+    float rstd = rsqrtf(sq - mean * mean + epsilon);
     for(int ic = threadIdx.x; ic < C; ic += warpSize) 
         py[ic] = (px[ic] - mean) * weight[ic] * rstd + bias[ic];
 }
@@ -55,31 +54,28 @@ void __global__ layernorm_kernel<half>(const half* x, const half* weight, const 
     // weight: C
     // bias:   C
     const half* px = x + idx * C;
-    half* py       = y + idx * C;
+          half* py = y + idx * C;
 
     // reduce sum
-    float sum = 0.0f;
-    for(int ic = threadIdx.x; ic < C; ic += warpSize) 
-        sum += __half2float(px[ic]);
-
-    for (int mask = 16; mask > 0; mask /= 2)
-        sum += __shfl_xor_sync(0xffffffff, sum, mask);
-
-    // variance
-    float mean = sum / C;
-    float var_sum = 0.0f;
+    float sq = 0.0f;
+    float s  = 0.0f;
+    float diver = 1.0f / C;
     for(int ic = threadIdx.x; ic < C; ic += warpSize){
-        // var_sum += powf(px[ic] - mean, 2.0f);
-        float t = __half2float(px[ic]) - mean;
-        var_sum = fmaf(t, t, var_sum);
+        float x = __half2float(px[ic]);
+        s += x;
+        sq = fmaf(x, x * diver, sq);
     }
 
     for (int mask = 16; mask > 0; mask /= 2)
-        var_sum += __shfl_xor_sync(0xffffffff, var_sum, mask);
+        s += __shfl_xor_sync(0xffffffff, s, mask);
 
-    float rstd = rsqrtf(var_sum / C + epsilon);
+    for (int mask = 16; mask > 0; mask /= 2)
+        sq += __shfl_xor_sync(0xffffffff, sq, mask);
+
+    float mean = s / C;
+    float rstd = rsqrtf(sq - mean * mean + epsilon);
     for(int ic = threadIdx.x; ic < C; ic += warpSize) 
-        py[ic] = __float2half((__half2float(px[ic]) - mean) * rstd) * weight[ic] + bias[ic];
+        py[ic] = __float2half((__half2float(px[ic]) - mean) * __half2float(weight[ic]) * rstd) + bias[ic];
 }
 
 class LayerNormPlugin : public IPluginV2DynamicExt{
@@ -134,12 +130,12 @@ public:
         const void* bias   = inputs[2];
         void* y            = outputs[0];
 
-        dim3 block(32, 32);
+        dim3 block(32, 8);
         dim3 grid(1, (N + block.y - 1) / block.y);
 
         if(inputDesc[0].type == DataType::kHALF){
             layernorm_kernel<half><<<grid, block, 0, stream>>>((half*)x, (half*)weight, (half*)bias, (half*)y, N, C, this->epsilon);
-        }else if(inputDesc[0].type == DataType::kHALF){
+        }else if(inputDesc[0].type == DataType::kFLOAT){
             layernorm_kernel<float><<<grid, block, 0, stream>>>((float*)x, (float*)weight, (float*)bias, (float*)y, N, C, this->epsilon);
         }else{
             // not implemented
