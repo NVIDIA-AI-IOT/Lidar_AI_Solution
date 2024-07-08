@@ -120,4 +120,4 @@ compile_trt_model "camera.vtransform" "$trtexec_fp16_flags" 1 1
 compile_trt_model "head.bbox" "$trtexec_fp16_flags" 1 6
 
 # for layernorm version head.bbox.onnx, accurate but slower
-compile_trt_model "head.bbox.layernormplugin" "$trtexec_fp16_flags" 1 6 "--plugins=libcustom_layernorm.so"
+# compile_trt_model "head.bbox.layernormplugin" "$trtexec_fp16_flags" 1 6 "--plugins=libcustom_layernorm.so"
