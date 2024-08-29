@@ -60,7 +60,12 @@ class BackboneImplement : public Backbone {
   virtual void print() override { engine_->print("Camerea Backbone"); }
 
   virtual void forward(const nvtype::half* images, const nvtype::half* depth, void* stream = nullptr) override {
-    engine_->forward({images, depth, depth_weights_, feature_}, static_cast<cudaStream_t>(stream));
+    engine_->forward({
+      {"img", images},
+      {"depth", depth},
+      {"camera_depth_weights", depth_weights_},
+      {"camera_feature", feature_}
+    }, static_cast<cudaStream_t>(stream));
   }
 
   virtual nvtype::half* depth() override { return depth_weights_; }

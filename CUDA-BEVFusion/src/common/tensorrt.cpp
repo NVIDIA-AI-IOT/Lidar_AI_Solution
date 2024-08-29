@@ -53,9 +53,9 @@ static std::string format_shape(const nvinfer1::Dims &shape) {
   char *p = buf;
   for (int i = 0; i < shape.nbDims; ++i) {
     if (i + 1 < shape.nbDims)
-      p += sprintf(p, "%d x ", shape.d[i]);
+      p += sprintf(p, "%d x ", (int)shape.d[i]);
     else
-      p += sprintf(p, "%d", shape.d[i]);
+      p += sprintf(p, "%d", (int)shape.d[i]);
   }
   return buf;
 }
@@ -81,16 +81,29 @@ static std::vector<uint8_t> load_file(const std::string &file) {
 static const char *data_type_string(nvinfer1::DataType dt) {
   switch (dt) {
     case nvinfer1::DataType::kFLOAT:
-      return "Float32";
+      return "float32";
     case nvinfer1::DataType::kHALF:
-      return "Float16";
-    case nvinfer1::DataType::kINT32:
-      return "Int32";
-    // case nvinfer1::DataType::kUINT8: return "UInt8";
+      return "float16";
     case nvinfer1::DataType::kINT8:
-      return "Int8";
-    case nvinfer1::DataType::kBOOL:
-      return "BOOL";
+      return "int8";
+    case nvinfer1::DataType::kINT32: 
+      return "int32";
+    case nvinfer1::DataType::kBOOL: 
+      return "bool";
+    case nvinfer1::DataType::kUINT8: 
+      return "uint8";
+
+    #if NV_TENSORRT_MAJOR >= 10
+      case nvinfer1::DataType::kFP8: 
+        return "fp8";
+      case nvinfer1::DataType::kBF16: 
+        return "bf16";
+      case nvinfer1::DataType::kINT64: 
+        return "int64";
+      case nvinfer1::DataType::kINT4:
+        return "int4";
+    #endif
+
     default:
       return "Unknow";
   }
@@ -119,8 +132,9 @@ class __native_engine_context {
       return false;
     }
 
-    engine_ = std::shared_ptr<nvinfer1::ICudaEngine>(runtime_->deserializeCudaEngine(pdata, size, nullptr),
+    engine_ = std::shared_ptr<nvinfer1::ICudaEngine>(runtime_->deserializeCudaEngine(pdata, size),
                                                      destroy_pointer<nvinfer1::ICudaEngine>);
+
     if (engine_ == nullptr) {
       printf("Failed to deserialize engine: %s\n", message_name);
       return false;
@@ -176,11 +190,11 @@ class EngineImplement : public Engine {
 
   void setup() {
     auto engine = this->context_->engine_;
-    int nbBindings = engine->getNbBindings();
+    int nbBindings = engine->getNbIOTensors();
 
     binding_name_to_index_.clear();
     for (int i = 0; i < nbBindings; ++i) {
-      const char *bindingName = engine->getBindingName(i);
+      const char *bindingName = engine->getIOTensorName(i);
       binding_name_to_index_[bindingName] = i;
     }
   }
@@ -191,27 +205,54 @@ class EngineImplement : public Engine {
     return iter->second;
   }
 
-  virtual bool forward(const std::vector<const void *> &bindings, void *stream, void *input_consum_event) override {
-    return this->context_->context_->enqueueV2((void **)bindings.data(), (cudaStream_t)stream, (cudaEvent_t *)input_consum_event);
+  virtual bool forward(const std::unordered_map<std::string, const void *> &bindings, void *stream, void *input_consum_event) override {
+    auto engine = this->context_->engine_;
+    auto context = this->context_->context_;
+    int ibinding = 0;
+    for(; ibinding < engine->getNbIOTensors(); ++ibinding){
+      auto tensor_name = engine->getIOTensorName(ibinding);
+      auto binding_iter = bindings.find(tensor_name);
+      if(binding_iter == bindings.end()){
+        printf("Failed to set the tensor address, can not found tensor %s in bindings provided.", tensor_name);
+        return false;
+      }
+
+      if(!context->setTensorAddress(tensor_name, (void*)binding_iter->second)){
+        printf("Failed to set tensor address for tensor %s\n", tensor_name);
+        return false;
+      }
+    }
+    return context->enqueueV3((cudaStream_t)stream);
   }
 
   virtual std::vector<int> run_dims(const std::string &name) override { return run_dims(index(name)); }
 
   virtual std::vector<int> run_dims(int ibinding) override {
-    auto dim = this->context_->context_->getBindingDimensions(ibinding);
+    auto engine = this->context_->engine_;
+    auto context = this->context_->context_;
+    auto dim = context->getTensorShape(engine->getIOTensorName(ibinding));
     return std::vector<int>(dim.d, dim.d + dim.nbDims);
   }
 
   virtual std::vector<int> static_dims(const std::string &name) override { return static_dims(index(name)); }
 
   virtual std::vector<int> static_dims(int ibinding) override {
-    auto dim = this->context_->engine_->getBindingDimensions(ibinding);
+    auto engine = this->context_->engine_;
+    auto dim = engine->getTensorShape(engine->getIOTensorName(ibinding));
     return std::vector<int>(dim.d, dim.d + dim.nbDims);
   }
 
-  virtual int num_bindings() override { return this->context_->engine_->getNbBindings(); }
+  virtual int num_bindings() override { return this->context_->engine_->getNbIOTensors(); }
 
-  virtual bool is_input(int ibinding) override { return this->context_->engine_->bindingIsInput(ibinding); }
+  virtual bool is_input(int ibinding) override { 
+    auto engine = this->context_->engine_;
+    return engine->getTensorIOMode(engine->getIOTensorName(ibinding)) == nvinfer1::TensorIOMode::kINPUT; 
+  }
+
+  virtual bool is_input(const std::string &name) override { 
+    auto engine = this->context_->engine_;
+    return engine->getTensorIOMode(name.c_str()) == nvinfer1::TensorIOMode::kINPUT; 
+  }
 
   virtual bool set_run_dims(const std::string &name, const std::vector<int> &dims) override {
     return this->set_run_dims(index(name), dims);
@@ -221,28 +262,50 @@ class EngineImplement : public Engine {
     nvinfer1::Dims d;
     memcpy(d.d, dims.data(), sizeof(int) * dims.size());
     d.nbDims = dims.size();
-    return this->context_->context_->setBindingDimensions(ibinding, d);
+    auto engine = this->context_->engine_;
+    auto context = this->context_->context_;
+    return context->setInputShape(engine->getIOTensorName(ibinding), d);
   }
 
   virtual int numel(const std::string &name) override { return numel(index(name)); }
 
   virtual int numel(int ibinding) override {
-    auto dim = this->context_->context_->getBindingDimensions(ibinding);
-    return std::accumulate(dim.d, dim.d + dim.nbDims, 1, std::multiplies<int>());
+    auto dim = this->run_dims(ibinding);
+    return std::accumulate(dim.begin(), dim.end(), 1, std::multiplies<int>());
   }
 
   virtual DType dtype(const std::string &name) override { return dtype(index(name)); }
 
-  virtual DType dtype(int ibinding) override { return (DType)this->context_->engine_->getBindingDataType(ibinding); }
+  virtual DType dtype(int ibinding) override { 
+    auto engine = this->context_->engine_;
+    auto dtype = engine->getTensorDataType(engine->getIOTensorName(ibinding));
+    switch(dtype){
+      case nvinfer1::DataType::kFLOAT: return DType::FLOAT;
+      case nvinfer1::DataType::kHALF: return DType::HALF;
+      case nvinfer1::DataType::kINT8: return DType::INT8;
+      case nvinfer1::DataType::kINT32: return DType::INT32;
+      case nvinfer1::DataType::kBOOL: return DType::BOOL;
+      case nvinfer1::DataType::kUINT8: return DType::UINT8;
+
+      #if NV_TENSORRT_MAJOR >= 10
+        case nvinfer1::DataType::kFP8: return DType::FP8;
+        case nvinfer1::DataType::kBF16: return DType::BF16;
+        case nvinfer1::DataType::kINT64: return DType::INT64;
+        case nvinfer1::DataType::kINT4: return DType::INT4;
+      #endif
+
+      default: return DType::NONE;
+    }
+  }
 
   virtual bool has_dynamic_dim() override {
     // check if any input or output bindings have dynamic shapes
     // code from ChatGPT
-    int numBindings = this->context_->engine_->getNbBindings();
+    int numBindings = this->num_bindings();
     for (int i = 0; i < numBindings; ++i) {
-      nvinfer1::Dims dims = this->context_->engine_->getBindingDimensions(i);
-      for (int j = 0; j < dims.nbDims; ++j) {
-        if (dims.d[j] == -1) return true;
+      auto dims = this->static_dims(i);
+      for (size_t j = 0; j < dims.size(); ++j) {
+        if (dims[j] == -1) return true;
       }
     }
     return false;
@@ -255,8 +318,8 @@ class EngineImplement : public Engine {
     int num_input = 0;
     int num_output = 0;
     auto engine = this->context_->engine_;
-    for (int i = 0; i < engine->getNbBindings(); ++i) {
-      if (engine->bindingIsInput(i))
+    for (int i = 0; i < this->num_bindings(); ++i) {
+      if (this->is_input(i))
         num_input++;
       else
         num_output++;
@@ -264,17 +327,17 @@ class EngineImplement : public Engine {
 
     printf("Inputs: %d\n", num_input);
     for (int i = 0; i < num_input; ++i) {
-      auto name = engine->getBindingName(i);
-      auto dim = engine->getBindingDimensions(i);
-      auto dtype = engine->getBindingDataType(i);
+      auto name = engine->getIOTensorName(i);
+      auto dim = engine->getTensorShape(name);
+      auto dtype = engine->getTensorDataType(name);
       printf("\t%d.%s : {%s} [%s]\n", i, name, format_shape(dim).c_str(), data_type_string(dtype));
     }
 
     printf("Outputs: %d\n", num_output);
     for (int i = 0; i < num_output; ++i) {
-      auto name = engine->getBindingName(i + num_input);
-      auto dim = engine->getBindingDimensions(i + num_input);
-      auto dtype = engine->getBindingDataType(i + num_input);
+      auto name = engine->getIOTensorName(i + num_input);
+      auto dim = engine->getTensorShape(name);
+      auto dtype = engine->getTensorDataType(name);
       printf("\t%d.%s : {%s} [%s]\n", i, name, format_shape(dim).c_str(), data_type_string(dtype));
     }
     printf("------------------------------------------------------\n");

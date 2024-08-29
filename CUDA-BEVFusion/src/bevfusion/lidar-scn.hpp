@@ -43,6 +43,7 @@ struct SCNParameter {
 
 class SCN {
  public:
+  virtual ~SCN() = default;
   // points and voxels must be of half-float device pointer
   virtual const nvtype::half* forward(const nvtype::half* points, unsigned int num_points, void* stream = nullptr) = 0;
   virtual std::vector<int64_t> shape() = 0;

@@ -42,6 +42,8 @@
 #include "common/tensor.hpp"
 #include "common/tensorrt.hpp"
 #include "common/timer.hpp"
+#include <dlfcn.h>
+#include <dlpack/dlpack.h>
 
 using namespace std;
 namespace py = pybind11;
@@ -168,7 +170,7 @@ class BEVFusion {
                   t_img_aug_matrix.ptr<float>(), stream_);
   }
 
-  py::array forward(py::array images, py::array points) {
+  py::array forward_with_normalization(py::array images, py::array points) {
     auto t_points = convert_to(points);
     auto t_images = convert_to(images);
 
@@ -192,8 +194,34 @@ class BEVFusion {
     }
     return py::array(py::dtype("float32"), output.shape, output.ptr());
   }
+  
+  py::array forward_without_normalization_dlpack(const py::capsule& images, const py::capsule& points) {
 
-  py::array forward_no_normalize(py::array images, py::array points) {
+    DLManagedTensor* dl_managed_images = static_cast<DLManagedTensor*>(images.get_pointer());
+    DLManagedTensor* dl_managed_points = static_cast<DLManagedTensor*>(points.get_pointer());
+
+    void* memory_ptr_images = dl_managed_images->dl_tensor.data;
+    void* memory_ptr_points = dl_managed_points->dl_tensor.data;
+
+    nvtype::half* camera_images = static_cast<nvtype::half*>(memory_ptr_images);
+    nvtype::half* lidar_points = static_cast<nvtype::half*>(memory_ptr_points);
+
+    auto bboxes = core_->forward_no_normalize(camera_images, lidar_points, 242180, stream_);
+    nv::Tensor output(std::vector<int>{static_cast<int>(bboxes.size()), 11}, nv::DataType::Float32, false);
+    for (size_t i = 0; i < bboxes.size(); ++i) {
+      auto& box = bboxes[i];
+      float* row = output.ptr<float>() + output.size(1) * i;
+      memcpy(row + 0, &box.position, sizeof(box.position));
+      memcpy(row + 3, &box.size, sizeof(box.size));
+      row[6] = box.z_rotation;
+      memcpy(row + 7, &box.velocity, sizeof(box.velocity));
+      row[9] = box.id;
+      row[10] = box.score;
+    }
+    return py::array(py::dtype("float32"), output.shape, output.ptr());
+  }
+
+  py::array forward_without_normalization(py::array images, py::array points) {
     auto t_points = convert_to(points);
     auto t_images = convert_to(images);
     t_images.to_device_();
@@ -215,12 +243,23 @@ class BEVFusion {
     }
     return py::array(py::dtype("float32"), output.shape, output.ptr());
   }
+
+  py::array forward(py::object images, py::object points, bool with_normalization, bool with_dlpack){
+    if(with_normalization){
+      return this->forward_with_normalization(images, points);
+    }else{
+      if(with_dlpack){
+        return this->forward_without_normalization_dlpack(images, points);
+      }else{
+        return this->forward_without_normalization(images, points);
+      }
+    }
+  }
 };
 
 PYBIND11_MODULE(libpybev, m) {
   py::class_<BEVFusion, shared_ptr<BEVFusion>>(m, "BEVFusion")
-      .def("forward_no_normalize", &BEVFusion::forward_no_normalize)
-      .def("forward", &BEVFusion::forward)
+      .def("forward", &BEVFusion::forward, py::arg("images"), py::arg("points"), py::arg("with_normalization")=true, py::arg("with_dlpack")=false)
       .def("print", &BEVFusion::print)
       .def("update", &BEVFusion::update);
 

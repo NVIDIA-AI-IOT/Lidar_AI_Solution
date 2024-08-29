@@ -76,7 +76,7 @@ core.update(
 )
 
 # while True:
-boxes = core.forward(images, points)
+boxes = core.forward(images, points, with_normalization=True, with_dlpack=False)
 
 np.set_printoptions(3, suppress=True, linewidth=300)
 print(boxes[:10])

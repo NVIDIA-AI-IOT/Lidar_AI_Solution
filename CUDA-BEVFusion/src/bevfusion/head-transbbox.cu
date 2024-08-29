@@ -126,11 +126,12 @@ class TransBBoxImplement : public TransBBox {
   }
 
   void create_binding_memory() {
-    for (int ibinding = 0; ibinding < engine_->num_bindings(); ++ibinding) {
-      if (engine_->is_input(ibinding)) continue;
+    const char* bindings[] = {"middle", "reg", "height", "dim", "rot", "vel", "score"};
+    for (size_t i = 0; i < sizeof(bindings) / sizeof(bindings[0]); ++i) {
+      if (engine_->is_input(bindings[i])) continue;
 
-      auto shape = engine_->static_dims(ibinding);
-      Asserts(engine_->dtype(ibinding) == TensorRT::DType::HALF, "Invalid binding data type.");
+      auto shape = engine_->static_dims(bindings[i]);
+      Asserts(engine_->dtype(bindings[i]) == TensorRT::DType::HALF, "Invalid binding data type.");
 
       size_t volumn = std::accumulate(shape.begin(), shape.end(), 1, std::multiplies<int>());
       half* pdata = nullptr;
@@ -147,9 +148,15 @@ class TransBBoxImplement : public TransBBox {
   virtual std::vector<BoundingBox> forward(const nvtype::half* transfusion_feature, float confidence_threshold, void* stream,
                                            bool sorted) override {
     cudaStream_t _stream = static_cast<cudaStream_t>(stream);
-    engine_->forward({/* input  */ transfusion_feature,
-                      /* output */ bindings_[0], bindings_[1], bindings_[2], bindings_[3], bindings_[4], bindings_[5]},
-                     _stream);
+    engine_->forward(std::unordered_map<std::string, const void *>{
+          {"middle", transfusion_feature}, 
+          {"reg", bindings_[0]},
+          {"height", bindings_[1]},
+          {"dim", bindings_[2]},
+          {"rot", bindings_[3]},
+          {"vel", bindings_[4]},
+          {"score", bindings_[5]}
+        }, _stream);
     checkRuntime(cudaMemsetAsync(output_device_size_, 0, sizeof(unsigned int), _stream));
 
     cuda_linear_launch(decode_kernel, _stream, bindshape_[0][2], bindings_[0], bindings_[1], bindings_[2], bindings_[3],

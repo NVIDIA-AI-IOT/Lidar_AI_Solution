@@ -12,7 +12,7 @@
 project_folder=$(realpath $(dirname ${BASH_SOURCE[-1]}))
 cd $project_folder
 
-protoc=protoc
+protoc=/usr/bin/protoc
 mkdir -p pbout
 $protoc onnx-ml.proto --cpp_out=pbout
 $protoc onnx-operators-ml.proto --cpp_out=pbout

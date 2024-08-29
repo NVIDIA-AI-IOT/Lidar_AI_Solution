@@ -13,3 +13,6 @@
 [submodule "libraries/cuPCL"]
 	path = libraries/cuPCL
 	url = https://github.com/NVIDIA-AI-IOT/cuPCL.git
+[submodule "dependencies/dlpack"]
+	path = dependencies/dlpack
+	url = https://github.com/dmlc/dlpack

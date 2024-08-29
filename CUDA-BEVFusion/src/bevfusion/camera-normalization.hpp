@@ -67,6 +67,7 @@ struct NormalizationParameter {
 
 class Normalization {
  public:
+  virtual ~Normalization() = default;
   // Here you should provide num_camera 3-channel images with the same dimensions as the width and
   // height provided at create time. The images pointer should be the host address. The pipeline is
   // as follows:

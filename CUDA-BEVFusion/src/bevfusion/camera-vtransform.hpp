@@ -35,6 +35,7 @@ namespace camera {
 
 class VTransform {
  public:
+  virtual ~VTransform() = default;
   virtual nvtype::half* forward(const nvtype::half* camera_bev, void* stream = nullptr) = 0;
 
   virtual std::vector<int> feat_shape() = 0;

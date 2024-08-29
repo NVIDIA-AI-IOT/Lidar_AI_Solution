@@ -35,6 +35,7 @@ namespace fuser {
 
 class Transfusion {
  public:
+  virtual ~Transfusion() = default;
   virtual nvtype::half* forward(const nvtype::half* camera_bev, const nvtype::half* lidar_bev, void* stream) = 0;
   virtual void print() = 0;
 };

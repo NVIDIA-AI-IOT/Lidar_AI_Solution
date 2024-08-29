@@ -46,6 +46,7 @@ struct GeometryParameter {
 
 class Geometry {
  public:
+  virtual ~Geometry() = default;
   virtual nvtype::Int3* intervals() = 0;
   virtual unsigned int num_intervals() = 0;
 

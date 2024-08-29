@@ -68,6 +68,7 @@ struct BoundingBox {
 
 class TransBBox {
  public:
+  virtual ~TransBBox() = default;
   virtual std::vector<BoundingBox> forward(const nvtype::half* transfusion_feature, float confidence_threshold, void* stream,
                                            bool sorted_by_conf = false) = 0;
   virtual void print() = 0;

@@ -51,7 +51,7 @@ def single_cuda_test(data_loader):
             img_aug_matrix
         )
 
-        boxes = core.forward_no_normalize(images, points)
+        boxes = core.forward(images, points, with_normalization=False)
         boxes = torch.from_numpy(boxes)
         bbs = data["metas"].data[0][0]["box_type_3d"](boxes[:, :-2], 9)
         labels = boxes[:, -2].int()

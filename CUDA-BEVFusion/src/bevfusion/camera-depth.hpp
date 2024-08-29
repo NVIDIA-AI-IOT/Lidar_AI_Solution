@@ -33,6 +33,7 @@ namespace camera {
 
 class Depth {
  public:
+  virtual ~Depth() = default;
   // points must be of half-float type
   // return value will is a num_camera x image_height x image_width Tensor
   virtual nvtype::half* forward(const nvtype::half* points, int num_points, int points_dim, void* stream = nullptr) = 0;

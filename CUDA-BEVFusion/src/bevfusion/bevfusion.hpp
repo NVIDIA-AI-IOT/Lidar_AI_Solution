@@ -48,6 +48,7 @@ struct CoreParameter {
 
 class Core {
  public:
+  virtual ~Core() = default;
   virtual std::vector<head::transbbox::BoundingBox> forward(const unsigned char **camera_images, const nvtype::half *lidar_points,
                                                             int num_points, void *stream) = 0;
 

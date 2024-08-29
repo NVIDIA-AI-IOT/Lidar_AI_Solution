@@ -62,9 +62,10 @@ class TransfusionImplement : public Transfusion {
 
   virtual nvtype::half* forward(const nvtype::half* camera_bev, const nvtype::half* lidar_bev, void* stream) override {
     cudaStream_t _stream = static_cast<cudaStream_t>(stream);
-    engine_->forward({/* input  */ camera_bev, lidar_bev,
-                      /* output */ output_},
-                     _stream);
+    engine_->forward({
+      {"camera", camera_bev},
+      {"lidar", lidar_bev},
+      {"middle", output_}}, _stream);
     return output_;
   }
 

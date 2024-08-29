@@ -35,6 +35,7 @@ namespace camera {
 
 class BEVPool {
  public:
+  virtual ~BEVPool() = default;
   virtual nvtype::half* forward(const nvtype::half* camera_feature, const nvtype::half* depth_weights,
                                 const unsigned int* indices, const nvtype::Int3* intervals, unsigned int num_intervals,
                                 void* stream = nullptr) = 0;

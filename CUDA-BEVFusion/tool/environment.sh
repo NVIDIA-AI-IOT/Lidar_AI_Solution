@@ -22,25 +22,36 @@
 
 # export CUDA_VISIBLE_DEVICES=2
 
-export TensorRT_Lib=/path/to/TensorRT/lib
-export TensorRT_Inc=/path/to/TensorRT/include
-export TensorRT_Bin=/usr/src/tensorrt/bin
+export TensorRT_Lib=/model_zoo/software/TensorRT-8.6.1.6/lib
+export TensorRT_Inc=/model_zoo/software/TensorRT-8.6.1.6/include
+export TensorRT_Bin=/model_zoo/software/TensorRT-8.6.1.6/bin
 
-export CUDA_Lib=/usr/local/cuda/lib64
-export CUDA_Inc=/usr/local/cuda/include
-export CUDA_Bin=/usr/local/cuda/bin
-export CUDA_HOME=/usr/local/cuda
+export CUDA_Lib=${CUDA_LIB}
+export CUDA_Inc=${CUDA_INCLUDE}
+export CUDA_Bin=${CUDA_BIN}
+# export CUDA_HOME=/usr/local/cuda
 
-export CUDNN_Lib=/path/to/cudnn/lib
+export CUDNN_Lib=/model_zoo/software/cudnn-linux-x86_64-8.9.7.29_cuda12-archive/lib
+
+# export TensorRT_Lib=${TENSORRT_LIB}
+# export TensorRT_Inc=${TENSORRT_INCLUDE}
+# export TensorRT_Bin=${TENSORRT_BIN}
+
+# export CUDA_Lib=${CUDA_LIB}
+# export CUDA_Inc=${CUDA_INCLUDE}
+# export CUDA_Bin=${CUDA_BIN}
+# # export CUDA_HOME=/usr/local/cuda
+
+# export CUDNN_Lib=${CUDNN_LIB}
 
 
 # resnet50/resnet50int8/swint
-export DEBUG_MODEL=resnet50int8
+export DEBUG_MODEL=resnet50
 
 # fp16/int8
-export DEBUG_PRECISION=int8
+export DEBUG_PRECISION=fp16
 export DEBUG_DATA=example-data
-export USE_Python=OFF
+export USE_Python=ON
 
 # check the configuration path
 # clean the configuration status
