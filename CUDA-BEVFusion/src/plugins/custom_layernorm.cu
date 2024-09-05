@@ -101,21 +101,21 @@ public:
     }
 
     virtual DimsExprs getOutputDimensions(
-        int32_t outputIndex, DimsExprs const* inputs, int32_t nbInputs, IExprBuilder& exprBuilder) noexcept{
+        int32_t outputIndex, DimsExprs const* inputs, int32_t nbInputs, IExprBuilder& exprBuilder) noexcept override{
         return inputs[0];
     }
 
     virtual bool supportsFormatCombination(
-        int32_t pos, PluginTensorDesc const* inOut, int32_t nbInputs, int32_t nbOutputs) noexcept{
+        int32_t pos, PluginTensorDesc const* inOut, int32_t nbInputs, int32_t nbOutputs) noexcept override{
         return inOut[pos].format == TensorFormat::kLINEAR && (inOut[pos].type == DataType::kFLOAT || inOut[pos].type == DataType::kHALF) && inOut[pos].type == inOut[0].type;
     }
 
     virtual void configurePlugin(DynamicPluginTensorDesc const* in, int32_t nbInputs,
-        DynamicPluginTensorDesc const* out, int32_t nbOutputs) noexcept{
-    }
+        DynamicPluginTensorDesc const* out, int32_t nbOutputs) noexcept override{
+    } 
 
     virtual size_t getWorkspaceSize(PluginTensorDesc const* inputs, int32_t nbInputs, PluginTensorDesc const* outputs,
-        int32_t nbOutputs) const noexcept{
+        int32_t nbOutputs) const noexcept override{
         return 0;
     }
 

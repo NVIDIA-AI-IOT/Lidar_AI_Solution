@@ -35,6 +35,11 @@ namespace camera {
 
 class BackboneImplement : public Backbone {
  public:
+  const char* BindingImages = "img";  // input
+  const char* BindingDepth  = "depth";     // output
+  const char* BindingCameraDepths  = "camera_depth_weights";
+  const char* BindingCameraFeature = "camera_feature";
+
   virtual ~BackboneImplement() {
     if (feature_) checkRuntime(cudaFree(feature_));
     if (depth_weights_) checkRuntime(cudaFree(depth_weights_));
@@ -44,8 +49,8 @@ class BackboneImplement : public Backbone {
     engine_ = TensorRT::load(model);
     if (engine_ == nullptr) return false;
 
-    depth_dims_ = engine_->static_dims(2);
-    feature_dims_ = engine_->static_dims(3);
+    depth_dims_   = engine_->static_dims(BindingCameraDepths);
+    feature_dims_ = engine_->static_dims(BindingCameraFeature);
     int32_t volumn = std::accumulate(depth_dims_.begin(), depth_dims_.end(), 1, std::multiplies<int32_t>());
     checkRuntime(cudaMalloc(&depth_weights_, volumn * sizeof(nvtype::half)));
 
@@ -61,10 +66,10 @@ class BackboneImplement : public Backbone {
 
   virtual void forward(const nvtype::half* images, const nvtype::half* depth, void* stream = nullptr) override {
     engine_->forward({
-      {"img", images},
-      {"depth", depth},
-      {"camera_depth_weights", depth_weights_},
-      {"camera_feature", feature_}
+      {BindingImages, images},
+      {BindingDepth, depth},
+      {BindingCameraDepths, depth_weights_},
+      {BindingCameraFeature, feature_}
     }, static_cast<cudaStream_t>(stream));
   }
 

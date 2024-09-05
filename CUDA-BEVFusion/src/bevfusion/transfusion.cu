@@ -36,6 +36,10 @@ namespace fuser {
 
 class TransfusionImplement : public Transfusion {
  public:
+  const char* BindingCamera = "camera";
+  const char* BindingLidar  = "lidar";
+  const char* BindingOutput = "middle";
+
   virtual ~TransfusionImplement() {
     if (output_) checkRuntime(cudaFree(output_));
   }
@@ -49,9 +53,8 @@ class TransfusionImplement : public Transfusion {
       return false;
     }
 
-    int output_binding = 2;
-    auto shape = engine_->static_dims(output_binding);
-    Asserts(engine_->dtype(output_binding) == TensorRT::DType::HALF, "Invalid binding data type.");
+    auto shape = engine_->static_dims(BindingOutput);
+    Asserts(engine_->dtype(BindingOutput) == TensorRT::DType::HALF, "Invalid binding data type.");
 
     size_t volumn = std::accumulate(shape.begin(), shape.end(), 1, std::multiplies<int>());
     checkRuntime(cudaMalloc(&output_, volumn * sizeof(half)));
@@ -63,9 +66,9 @@ class TransfusionImplement : public Transfusion {
   virtual nvtype::half* forward(const nvtype::half* camera_bev, const nvtype::half* lidar_bev, void* stream) override {
     cudaStream_t _stream = static_cast<cudaStream_t>(stream);
     engine_->forward({
-      {"camera", camera_bev},
-      {"lidar", lidar_bev},
-      {"middle", output_}}, _stream);
+      {BindingCamera, camera_bev},
+      {BindingLidar, lidar_bev},
+      {BindingOutput, output_}}, _stream);
     return output_;
   }
 

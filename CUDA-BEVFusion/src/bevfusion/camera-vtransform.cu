@@ -35,6 +35,9 @@ namespace camera {
 
 class VTransformImplement : public VTransform {
  public:
+  const char* BindingInput  = "feat_in";
+  const char* BindingOutput = "feat_out";
+
   virtual ~VTransformImplement() {
     if (output_feature_) checkRuntime(cudaFree(output_feature_));
   }
@@ -43,7 +46,7 @@ class VTransformImplement : public VTransform {
     engine_ = TensorRT::load(model);
     if (engine_ == nullptr) return false;
 
-    output_dims_ = engine_->static_dims(1);
+    output_dims_ = engine_->static_dims(BindingOutput);
     int32_t volumn = std::accumulate(output_dims_.begin(), output_dims_.end(), 1, std::multiplies<int32_t>());
     checkRuntime(cudaMalloc(&output_feature_, volumn * sizeof(nvtype::half)));
     return true;
@@ -53,8 +56,8 @@ class VTransformImplement : public VTransform {
 
   virtual nvtype::half* forward(const nvtype::half* camera_bev, void* stream = nullptr) override {
     engine_->forward({
-      {"feat_in", camera_bev},
-      {"feat_out", output_feature_}
+      {BindingInput, camera_bev},
+      {BindingOutput, output_feature_}
     }, static_cast<cudaStream_t>(stream));
     return output_feature_;
   }
