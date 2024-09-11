@@ -4,7 +4,7 @@
             "name": "Linux",
             "includePath": [
                 "${workspaceFolder}/**",
-                "/usr/local/cuda/include/**",
+                "/usr/local/cuda-12.1/include/**",
                 "${workspaceFolder}/src/**",
                 "${workspaceFolder}/../dependencies/stb/**",
                 "${workspaceFolder}/../dependencies/pybind11/include/**",

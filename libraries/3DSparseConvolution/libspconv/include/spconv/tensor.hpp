@@ -1,24 +1,13 @@
 /*
  * SPDX-FileCopyrightText: Copyright (c) 2023 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
- * SPDX-License-Identifier: MIT
+ * SPDX-License-Identifier: LicenseRef-NvidiaProprietary
  *
- * Permission is hereby granted, free of charge, to any person obtaining a
- * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
- * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
- * DEALINGS IN THE SOFTWARE.
+ * NVIDIA CORPORATION, its affiliates and licensors retain all intellectual
+ * property and proprietary rights in and to this material, related
+ * documentation and any modifications thereto. Any use, reproduction,
+ * disclosure or distribution of this material and related documentation
+ * without an express license agreement from NVIDIA CORPORATION or
+ * its affiliates is strictly prohibited.
  */
  
 #ifndef __SPCONV_TENSOR_HPP__
@@ -92,8 +81,7 @@ struct Tensor {
   Exported bool empty() const { return data == nullptr || data->empty(); }
   Exported DataType dtype() const { return data ? data->dtype : DataType::None; }
   Exported bool device() const { return data ? data->device : false; }
-  Exported void reference(void *data, std::vector<int64_t> shape, DataType dtype,
-                          bool device = true);
+  Exported void reference(void *data, std::vector<int64_t> shape, DataType dtype, bool device = true);
   Exported void to_device_(void *stream = nullptr);
   Exported void to_host_(void *stream = nullptr);
   Exported Tensor to_device(void *stream = nullptr) const;
@@ -101,11 +89,11 @@ struct Tensor {
   Exported Tensor clone(void *stream = nullptr) const;
   Exported Tensor to_half(void *stream = nullptr) const;
   Exported float absmax(void *stream = nullptr) const;
-  Exported void print(const std::string &prefix = "Tensor", size_t offset = 0,
+  Exported void print(const char* prefix = "Tensor", size_t offset = 0,
                       size_t num_per_line = 10, size_t lines = 1, void* stream = nullptr) const;
   Exported void memset(unsigned char value = 0, void *stream = nullptr);
   Exported void arange(size_t num, void *stream = nullptr);
-  Exported bool save(const std::string &file, void *stream = nullptr) const;
+  Exported bool save(const char* file, void *stream = nullptr) const;
   Exported void create_(const std::vector<int64_t> &shape, DataType dtype, bool device = true);
 
   Exported Tensor() = default;
@@ -119,18 +107,21 @@ struct Tensor {
                                    bool device = true, void *stream = nullptr);
   Exported static Tensor from_data_reference(void *data, std::vector<int64_t> shape, DataType dtype,
                                              bool device = true);
-  Exported static Tensor load(const std::string &file, bool device = true, void* stream = nullptr);
-  Exported static Tensor load_from_raw(const std::string &file, std::vector<int64_t> shape,
+  Exported static Tensor load(const char* file, bool device = true, void* stream = nullptr);
+  Exported static Tensor load_from_raw(const char* file, std::vector<int64_t> shape,
                                        DataType dtype, bool device = true, void* stream = nullptr);
-  Exported static bool save(const Tensor &tensor, const std::string &file, void *stream = nullptr);
+  Exported static bool save(const Tensor &tensor, const char* file, void *stream = nullptr);
 };
 
 Exported std::vector<int64_t> toshape(const std::vector<int> &ishape);
+Exported std::vector<int> toshape(const std::vector<int64_t> &ishape);
 Exported float native_half2float(const unsigned short h);
 Exported const char *dtype_string(DataType dtype);
 Exported size_t dtype_bytes(DataType dtype);
+
+// Note: this is a thread unsafe function.
 template <typename _T>
-Exported std::string format_shape(const std::vector<_T> &shape, bool space = true);
+Exported const char* format_shape(const std::vector<_T> &shape, bool space = true);
 
 };  // namespace spconv
 

@@ -105,6 +105,10 @@ export CUDA_HOME=/path/to/cuda
 
 export CUDNN_Lib=/path/to/cudnn/lib
 
+# For CUDA-11.x:    SPCONV_CUDA_VERSION=11.4
+# For CUDA-12.x:    SPCONV_CUDA_VERSION=12.6
+export SPCONV_CUDA_VERSION=11.4
+
 # resnet50/resnet50int8/swint
 export DEBUG_MODEL=resnet50int8
 

@@ -29,17 +29,23 @@ custrict  := -Werror=all-warnings
 nvcc      := $(CUDA_HOME)/bin/nvcc
 cuda_arch := -gencode arch=compute_80,code=sm_80 \
 			 -gencode arch=compute_86,code=sm_86
-libspconv := libspconv_cuda11
+
+# For example: SPCONV_CUDA_VERSION=11.4  SPCONV_CUDA_VERSION=12.6
+# If your application uses cuda-11.x, you can set SPCONV_CUDA_VERSION=11.4
+# If your application uses cuda-12.x, you can set SPCONV_CUDA_VERSION=12.6
+spconv_cuda_version := cuda$(SPCONV_CUDA_VERSION)
+spconv_library_path := libspconv/lib/$(arch)_$(spconv_cuda_version)
+$(info Use spconv_library_path: $(spconv_library_path))
 
 ifeq ($(arch), aarch64)
 cuda_arch += -gencode arch=compute_87,code=sm_87
 endif
 
-include_paths     := -Isrc -I$(libspconv)/include -I$(CUDA_HOME)/include
+include_paths     := -Isrc -Ilibspconv/include -I$(CUDA_HOME)/include
 cpp_compile_flags := -std=$(stdcpp) $(strict) -g $(optimize) -fPIC -fopenmp -pthread $(include_paths)
 cu_compile_flags  := -std=$(stdcpp) $(custrict) -g $(optimize) $(cuda_arch) -Xcompiler "$(cpp_compile_flags)"
-link_flags        := -L$(libspconv)/lib/$(arch) -L$(CUDA_HOME)/lib64 -lcudart -lstdc++ -ldl -lspconv -lprotobuf -pthread \
-					 -fopenmp -Wl,-rpath='$$ORIGIN' -Wl,-rpath=$(pwd)/$(libspconv)/lib/$(arch)
+link_flags        := -L$(spconv_library_path) -L$(CUDA_HOME)/lib64 -lcudart -lstdc++ -ldl -lspconv -lprotobuf -pthread \
+					 -fopenmp -Wl,-rpath='$$ORIGIN' -Wl,-rpath=$(pwd)/$(spconv_library_path)
 
 ifeq ($(MAKECMDGOALS), pyscn)
 python_include := $(shell python3 -c "import sysconfig;print(sysconfig.get_path('include'))")

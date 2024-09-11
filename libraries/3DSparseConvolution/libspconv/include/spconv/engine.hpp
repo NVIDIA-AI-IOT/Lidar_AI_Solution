@@ -1,24 +1,13 @@
 /*
  * SPDX-FileCopyrightText: Copyright (c) 2023 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
- * SPDX-License-Identifier: MIT
+ * SPDX-License-Identifier: LicenseRef-NvidiaProprietary
  *
- * Permission is hereby granted, free of charge, to any person obtaining a
- * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
- * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
- * DEALINGS IN THE SOFTWARE.
+ * NVIDIA CORPORATION, its affiliates and licensors retain all intellectual
+ * property and proprietary rights in and to this material, related
+ * documentation and any modifications thereto. Any use, reproduction,
+ * disclosure or distribution of this material and related documentation
+ * without an express license agreement from NVIDIA CORPORATION or
+ * its affiliates is strictly prohibited.
  */
  
 #ifndef __SPCONV_ENGINE_HPP__
@@ -34,25 +23,22 @@ namespace spconv {
 #define Exported __attribute__((visibility("default")))
 
 enum class Precision : int { None = 0, Float16 = 1, Int8 = 2 };
+enum class TensorLayout : int { None = 0, NCHW = 1, NCHW32 = 2 };
 
 /**
   Storage of data tensor
 **/
 class SparseDTensor {
  public:
-  virtual const Tensor& features() const = 0;
-  virtual const Tensor& indices() const  = 0;
+  virtual ~SparseDTensor(){}
+  virtual Tensor& features() = 0;
+  virtual Tensor& indices()  = 0;
 
+  virtual void set_grid_size(const std::vector<int>& grid_size) = 0;
   virtual std::vector<int> grid_size() const = 0;
   virtual int device() const = 0;
 
-  virtual std::string name() const = 0;
-
-  virtual void set_data(
-    const std::vector<int64_t>& features_shape, DataType features_dtype, const void* features_data,
-    const std::vector<int64_t>& indices_shape,  DataType indices_dtype,  const void* indices_data, 
-    std::vector<int> grid_size
-  ) = 0;
+  virtual const char* name() const = 0;
 };
 
 /**
@@ -60,6 +46,7 @@ class SparseDTensor {
 **/
 class Engine {
  public:
+  Exported virtual ~Engine(){}
   /**
     Inference function for sparse convolution
 
@@ -82,13 +69,15 @@ class Engine {
 
 class ITensor{
 public:
-  virtual std::string name() = 0;
+  virtual ~ITensor(){}
+  virtual const char* name() = 0;
 };
 
 class INode{
 public:
-  virtual std::string name() = 0;
-  virtual std::string optype() = 0;
+  virtual ~INode(){}
+  virtual const char* name() = 0;
+  virtual const char* optype() = 0;
   virtual ITensor* input(unsigned int index) = 0;
   virtual ITensor* output(unsigned int index) = 0;
 
@@ -98,47 +87,51 @@ public:
 
 class EngineBuilder{
 public:
-  Exported virtual ITensor* push_input(const std::string& name) = 0;
+  Exported virtual ~EngineBuilder(){}
+  Exported virtual ITensor* push_input(const char* name) = 0;
   Exported virtual INode* push_add(
-      const std::string& name, 
+      const char* name, 
       ITensor* a, 
       ITensor* b,
       float a_dynamic_range,
       float b_dynamic_range,
-      const std::string& output_name,
+      const char* output_name,
       Precision precision, Precision output_precision) = 0;
 
   Exported virtual INode* push_relu(
-      const std::string& name, 
+      const char* name, 
       ITensor* x, 
-      const std::string& output_name) = 0;
+      const char* output_name) = 0;
 
   Exported virtual INode* push_dense(
-      const std::string& name, ITensor* x,
-      const std::string& format,
-      const std::string& output_name,
+      const char* name, ITensor* x,
+      const char* format,
+      const char* output_name,
       const std::vector<int>& input_spatial_shape,
-      const std::vector<int>& output_shape) = 0;
+      const std::vector<int>& output_shape,
+      TensorLayout output_layout = TensorLayout::NCHW,
+      float input_dynamic_range = 0.0f              // Enabled if int8 out
+  ) = 0;
 
   Exported virtual INode* push_reshape(
-      const std::string& name, ITensor* x, 
+      const char* name, ITensor* x, 
       const std::vector<int64_t>& shape,
-      const std::string& output_name) = 0;
+      const char* output_name) = 0;
 
   Exported virtual INode* push_transpose(
-      const std::string& name, ITensor* x, 
+      const char* name, ITensor* x, 
       const std::vector<int64_t>& dims,
-      const std::string& output_name) = 0;
+      const char* output_name) = 0;
 
   Exported virtual INode* push_sparse_conv(
-      const std::string& name, 
+      const char* name, 
       ITensor* x,
       const std::vector<unsigned short>& weight,
       const std::vector<int>& weight_shape,
       const std::vector<float>& weight_dynamic_ranges,
       const std::vector<unsigned short>& bias,
       const std::vector<int>& bias_shape,
-      const std::string& activation,
+      const char* activation,
       const std::vector<int>& kernel_size,
       const std::vector<int>& stride,
       const std::vector<int>& padding,
@@ -146,10 +139,10 @@ public:
       float input_dynamic_range,
       bool submanifold,
       int max_output_points,
-      const std::string& rulebook,
+      const char* rulebook,
       Precision precision,
       Precision output_precision,
-      const std::string& output_name, 
+      const char* output_name, 
       bool inverse) = 0;
 
   Exported virtual void push_output(ITensor* value) = 0;
@@ -172,6 +165,7 @@ Exported std::shared_ptr<EngineBuilder> create_engine_builder();
 Exported void set_verbose(bool enable);
 Exported bool get_verbose();
 Exported const char* get_precision_string(Precision precision);
+Exported const char* get_tensor_layout_string(TensorLayout layout);
 
 };  // namespace spconv
 

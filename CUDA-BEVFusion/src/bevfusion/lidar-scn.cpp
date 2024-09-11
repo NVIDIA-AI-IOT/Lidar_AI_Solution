@@ -42,10 +42,9 @@ class SCNImplement : public SCN {
 
   virtual const nvtype::half* forward(const nvtype::half* points, unsigned int num_points, void* stream) override {
     voxelization_->forward(points, num_points, stream, param_.order);
-    native_scn_->input(0)->set_data(
-      std::vector<int64_t>{voxelization_->num_voxels(), voxelization_->voxel_dim()}, spconv::DataType::Float16, voxelization_->features(),
-      std::vector<int64_t>{voxelization_->num_voxels(), voxelization_->indices_dim()}, spconv::DataType::Int32, voxelization_->indices(), voxelization_->grid_size()
-    );
+    native_scn_->input(0)->features().reference((void*)voxelization_->features(), std::vector<int64_t>{voxelization_->num_voxels(), voxelization_->voxel_dim()}, spconv::DataType::Float16);
+    native_scn_->input(0)->indices().reference((void*)voxelization_->indices(), std::vector<int64_t>{voxelization_->num_voxels(), voxelization_->indices_dim()}, spconv::DataType::Int32);
+    native_scn_->input(0)->set_grid_size(voxelization_->grid_size());
     native_scn_->forward(stream);
     return native_scn_->output(0)->features().ptr<nvtype::half>();
   }

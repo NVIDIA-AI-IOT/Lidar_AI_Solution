@@ -12,7 +12,8 @@
 project_folder=$(realpath $(dirname ${BASH_SOURCE[-1]}))
 cd $project_folder
 
-protoc=protoc
+# if /usr/bin/protoc not exists, please try to run: sudo apt install protobuf-compiler -y
+protoc=/usr/bin/protoc
 mkdir -p pbout
 $protoc onnx-ml.proto --cpp_out=pbout
 $protoc onnx-operators-ml.proto --cpp_out=pbout
