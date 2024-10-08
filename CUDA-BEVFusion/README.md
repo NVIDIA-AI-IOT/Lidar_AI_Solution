@@ -23,11 +23,11 @@ This repository contains sources and model for [BEVFusion](https://github.com/mi
 ![](../assets/cuda-bevfusion.gif)
 
 ## Model and Data
-- For quick practice, we provide an example data of nuScenes. You can download it from ( [Google Drive](https://nvidia.box.com/shared/static/g8vxxes3xj1288teyo4og87rn99brdf8) ) or ( [Baidu Drive](https://pan.baidu.com/s/1ED6eospSIF8oIQ2unU9WIQ?pwd=mtvt) ). It contains the following:
+- For quick practice, we provide an example data of nuScenes. You can download it from ( [NVBox](https://nvidia.box.com/shared/static/g8vxxes3xj1288teyo4og87rn99brdf8) ) or ( [Baidu Drive](https://pan.baidu.com/s/1ED6eospSIF8oIQ2unU9WIQ?pwd=mtvt) ). It contains the following:
   1. Camera images in 6 directions.
   2. Transformation matrix of camera/lidar/ego.
   3. Use for bevfusion-pytorch data of example-data.pth, allow export onnx only without depending on the full dataset.
-- All models (model.zip) can be downloaded from ( [Google Drive](https://nvidia.box.com/shared/static/vc1ezra9kw7gu7wg3v8cwuiqshwr8b39) ) or ( [Baidu Drive](https://pan.baidu.com/s/1BiAoQ8L7nC45vEwkN3bSGQ?pwd=8jb6) ). It contains the following:
+- All models (model.zip) can be downloaded from ( [NVBox](https://nvidia.box.com/shared/static/vc1ezra9kw7gu7wg3v8cwuiqshwr8b39) ) or ( [Baidu Drive](https://pan.baidu.com/s/1BiAoQ8L7nC45vEwkN3bSGQ?pwd=8jb6) ). It contains the following:
   1. swin-tiny onnx models.
   2. resnet50 onnx and pytorch models.
   3. resnet50 int8 onnx and PTQ models.
