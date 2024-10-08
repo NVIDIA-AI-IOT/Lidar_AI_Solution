@@ -40,7 +40,7 @@ class EventTimer {
     checkRuntime(cudaEventDestroy(end_));
   }
 
-  void start(cudaStream_t stream) { checkRuntime(cudaEventRecord(begin_, stream)); }
+  void start(cudaStream_t stream) { stream_ = stream; checkRuntime(cudaEventRecord(begin_, stream)); }
 
   float stop(const char* prefix = "timer") {
     float times = 0;
