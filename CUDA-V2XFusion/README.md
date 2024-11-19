@@ -182,7 +182,7 @@ To make the model more robust, the sequence dataset V2X-Seq-SPD also can be adde
 
 - Device: NVIDIA Jetson AGX Orin Developer Kit (MAXN power mode)
 - Version: Jetpack 6.0 DP
-- Modality: Camera + LiDAR
+- Modality: 1xCamera + 1xLiDAR
 - Image Resolution: 864 x 1536
 - Batch size: 4
 
