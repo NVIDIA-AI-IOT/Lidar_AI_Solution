@@ -176,9 +176,9 @@ To make the model more robust, the sequence dataset V2X-Seq-SPD also can be adde
 
 
 ## Performance on Jetson Orin
-| FP16 Dense(ms)| FP16 Spasity(ms) | INT8 Dense(ms) | INT8 Sparsity(ms) |
+| FP16 Dense(fps)| FP16 Spasity(fps) | INT8 Dense(fps) | INT8 Sparsity(fps) |
 | ------ | ------| --------   | ------- |
-| 49.3| 42.2  |  31.6       | 25.3   | 
+| 81 | 95  |  127       | 158   | 
 
 - Device: NVIDIA Jetson AGX Orin Developer Kit (MAXN power mode)
 - Version: Jetpack 6.0 DP
