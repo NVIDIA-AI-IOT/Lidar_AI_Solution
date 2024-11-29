@@ -60,6 +60,9 @@ We have two training mechanisms, including sparsity training (2:4 structured spa
 We have two export configurations available: FP16 (--precision fp16) and INT8 (--precision int8).
 FP16 configuration provides sub-optimal TensorRT performance but the best prediction accuracy when compared to INT8. There are no QDQ nodes in the exported ONNX file.
 INT8 configuration provides optimal TensorRT performance but sub-optimal prediction accuracy when compared to FP16. In this configuration, quantization parameters are present as QDQ nodes in the exported ONNX file.
+
+To standardize the export of quantized and non-quantized models, trained models must first be PTQ, then are exported in FP16 and INT8 formats.
+
 - FP16    
     ```bash
     $ python scripts/export_v2xfusion.py configs/V2X-I/det/centerhead/lssfpn/camera+pointpillar/resnet34/default.yaml ptq.pth --precision fp16
@@ -136,7 +139,7 @@ dbound = [-2, 0, 90]
             <td>60.95</td>
             <td>57.81</td>
             <td>58.43</td>
-            <td><a href="https://nvidia.box.com/shared/static/5s2zjfelbhsmrfmme8g1cm49wuh2y7q3">ptq.pth</a></td>
+            <td>/</td>
         </tr>
         <tr align=center>
             <td>Dense</td>
@@ -164,7 +167,7 @@ dbound = [-2, 0, 90]
             <td>59.28</td>
             <td>58.12</td>
             <td>58.52</td>
-            <td><a href="https://nvidia.box.com/shared/static/0u9ax27szfbxdsjkf4oawyxvssg8p8xw">ptq.pth</a></td>
+            <td>/</td>
         </tr>
     <table>
     </div>
