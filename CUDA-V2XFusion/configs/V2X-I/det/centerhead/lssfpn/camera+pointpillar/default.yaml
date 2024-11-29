@@ -24,7 +24,7 @@ model:
           output_shape: [128, 128]
     camera:
       vtransform:
-        type: LSSTransform
+        type: LSSV2XTransform
         image_size: ${image_size}
         xbound: [-51.2, 51.2, 0.8]
         ybound: [-51.2, 51.2, 0.8]

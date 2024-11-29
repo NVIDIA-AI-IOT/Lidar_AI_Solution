@@ -130,9 +130,10 @@ class Voxelization(torch.autograd.Function):
 class PillarsScatter(torch.autograd.Function):
     @staticmethod
     def forward(ctx, feats, coords, N):
+        batch_size = N.shape[0].item()
         with no_jit_trace():
             N = N[0, 0].item()
-            return PillarsScatter.pts_middle_encoder(feats[:N], coords.view(-1, 4)[:N], 4)
+            return PillarsScatter.pts_middle_encoder(feats[:N], coords.view(-1, 4)[:N], batch_size)
     
     @staticmethod
     def symbolic(g, feats, coords, N):
@@ -183,12 +184,10 @@ class SubclassBEVFusion(nn.Module):
             img_aug_matrix,
             None,
             None,
-            denorms,
-            None,
-            None,
             intervals,
             geometry,
-            num_intervals
+            num_intervals,
+            denorms=denorms
         )
         
         x = self.model.fuser([x, lidar_bev])
@@ -222,11 +221,12 @@ def main():
             ds_cfg.test_mode = True
 
     # build the dataloader
+    bacth_size = 4
     dataset = build_dataset(cfg.data.test)
     data_loader = build_dataloader(
         dataset,
-        samples_per_gpu=4,
-        workers_per_gpu=cfg.data.workers_per_gpu,
+        samples_per_gpu=bacth_size,
+        workers_per_gpu=bacth_size,#cfg.data.workers_per_gpu,
         dist=False,
         shuffle=False,
     )
@@ -266,7 +266,14 @@ def main():
         metas = data["metas"][0]
         points = data["points"]
         feats, coords, sizes = model.model.voxelize(points)
-        MAX = 8000 * 4
+        
+        # max_effective_voxel_count, max_intervals, max_geometry are statistics from the DAIR-V2X-I dataset
+        # intervals and geometry are the numbers after filtering. The geometry is related to the number of batches. Here we take 4 as an example.
+        max_effective_voxel_count = 8000  
+        max_intervals = 10499
+        max_geometry  = 1086935
+        MAX = bacth_size*max_effective_voxel_count 
+        
         lidar_backbone = model.model.encoders["lidar"]["backbone"]
         features = lidar_backbone.pts_voxel_encoder(feats, sizes, coords, do_pfn=False)
         def pad(x):
@@ -274,15 +281,15 @@ def main():
             t[:x.size(0)] = x
             return t
 
-        N = torch.tensor([features.size(0)], dtype=torch.int32).view(1, 1).repeat(4, 1).cuda()
-        num_intervals = torch.tensor([1], dtype=torch.int32).view(1, 1).repeat(4, 1).cuda()
+        N = torch.tensor([features.size(0)], dtype=torch.int32).view(1, 1).repeat(bacth_size, 1).cuda()
+        num_intervals = torch.tensor([1], dtype=torch.int32).view(1, 1).repeat(bacth_size, 1).cuda()
         
-        features = pad(features).view(4, 8000, 10, 9)
-        coords = pad(coords).view(4, 8000, 4)
+        features = pad(features).view(bacth_size, max_effective_voxel_count, cfg.model.encoders.lidar.voxelize.max_num_points, 9)
+        coords = pad(coords).view(bacth_size, max_effective_voxel_count, 4)
         
         TensorQuantizer.use_fb_fake_quant = True
-        intervals = torch.zeros(4, int(10499), 3, dtype=torch.int32)
-        geometry  = torch.zeros(4, int(1086935), dtype=torch.int32)
+        intervals = torch.zeros(bacth_size, int(max_intervals), 3, dtype=torch.int32)
+        geometry  = torch.zeros(bacth_size, int(max_geometry), dtype=torch.int32)
 
         export_file_name = "onemodel-fp16-seq.onnx" if export_fp16 else "onemodel-int8-seq.onnx"
         print(f"Exporting...")

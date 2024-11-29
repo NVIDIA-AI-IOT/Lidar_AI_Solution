@@ -119,9 +119,7 @@ class BEVFusion(Base3DFusionModel):
         img_aug_matrix,
         lidar_aug_matrix,
         img_metas,
-        denorms,
-        sensor2virtual,
-        reference_heights
+        **kwargs
     ) -> torch.Tensor:
         B, N, C, H, W = x.size()
         x = x.view(B * N, C, H, W)
@@ -147,9 +145,7 @@ class BEVFusion(Base3DFusionModel):
             img_aug_matrix,
             lidar_aug_matrix,
             img_metas,
-            denorms,
-            sensor2virtual,
-            reference_heights
+            **kwargs
         )
         return x
 
@@ -203,9 +199,6 @@ class BEVFusion(Base3DFusionModel):
         img_aug_matrix,
         lidar_aug_matrix,
         metas,
-        denorms,
-        sensor2virtual,
-        reference_heights,
         gt_masks_bev=None,
         gt_bboxes_3d=None,
         gt_labels_3d=None,
@@ -226,9 +219,6 @@ class BEVFusion(Base3DFusionModel):
                 img_aug_matrix,
                 lidar_aug_matrix,
                 metas,
-                denorms,
-                sensor2virtual,
-                reference_heights,
                 gt_masks_bev,
                 gt_bboxes_3d,
                 gt_labels_3d,
@@ -250,9 +240,6 @@ class BEVFusion(Base3DFusionModel):
         img_aug_matrix,
         lidar_aug_matrix,
         metas,
-        denorms,
-        sensor2virtual,
-        reference_heights,
         gt_masks_bev=None,
         gt_bboxes_3d=None,
         gt_labels_3d=None,
@@ -275,9 +262,7 @@ class BEVFusion(Base3DFusionModel):
                     img_aug_matrix,
                     lidar_aug_matrix,
                     metas,
-                    denorms,
-                    sensor2virtual,
-                    reference_heights
+                    **kwargs
                 )
             elif sensor == "lidar":
                 feature = self.extract_lidar_features(points)
@@ -293,7 +278,10 @@ class BEVFusion(Base3DFusionModel):
             x = self.fuser(features)
         else:
             assert len(features) == 1, features
-            x = features[0]
+            if 'denorms' in kwargs.keys():
+                x = features[0] 
+            else:
+                x = features[1]
 
         batch_size = x.shape[0]
 

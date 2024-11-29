@@ -37,30 +37,35 @@ if platform.system() != "Windows":
 
 OBJECTSAMPLERS = Registry("Object sampler")
 
+
 def build_dataset(cfg, default_args=None):
-    from mmdet3d.datasets.v2x_dataset import V2XDataset
-    ida_aug_conf ={
-                'final_dim':
-                cfg["dataset"].final_dim,
-                'H':
-                cfg["dataset"].H,
-                'W':
-                cfg["dataset"].W,
-                'bot_pct_lim': (0.0, 0.0),
-                'cams': ['CAM_FRONT'],
-                'Ncams': 1,
-            }
-    
-    img_conf = dict(img_mean = cfg["dataset"].img_mean,
-                img_std = cfg["dataset"].img_std,
-                to_rgb = cfg["dataset"].to_rgb)
-    
-    dataset = V2XDataset(
+    from mmdet3d.datasets.dataset_wrappers import CBGSDataset
+    from mmdet.datasets.dataset_wrappers import ClassBalancedDataset, ConcatDataset, RepeatDataset
+
+    if "type" in cfg and cfg["type"] == "V2XDataset":
+        from mmdet3d.datasets.v2x_dataset import V2XDataset
+
+        ida_aug_conf = {
+            "final_dim": cfg["dataset"].final_dim,
+            "H": cfg["dataset"].H,
+            "W": cfg["dataset"].W,
+            "bot_pct_lim": (0.0, 0.0),
+            "cams": ["CAM_FRONT"],
+            "Ncams": 1,
+        }
+
+        img_conf = dict(
+            img_mean=cfg["dataset"].img_mean,
+            img_std=cfg["dataset"].img_std,
+            to_rgb=cfg["dataset"].to_rgb,
+        )
+
+        dataset = V2XDataset(
             ida_aug_conf=ida_aug_conf,
             classes=cfg["dataset"].object_classes,
             data_root=cfg["dataset"].dataset_root,
-            kitti_root = cfg['dataset'].dataset_kitti_root,
-            result_root = cfg['dataset'].result_root,
+            kitti_root=cfg["dataset"].dataset_kitti_root,
+            result_root=cfg["dataset"].result_root,
             info_path=cfg["dataset"].ann_file,
             is_train=cfg["dataset"].is_train,
             use_cbgs=cfg["dataset"].use_cbgs,
@@ -69,31 +74,26 @@ def build_dataset(cfg, default_args=None):
             sweep_idxes=list(),
             key_idxes=list(),
             return_depth=False,
-    )
+        )
+        return dataset
+    elif isinstance(cfg, (list, tuple)):
+        dataset = ConcatDataset([build_dataset(c, default_args) for c in cfg])
+    elif cfg["type"] == "ConcatDataset":
+        dataset = ConcatDataset(
+            [build_dataset(c, default_args) for c in cfg["datasets"]],
+            cfg.get("separate_eval", True),
+        )
+    elif cfg["type"] == "RepeatDataset":
+        dataset = RepeatDataset(build_dataset(cfg["dataset"], default_args), cfg["times"])
+    elif cfg["type"] == "ClassBalancedDataset":
+        dataset = ClassBalancedDataset(
+            build_dataset(cfg["dataset"], default_args), cfg["oversample_thr"]
+        )
+    elif cfg["type"] == "CBGSDataset":
+        dataset = CBGSDataset(build_dataset(cfg["dataset"], default_args))
+    elif isinstance(cfg.get("ann_file"), (list, tuple)):
+        dataset = _concat_dataset(cfg, default_args)
+    else:
+        dataset = build_from_cfg(cfg, DATASETS, default_args)
+
     return dataset
-
-# def build_dataset(cfg, default_args=None):
-#     from mmdet3d.datasets.dataset_wrappers import CBGSDataset
-#     from mmdet.datasets.dataset_wrappers import ClassBalancedDataset, ConcatDataset, RepeatDataset
-
-#     if isinstance(cfg, (list, tuple)):
-#         dataset = ConcatDataset([build_dataset(c, default_args) for c in cfg])
-#     elif cfg["type"] == "ConcatDataset":
-#         dataset = ConcatDataset(
-#             [build_dataset(c, default_args) for c in cfg["datasets"]],
-#             cfg.get("separate_eval", True),
-#         )
-#     elif cfg["type"] == "RepeatDataset":
-#         dataset = RepeatDataset(build_dataset(cfg["dataset"], default_args), cfg["times"])
-#     elif cfg["type"] == "ClassBalancedDataset":
-#         dataset = ClassBalancedDataset(
-#             build_dataset(cfg["dataset"], default_args), cfg["oversample_thr"]
-#         )
-#     elif cfg["type"] == "CBGSDataset":
-#         dataset = CBGSDataset(build_dataset(cfg["dataset"], default_args))
-#     elif isinstance(cfg.get("ann_file"), (list, tuple)):
-#         dataset = _concat_dataset(cfg, default_args)
-#     else:
-#         dataset = build_from_cfg(cfg, DATASETS, default_args)
-
-#     return dataset

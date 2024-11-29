@@ -20,7 +20,7 @@
 # DEALINGS IN THE SOFTWARE.
 
 import torch
-from mmcv.parallel import MMDistributedDataParallel,MMDataParallel
+from mmcv.parallel import MMDistributedDataParallel, MMDataParallel
 from mmcv.runner import (
     DistSamplerSeedHook,
     EpochBasedRunner,
@@ -34,9 +34,12 @@ from mmdet3d.runner import CustomEpochBasedRunner
 
 from mmdet3d.utils import get_root_logger
 from mmdet.core import DistEvalHook
-from mmdet.datasets import build_dataloader, replace_ImageToTensor
-from mmdet3d.datasets import build_dataset
+from mmdet.datasets import build_dataloader, build_dataset, replace_ImageToTensor
+from mmdet3d.datasets import build_dataset as build_dataset_3d
 from mmdet3d.datasets.v2x_dataset import collate_fn
+from functools import partial
+
+
 def train_model(
     model,
     dataset,
@@ -49,7 +52,7 @@ def train_model(
 
     # prepare data loaders
     dataset = dataset if isinstance(dataset, (list, tuple)) else [dataset]
-    from functools import partial
+
     data_loaders = [
         build_dataloader(
             ds,
@@ -60,8 +63,9 @@ def train_model(
         )
         for ds in dataset
     ]
-    data_loaders[0].collate_fn = partial(collate_fn,is_return_depth=False)
-    
+    if cfg.data.train["type"] == "V2XDataset":
+        data_loaders[0].collate_fn = partial(collate_fn, is_return_depth=False)
+
     if distributed:
         # put model on gpus
         find_unused_parameters = cfg.get("find_unused_parameters", True)
@@ -74,10 +78,7 @@ def train_model(
             find_unused_parameters=find_unused_parameters,
         )
     else:
-        model = MMDataParallel(
-            model.cuda(),
-            device_ids=[torch.cuda.current_device()]
-        )
+        model = MMDataParallel(model.cuda(), device_ids=[torch.cuda.current_device()])
     # build runner
     optimizer = build_optimizer(model, cfg.optimizer)
 
@@ -91,7 +92,7 @@ def train_model(
             meta={},
         ),
     )
-    
+
     if hasattr(runner, "set_dataset"):
         runner.set_dataset(dataset)
 
@@ -132,7 +133,10 @@ def train_model(
         if val_samples_per_gpu > 1:
             # Replace 'ImageToTensor' to 'DefaultFormatBundle'
             cfg.data.val.pipeline = replace_ImageToTensor(cfg.data.val.pipeline)
-        val_dataset = build_dataset(cfg.data.val, dict(test_mode=True))
+        if cfg.data.val["type"] == "V2XDataset":
+            val_dataset = build_dataset_3d(cfg.data.val, dict(test_mode=True))
+        else:
+            val_dataset = build_dataset(cfg.data.val, dict(test_mode=True))
         val_dataloader = build_dataloader(
             val_dataset,
             samples_per_gpu=val_samples_per_gpu,
@@ -140,8 +144,8 @@ def train_model(
             dist=distributed,
             shuffle=False,
         )
-        val_dataloader.collate_fn = partial(collate_fn,is_return_depth=False)
-        
+        if cfg.data.val["type"] == "V2XDataset":
+            val_dataloader.collate_fn = partial(collate_fn, is_return_depth=False)
         eval_cfg = cfg.get("evaluation", {})
         eval_cfg["by_epoch"] = cfg.runner["type"] != "IterBasedRunner"
         eval_hook = DistEvalHook

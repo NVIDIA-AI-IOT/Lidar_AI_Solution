@@ -94,9 +94,9 @@ def get_denorm(sweepego2sweepsensor):
     return denorm
 
 def get_sensor2virtual(denorm):
-    origin_vector = np.array([0, 1, 0])    
+    origin_vector = np.array([0, 1, 0])
     target_vector = -1 * np.array([denorm[0], denorm[1], denorm[2]])
-    target_vector_norm = target_vector / np.sqrt(target_vector[0]**2 + target_vector[1]**2 + target_vector[2]**2)       
+    target_vector_norm = target_vector / np.sqrt(target_vector[0]**2 + target_vector[1]**2 + target_vector[2]**2) 
     sita = math.acos(np.inner(target_vector_norm, origin_vector))
     n_vector = np.cross(target_vector_norm, origin_vector) 
     n_vector = n_vector / np.sqrt(n_vector[0]**2 + n_vector[1]**2 + n_vector[2]**2)
@@ -516,7 +516,6 @@ class V2XDataset(Dataset):
                 for ic in range(len(dtype)):
                     output[:, ic] = data[dtype.names[ic]]
                 data   = output
-                # data = np.concatenate((data, np.zeros((data.shape[0], 1))), axis=1) #### Add for debug
         return data, meta
     
     def get_image(self, cam_infos, cams):
@@ -597,9 +596,9 @@ class V2XDataset(Dataset):
                     cam_info[cam]['calibrated_sensor']['camera_intrinsic'])
                 sweepego2sweepsensor = sweepsensor2sweepego.inverse()
             
-                # if self.is_train and random.random() < 0.5:
-                #     intrin_mat, sweepego2sweepsensor, ratio, roll, transform_pitch = self.sample_intrin_extrin_augmentation(intrin_mat, sweepego2sweepsensor)
-                #     img = img_intrin_extrin_transform(img, ratio, roll, transform_pitch, intrin_mat.numpy())
+                if self.is_train and random.random() < 0.5:
+                    intrin_mat, sweepego2sweepsensor, ratio, roll, transform_pitch = self.sample_intrin_extrin_augmentation(intrin_mat, sweepego2sweepsensor)
+                    img = img_intrin_extrin_transform(img, ratio, roll, transform_pitch, intrin_mat.numpy())
                 
                 denorm = get_denorm(sweepego2sweepsensor.numpy())
                 sweepsensor2sweepego = sweepego2sweepsensor.inverse()
@@ -620,7 +619,7 @@ class V2XDataset(Dataset):
                 if "rotation_matrix" in key_info[cam]['calibrated_sensor'].keys():
                     keysensor2keyego_rot = torch.Tensor(key_info[cam]['calibrated_sensor']['rotation_matrix'])
                 else:
-                    w, x, y, z = key_info[cam]['calibrated_sensor']['rotation']                    
+                    w, x, y, z = key_info[cam]['calibrated_sensor']['rotation']
                     keysensor2keyego_rot = torch.Tensor(
                         Quaternion(w, x, y, z).rotation_matrix)
                 keysensor2keyego_tran = torch.Tensor(
@@ -797,7 +796,6 @@ class V2XDataset(Dataset):
                             break
         image_data_list = self.get_image(cam_infos, cams)
         
-        #### lidar 模块
         lidar_data_list, _ = self.load_pcd(os.path.join(self.data_root,self.infos[idx]['lidar_infos']['LIDAR_TOP']['filename']))
         lidar2camera = self.load_lidar2camera_mat(self.infos[idx]['lidar_infos']['LIDAR_TOP']['filename'], self.data_root)
         
@@ -972,40 +970,31 @@ def collate_fn(data, is_return_depth=False):
         timestamps_batch.append(sweep_timestamps)
         reference_heights_batch.append(sweep_reference_heights)
         img_metas_batch.append(img_metas)
-        gt_boxes = LiDARInstance3DBoxes(gt_boxes, box_dim=gt_boxes.shape[-1], origin=(0.5, 0.5, 0.5))  #### Add for debug
+        gt_boxes = LiDARInstance3DBoxes(gt_boxes, box_dim=gt_boxes.shape[-1], origin=(0.5, 0.5, 0.5))
         gt_boxes_batch.append(gt_boxes)
         gt_labels_batch.append(gt_labels)
         lidar_data_list_batch.append(torch.tensor(lidar_data_list, dtype=torch.float32))
         lidar2camera_batch.append(torch.unsqueeze(torch.tensor(lidar2camera,dtype=torch.float32), dim =0))
         lidar2image = sweep_ida_mats[0,0] @ sweep_intrins[0,0] @ torch.tensor(lidar2camera,dtype=torch.float32)
         lidar2image_batch.append(torch.unsqueeze(lidar2image, dim =0))
-        
-        
-    # Build the identity matrix
-    identity_matrix_batch =[]
-    for ind in range(len(imgs_batch)):
-        identity_matrix = torch.zeros((4, 4))
-        identity_matrix[3, 3] = 1
-        identity_matrix[:3, :3] = torch.eye(3)
-        identity_matrix_batch.append(identity_matrix)
-
+            
+    identity_matrix_batch = torch.eye(4).repeat(len(imgs_batch), 1, 1)
     dict_info = dict()
     dict_info['img'] = torch.cat(imgs_batch, dim=0)
     dict_info['points'] = lidar_data_list_batch
     dict_info['gt_bboxes_3d'] = gt_boxes_batch
     dict_info['gt_labels_3d'] = gt_labels_batch
     dict_info['gt_masks_bev'] = None
-    dict_info['camera_intrinsics'] = torch.cat(intrin_mats_batch, dim=0)            
-    dict_info['camera2ego'] = torch.cat(sensor2ego_mats_batch, dim=0)   #The ego coordinate system can be considered as the lidar coordinate system.
-    dict_info['lidar2ego'] = torch.stack(identity_matrix_batch)  
-    dict_info['lidar2camera'] = torch.stack(lidar2camera_batch)  
-    dict_info['camera2lidar'] = torch.cat(sensor2ego_mats_batch, dim=0)      
-    dict_info['lidar2image'] = torch.stack(lidar2image_batch)  
-    dict_info['img_aug_matrix'] = torch.cat(ida_mats_batch, dim=0)   
-    dict_info['lidar_aug_matrix'] =torch.stack(identity_matrix_batch) # No augmentation
+    dict_info['camera_intrinsics'] = torch.cat(intrin_mats_batch, dim=0)
+    dict_info['camera2ego'] = torch.cat(sensor2ego_mats_batch, dim=0)
+    dict_info['lidar2ego'] = identity_matrix_batch  
+    dict_info['lidar2camera'] = torch.stack(lidar2camera_batch)
+    dict_info['camera2lidar'] = torch.cat(sensor2ego_mats_batch, dim=0)
+    dict_info['lidar2image'] = torch.stack(lidar2image_batch)
+    dict_info['img_aug_matrix'] = torch.cat(ida_mats_batch, dim=0) 
+    dict_info['lidar_aug_matrix'] = identity_matrix_batch  
     dict_info['denorms'] = torch.stack(denorms_batch)
     dict_info['sensor2virtual'] = torch.cat(sensor2virtual_mats_batch, dim =0)
     dict_info['reference_heights'] = torch.cat(reference_heights_batch, dim =0)
-
-    dict_info['metas'] = img_metas_batch      
+    dict_info['metas'] = img_metas_batch
     return dict_info
