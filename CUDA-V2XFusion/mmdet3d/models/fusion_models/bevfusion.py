@@ -128,8 +128,11 @@ class BEVFusion(Base3DFusionModel):
         x = self.encoders["camera"]["neck"](x)
 
         if not isinstance(x, torch.Tensor):
-            x = x[1]
-
+            if 'denorms' in kwargs.keys():
+                x = x[1]
+            else:
+                x = x[0]
+                
         BN, C, H, W = x.size()
         x = x.view(B, int(BN / B), C, H, W)
 
@@ -278,10 +281,7 @@ class BEVFusion(Base3DFusionModel):
             x = self.fuser(features)
         else:
             assert len(features) == 1, features
-            if 'denorms' in kwargs.keys():
-                x = features[0] 
-            else:
-                x = features[1]
+            x = features[0]
 
         batch_size = x.shape[0]
 

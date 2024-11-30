@@ -162,10 +162,6 @@ class LSSV2XTransform(V2XTransform):
         if export:
             BN, C, fH, fW = map(int, x.shape)
             x = self.depthnet(x)
-            # depth = x[:, : self.D].softmax(dim=1)
-            # torch.save([depth, x[:, self.D : (self.D + self.C)]], "depth+feat.pth")
-            # x = depth.unsqueeze(1) * x[:, self.D : (self.D + self.C)].unsqueeze(2)
-
             depth = x[:, : self.D].softmax(dim=1)
             feat  = x[:, self.D : (self.D + self.C)]
             
@@ -175,12 +171,9 @@ class LSSV2XTransform(V2XTransform):
                 x = x.view(-1, N, self.C, self.D, fH, fW)
                 x = x.permute(0, 1, 3, 4, 5, 2)
             return feat, depth, x
-    
         else:
             B, N, C, fH, fW = x.shape
-
             x = x.view(B * N, C, fH, fW)
-
             x = self.depthnet(x)
             depth = x[:, : self.D].softmax(dim=1)
             x = depth.unsqueeze(1) * x[:, self.D : (self.D + self.C)].unsqueeze(2)
