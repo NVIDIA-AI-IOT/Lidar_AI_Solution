@@ -121,7 +121,12 @@ public:
 
     virtual int32_t enqueue(PluginTensorDesc const* inputDesc, PluginTensorDesc const* outputDesc,
         void const* const* inputs, void* const* outputs, void* workspace, cudaStream_t stream) noexcept{
-        
+
+        if(inputDesc[0].dims.nbDims != 3){
+            printf("Unsupported tensor dims: %d (expected 3)\n", inputDesc[0].dims.nbDims);
+            return 1;
+        }
+
         // B, N, C
         int N = inputDesc[0].dims.d[0] * inputDesc[0].dims.d[1];
         int C = inputDesc[0].dims.d[2];
@@ -139,6 +144,12 @@ public:
             layernorm_kernel<float><<<grid, block, 0, stream>>>((float*)x, (float*)weight, (float*)bias, (float*)y, N, C, this->epsilon);
         }else{
             // not implemented
+            return 1;
+        }
+
+        auto code = cudaPeekAtLastError();
+        if(code != cudaSuccess){
+            printf("Failed to run kernel(layernorm_kernel) with dtype %d\n", (int)inputDesc[0].type);
             return 1;
         }
         return 0;
