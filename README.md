@@ -104,7 +104,7 @@ YUV to RGB conversion. Combine Resize/Padding/Conversion/Normalization into a si
     - **Normalization**
 
 ## roi_conversion(CUDA Conversion)
-ROI to RGB conversion. Combine Resize/Padding/Conversion/Normalization into a single kernel function.
+ROIs to continuous tensor conversion. Combine Resize/Padding/Conversion/Normalization into a single kernel function.
 - **Most of the time, it can be bit-aligned with OpenCV.**
     - It will give an exact result when the scaling factor is a rational number.
     - Better performance is usually achieved when the stride can divide by 4.
