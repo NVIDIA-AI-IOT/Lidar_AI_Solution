@@ -11,12 +11,12 @@ ROIs to continuous tensor conversion. This is a library for implementing convers
 - Async API to run on specific CUDA stream
 
 ## 2. unitests
-### 2.1 build
+### 2.1 Build
 ```bash
 $ export CUDA_VER=12.6 && make
 ```
 
-### 2.2 test cases
+### 2.2 Test Cases
 ```bash
 $ mkdir outputs
 $ python3 unitests/test_nv12.py     #input nv12
