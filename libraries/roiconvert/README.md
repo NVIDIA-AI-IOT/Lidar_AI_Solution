@@ -9,7 +9,6 @@ ROIs to continuous tensor conversion. This is a library for implementing convers
 - Rescale interpolation support Nearest and Bilinear mode
 - Verifed to keep exactly the same output as OpenCV
 - Async API to run on specific CUDA stream
-- Command line:
 
 ## 2. unitests
 ### 2.1 build
