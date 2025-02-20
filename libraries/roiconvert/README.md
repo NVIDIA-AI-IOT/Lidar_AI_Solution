@@ -14,11 +14,10 @@ ROIs to continuous tensor conversion. This is a library for implementing convers
 ## 2. unitests
 ### 2.1 build
 ```bash
-$ export CUDA_VER=12.6
-$ make
+$ export CUDA_VER=12.6 && make
 ```
 
-### 2.1 test cases
+### 2.2 test cases
 ```bash
 $ mkdir outputs
 $ python3 unitests/test_nv12.py     #input nv12
@@ -28,7 +27,7 @@ or
 $ python3  unitests/test_all.py     #input all supported formats.
 ```
 
-### 2.2 Performance
+### 2.3 Performance
 
 ```bash
 $ python3  unitests/test_perf.py
@@ -36,9 +35,9 @@ $ python3  unitests/test_perf.py
 Performance Table
 |Device            |             Conditions                      |  time consuming(ms)  |
 | ---------------- | ------------------------------------------- | --------- |
-|RTX 6000 Ada      |                   --                        |   0.20998 |
+|RTX 6000 Ada      |   cuda12.6                                  |   0.20998 |
 
-### 2.3 How to Verify the Accuracy
+### 2.4 How to Verify the Accuracy
 Reszie the RGBA source to a specific size by roi_conversion and opencv respectively. Then compare the two results.
 ```
 $ pip install numpy opencv-python
