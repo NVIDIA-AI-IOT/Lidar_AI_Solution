@@ -103,6 +103,33 @@ YUV to RGB conversion. Combine Resize/Padding/Conversion/Normalization into a si
     - **Conversion**
     - **Normalization**
 
+## ROI Conversion (ROIs To Continuous Tensor Conversion)
+Combine Resize/Padding/Conversion/Normalization into a single kernel function.
+- **Most of the time, it can be bit-aligned with OpenCV.**
+    - It will give an exact result when the scaling factor is a rational number.
+    - Better performance is usually achieved when the stride can divide by 4.
+- Supported Input Format:
+    - **NV12BlockLinear**
+    - **NV12PitchLinear**
+    - **YUV422Packed_YUYV**
+- Supported Interpolation methods:
+    - **Nearest**
+    - **Bilinear**
+- Supported Output Data Type:
+    - **Uint8**
+    - **Float32**
+    - **Float16**
+- Supported Output Layout:
+    - **CHW_RGB/BGR**
+    - **HWC_RGB/BGR**
+    - **CHW16/32/4/RGB/BGR for DLA input**
+    - **Gray**
+- Supported Features:
+    - **Resize**
+    - **Padding**
+    - **Conversion**
+    - **Normalization**
+
 ## Thanks
 This project makes use of a number of awesome open source libraries, including:
 
