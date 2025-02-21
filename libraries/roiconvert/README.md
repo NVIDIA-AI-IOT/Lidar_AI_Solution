@@ -10,7 +10,7 @@ ROIs to continuous tensor conversion. This is a library for implementing convers
 - Verifed to keep exactly the same output as OpenCV
 - Async API to run on specific CUDA stream
 
-## 2. unitests
+## 2. Unitests
 ### 2.1 Build
 ```bash
 $ export CUDA_VER=12.6 && make
@@ -19,11 +19,9 @@ $ export CUDA_VER=12.6 && make
 ### 2.2 Test Cases
 ```bash
 $ mkdir outputs
-$ python3 unitests/test_nv12.py     #input nv12
-or
-$ python3 unitests/test_rgba.py     #input rgba
-or
-$ python3  unitests/test_all.py     #input all supported formats.
+$ python3 unitests/test_nv12.py     #Input nv12
+$ python3 unitests/test_rgba.py     #Input rgba
+$ python3  unitests/test_all.py     #Input all supported formats.
 ```
 
 ### 2.3 Performance
@@ -32,9 +30,36 @@ $ python3  unitests/test_all.py     #input all supported formats.
 $ python3  unitests/test_perf.py
 ```
 Performance Table
-|Device            |             Conditions                      |  time consuming(ms)  |
-| ---------------- | ------------------------------------------- | --------- |
-|RTX 6000 Ada      |   cuda12.6                                  |   0.20998 |
+<table>
+<thead>
+  <tr>
+    <th>Input</th>
+    <th colspan="6">NV12 Block Linear</th>
+  </tr>
+</thead>
+<tbody>
+  <tr>
+    <td>Foumal</td>
+    <td colspan="6">R/G/B_Output = (R/G/B - offset_R/G/B) * scale_R/G/B</td>
+  </tr>
+  <tr>
+    <td>Environment</td>
+    <td colspan="6">RTX 6000 Ada / CUDA12.6 / BATCHSIZE=16</td>
+  </tr>
+  <tr>
+    <td>Output(RGB)</td>
+    <td>NHWC</td>
+  </tr>
+  <tr>
+    <td>Input-Output</td>
+    <td>1920x1080-960x544</td>
+  </tr>
+  <tr>
+    <td>FP32/Nearest</td>
+    <td>0.20998ms</td>
+  </tr>
+</tbody>
+</table>
 
 ### 2.4 How to Verify the Accuracy
 Reszie the RGBA source to a specific size by roi_conversion and opencv respectively. Then compare the two results.
