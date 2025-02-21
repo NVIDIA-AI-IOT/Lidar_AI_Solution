@@ -48,7 +48,7 @@ Performance Table
   </tr>
   <tr>
     <td>Output(RGB)</td>
-    <td>NHWC</td>
+    <td>NCHW</td>
   </tr>
   <tr>
     <td>Input-Output</td>
