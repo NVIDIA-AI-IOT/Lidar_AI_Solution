@@ -133,6 +133,10 @@ class cuOSD {
     cuosd_draw_rotationbox(context_, cx, cy, width, height, yaw, thickness, pytocolor(border_color), interpolation, pytocolor(bg_color));
   }
 
+  void ellipse(int cx, int cy, int width, int height, float yaw, int thickness, py::tuple border_color, py::tuple bg_color){
+    cuosd_draw_ellipse(context_, cx, cy, width, height, yaw, thickness, pytocolor(border_color), pytocolor(bg_color));
+  }
+
   void segmentmask(int left, int top, int right, int bottom, int thickness, float* d_seg, int seg_width, int seg_height, float seg_threshold, py::tuple border_color, py::tuple seg_color){
     cuosd_draw_segmentmask(context_, left, top, right, bottom, thickness, d_seg, seg_width, seg_height, seg_threshold, pytocolor(border_color), pytocolor(seg_color));
   }

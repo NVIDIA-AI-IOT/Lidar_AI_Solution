@@ -451,6 +451,15 @@ void cuosd_draw_rotationbox(
     context->commands.emplace_back(cmd);
 }
 
+void cuosd_draw_ellipse(
+    cuOSDContext_t _context, int cx, int cy, int width, int height, float yaw, int thickness, cuOSDColor border_color, cuOSDColor bg_color
+) {
+    cuOSDContextImpl* context = (cuOSDContextImpl*)_context;
+    if (border_color.a == 0) return;
+    if (bg_color.a && thickness > 0) context->commands.emplace_back(make_shared<EllipseCommand>(cx, cy, width, height, yaw, -thickness, bg_color.r, bg_color.g, bg_color.b, bg_color.a));
+    context->commands.emplace_back(make_shared<EllipseCommand>(cx, cy, width, height, yaw, thickness, border_color.r, border_color.g, border_color.b, border_color.a));
+}
+
 void cuosd_draw_polyline(
     cuOSDContext_t _context, int* h_pts, int* d_pts, int n_pts, int thickness, bool is_closed, cuOSDColor border_color, bool interpolation, cuOSDColor fill_color
 ) {
@@ -878,6 +887,8 @@ void cuosd_apply(
                 byte_of_commands += sizeof(RectangleCommand);
             else if (cmd->type == CommandType::Circle)
                 byte_of_commands += sizeof(CircleCommand);
+            else if (cmd->type == CommandType::Ellipse)
+                byte_of_commands += sizeof(EllipseCommand);
             else if (cmd->type == CommandType::Segment)
                 byte_of_commands += sizeof(SegmentCommand);
             else if (cmd->type == CommandType::PolyFill)
@@ -905,6 +916,8 @@ void cuosd_apply(
                 memcpy(pg_cmd, cmd.get(), sizeof(RectangleCommand));
             else if (cmd->type == CommandType::Circle)
                 memcpy(pg_cmd, cmd.get(), sizeof(CircleCommand));
+            else if (cmd->type == CommandType::Ellipse)
+                memcpy(pg_cmd, cmd.get(), sizeof(EllipseCommand));
             else if (cmd->type == CommandType::Segment)
                 memcpy(pg_cmd, cmd.get(), sizeof(SegmentCommand));
             else if (cmd->type == CommandType::PolyFill)

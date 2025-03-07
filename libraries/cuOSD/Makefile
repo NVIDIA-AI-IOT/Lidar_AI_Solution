@@ -116,7 +116,7 @@ endif
 
 all      : cuosd
 run      : cuosd
-	@./cuosd polyline
+	@./cuosd ellipse
 
 simple      : cuosd
 	@./cuosd simple

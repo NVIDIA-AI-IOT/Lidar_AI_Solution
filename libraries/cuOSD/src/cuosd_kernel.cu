@@ -113,6 +113,36 @@ CircleCommand::CircleCommand(int cx, int cy, int radius, int thickness, unsigned
     this->bounding_bottom = cy + radius + half_thickness;
 }
 
+EllipseCommand::EllipseCommand(int cx, int cy, int width, int height, float yaw, int thickness, unsigned char c0, unsigned char c1, unsigned char c2, unsigned char c3) {
+    this->type = CommandType::Ellipse;
+    this->cx = cx;
+    this->cy = cy;
+    this->width     = width;
+    this->height    = height;
+    this->yaw       = yaw;
+    this->thickness = thickness;
+    this->c0 = c0;
+    this->c1 = c1;
+    this->c2 = c2;
+    this->c3 = c3;
+
+    int a = max((width / 2), 1);
+    int b = max((height / 2), 1);
+    float cos_ = cos(yaw);
+    float sin_ = sin(yaw);
+
+    this->radius  = max(a, b);
+    this->afactor = ((cos_*cos_)/float(a*a) + (sin_*sin_)/float(b*b)) * this->radius * this->radius;
+    this->bfactor = (2 * (1/float(b*b) - 1/float(a*a)) * sin_ * cos_) * this->radius * this->radius;
+    this->cfactor = ((sin_*sin_)/float(a*a) + (cos_*cos_)/float(b*b)) * this->radius * this->radius;
+
+    int half_thickness = (thickness + 1) / 2 + 2;
+    this->bounding_left  = cx - this->radius - half_thickness;
+    this->bounding_right = cx + this->radius + half_thickness;
+    this->bounding_top   = cy - this->radius - half_thickness;
+    this->bounding_bottom = cy + this->radius + half_thickness;
+}
+
 RectangleCommand::RectangleCommand() {
     this->type = CommandType::Rectangle;
 }
@@ -289,6 +319,39 @@ static __device__ void render_circle_interpolation(
     float tr1 = sqrt((float)(ix + 1 - p->cx) * (ix + 1 - p->cx) + (iy - p->cy) * (iy - p->cy));
     float tr2 = sqrt((float)(ix - p->cx) * (ix - p->cx) + (iy + 1 - p->cy) * (iy + 1 - p->cy));
     float tr3 = sqrt((float)(ix + 1 - p->cx) * (ix + 1 - p->cx) + (iy + 1 - p->cy) * (iy + 1 - p->cy));
+
+    int inner_boundsize = p->radius - p->thickness / 2;
+    int external_boundsize = inner_boundsize + p->thickness;
+
+    if (p->thickness < 0) {
+        if (p->thickness == -1) {
+            external_boundsize = p->radius;
+        } else {
+            external_boundsize = inner_boundsize;
+        }
+        inner_boundsize = 0;
+    }
+
+    unsigned char alpha0 = interpolation_fn(tr0, inner_boundsize, external_boundsize, 1, p->c3);
+    unsigned char alpha1 = interpolation_fn(tr1, inner_boundsize, external_boundsize, 1, p->c3);
+    unsigned char alpha2 = interpolation_fn(tr2, inner_boundsize, external_boundsize, 1, p->c3);
+    unsigned char alpha3 = interpolation_fn(tr3, inner_boundsize, external_boundsize, 1, p->c3);
+
+    if (alpha0){blend_single_color(color[0], p->c0, p->c1, p->c2, alpha0);}
+    if (alpha1){blend_single_color(color[1], p->c0, p->c1, p->c2, alpha1);}
+    if (alpha2){blend_single_color(color[2], p->c0, p->c1, p->c2, alpha2);}
+    if (alpha3){blend_single_color(color[3], p->c0, p->c1, p->c2, alpha3);}
+}
+
+// render_ellipse_interpolation:
+// render ellipse with border interpolation
+static __device__ void render_ellipse_interpolation(
+    int ix, int iy, EllipseCommand* p, uchar4 color[4]
+) {
+    float tr0 = sqrt((float)(ix - p->cx) * (ix - p->cx) * p->afactor + (ix - p->cx) *  (iy - p->cy) * p->bfactor + (iy - p->cy) * (iy - p->cy) * p->cfactor);
+    float tr1 = sqrt((float)(ix + 1 - p->cx) * (ix + 1 - p->cx) * p->afactor + (ix + 1 - p->cx) * (iy - p->cy) * p->bfactor + (iy - p->cy) * (iy - p->cy) * p->cfactor);
+    float tr2 = sqrt((float)(ix - p->cx) * (ix - p->cx) * p->afactor + (ix - p->cx) * (iy + 1 - p->cy) * p->bfactor + (iy + 1 - p->cy) * (iy + 1 - p->cy) * p->cfactor);
+    float tr3 = sqrt((float)(ix + 1 - p->cx) * (ix + 1 - p->cx) * p->afactor + (ix + 1 - p->cx) * (iy + 1 - p->cy) * p->bfactor + (iy + 1 - p->cy) * (iy + 1 - p->cy) * p->cfactor);
 
     int inner_boundsize = p->radius - p->thickness / 2;
     int external_boundsize = inner_boundsize + p->thickness;
@@ -833,6 +896,11 @@ static __global__ void render_elements_kernel(
             case CommandType::Circle:{
                 CircleCommand* circle_cmd = (CircleCommand*)pcommand;
                 render_circle_interpolation(ix, iy, circle_cmd, context_color);
+                break;
+            }
+            case CommandType::Ellipse:{
+                EllipseCommand* ellipse_cmd = (EllipseCommand*)pcommand;
+                render_ellipse_interpolation(ix, iy, ellipse_cmd, context_color);
                 break;
             }
             case CommandType::Segment:{

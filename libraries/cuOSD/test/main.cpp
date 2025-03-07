@@ -246,6 +246,35 @@ static int polyline() {
     return 0;
 }
 
+static int ellipse() {
+    cudaStream_t stream = nullptr;
+    checkRuntime(cudaStreamCreateWithFlags(&stream, cudaStreamNonBlocking));
+
+    printf("Test cuosd_draw_ellipse.\n");
+    auto context = cuosd_context_create();
+    gpu::Image* image = gpu::create_image(1280, 720, gpu::ImageFormat::PitchLinearNV12);
+    gpu::set_color(image, 255, 255, 255, 255, stream);
+    gpu::copy_yuvnv12_to(image, 0, 0, 1280, 720, "data/image/nv12_3840x2160.yuv", 3840, 2160, 180, stream);
+    gpu::save_image(image, "input.png", stream);
+
+    int h = 720;
+    int w = 1280;
+    float pi = 3.1415925f;
+
+    // cuosd_draw_ellipse(context, 600, 300, 200, 50, pi/2, 5, {0, 0, 255, 200}, {0, 255, 0, 0});
+    for (int i = 0; i < 10; ++i)
+    {
+        cuosd_draw_ellipse(context, randl(0, w), randl(0, h), randl(10, 300), randl(10, 300), pi / randl(0, 360), randl(1, 10), {255, 255, 0, 200}, {0, 0, 255, 200});
+    };
+    cuosd_apply(context, image, stream);
+    cuosd_context_destroy(context);
+
+    printf("Save to output.png\n");
+    gpu::save_image(image, "output.png", stream);
+    checkRuntime(cudaStreamDestroy(stream));
+    return 0;
+}
+
 static int segment() {
     cudaStream_t stream = nullptr;
     checkRuntime(cudaStreamCreateWithFlags(&stream, cudaStreamNonBlocking));
@@ -738,6 +767,8 @@ int main(int argc, char **argv)
         return segment();
     } else if (strcmp(cmd, "segment2") == 0) {
         return segment2();
+    } else if (strcmp(cmd, "ellipse") == 0) {
+        return ellipse();
     } else if (strcmp(cmd, "polyline") == 0) {
         return polyline();
     } else if (strcmp(cmd, "comp") == 0) {

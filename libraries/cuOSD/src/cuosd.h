@@ -121,6 +121,12 @@ void cuosd_draw_boxblur(
 void cuosd_draw_rotationbox(
     cuOSDContext_t _context, int cx, int cy, int width, int height, float yaw, int thickness, cuOSDColor border_color, bool interpolation = false, cuOSDColor bg_color = {0, 0, 0, 0});
 
+// cuosd_draw_ellipse: draw ellipse element on given cuOSD context.
+// width, height: full length of ellipse axis on x-axis and y-axis.
+// yaw: rotation angle from y-axis, clockwise +, unit in rad.
+void cuosd_draw_ellipse(
+    cuOSDContext_t _context, int cx, int cy, int width, int height, float yaw, int thickness, cuOSDColor border_color, cuOSDColor bg_color = {0, 0, 0, 0});
+
 // cuosd_draw_segmentmask: draw segmentation mask on given cuOSD context.
 // d_seg: device pointer of segmentation mask, alpha in seg_color is ignored.
 // thickness should > 0 for drawing border, threshold: Threshold for binarization
