@@ -34,7 +34,7 @@ Draw all elements using a single CUDA kernel.
   </tr>
   <tr>
     <td>Ellipse</td>
-    <td>center x, center y, radius, thickness, border color, background color</td>
+    <td>center x, center y, width, height, yaw, thickness, border color, background color</td>
   </tr>
   <tr>
     <td>Rectangle</td>
