@@ -96,11 +96,11 @@ To verify result:
 - Summary performance using 6019 data from nuscenes
 ![](workspace/perf.png)
 
-## Note
+## Notes
 - The current version supports compute arch are required sm_80, sm_86, and sm_87..
 - Supported operators:
   - SparseConvolution, Add, Relu, Add&Relu, ScatterDense, Reshape and ScatterDense&Transpose.
 - Supported SparseConvolution:
-  - SpatiallySparseConvolution and SubmanifoldSparseConvolution.
+  - SpatiallySparseConvolution, SparseInverseConvolution, and SubmanifoldSparseConvolution.
 - Supported properties of SparseConvolution:
   - activation, kernel_size, dilation, stride, padding, rulebook, subm, output_bound, precision and output_precision.
