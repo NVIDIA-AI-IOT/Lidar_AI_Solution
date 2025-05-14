@@ -27,20 +27,12 @@
 #include <fstream>
 #include <numeric>
 #include <unordered_map>
+#include <algorithm>
 
 namespace spconv{
 
-#define LOGV(fmt, ...)                                         \
-  do {                                                         \
-    if (get_verbose()) {                                           \
-      printf("\033[33m[Verb🚩]\033[0m " fmt "\n", __VA_ARGS__); \
-    }                                                          \
-  } while (0)
-
-#define LOGERR(fmt, ...)                                        \
-  do {                                                          \
-    printf("\033[31m[Erro❌ ]\033[0m " fmt "\n", __VA_ARGS__);   \
-  } while (0)
+#define LOGV(...)   spconv::logger_output(__FILE__, __LINE__, spconv::LoggerLevel::Verb, __VA_ARGS__)
+#define LOGERR(...) spconv::logger_output(__FILE__, __LINE__, spconv::LoggerLevel::Error, __VA_ARGS__)
 
 struct ParameterFP16Data{
     std::vector<unsigned short> data;
@@ -78,6 +70,15 @@ static ParameterFP16Data get_initializer_data(const onnx::GraphProto& graph, con
     return output;
 };
 
+static bool has_attribute(const onnx::NodeProto& node, const std::string& name) {
+    for (int i = 0; i < node.attribute_size(); ++i) {
+        auto& attr = node.attribute(i);
+        if (attr.name() == name) 
+            return true;
+    }
+    return false;
+};
+
 static onnx::AttributeProto get_attribute(const onnx::NodeProto& node, const std::string& name) {
     for (int i = 0; i < node.attribute_size(); ++i) {
         auto& attr = node.attribute(i);
@@ -92,7 +93,7 @@ static onnx::AttributeProto get_attribute(const onnx::NodeProto& node, const std
 static std::vector<int> get_attribute_as_intarray(const onnx::NodeProto& node, const std::string& name) {
     auto ints = get_attribute(node, name).ints();
     std::vector<int> output(ints.size());
-    for (int i = 0; i < ints.size(); ++i) 
+    for (size_t i = 0; i < ints.size(); ++i) 
         output[i] = ints[i];
     return output;
 };
@@ -117,9 +118,21 @@ std::shared_ptr<Engine> load_engine_from_onnx(const std::string& onnx_file, Prec
         tensor_map_by_name[name] = builder->push_input(name.c_str());
     }
 
+    const char* fixed_launch_points_str = getenv("SPCONV_FIXED_LAUNCH_POINTS");
     std::vector<spconv::ITensor*> collect_outputs;
     for (int i = 0; i < model.graph().node_size(); ++i) {
         auto& node = model.graph().node(i);
+        unsigned int fixed_launch_points = 5000;
+        if(has_attribute(node, "fixed_launch_points")){
+            fixed_launch_points = get_attribute(node, "fixed_launch_points").i();
+            LOGV("using fixed_launch_points from attribute: %d for node: %s", fixed_launch_points, node.name().c_str());
+        }else if(fixed_launch_points_str != nullptr){
+            LOGV("using fixed_launch_points from environment variable SPCONV_FIXED_LAUNCH_POINTS: %s for node: %s", fixed_launch_points_str, node.name().c_str());
+            fixed_launch_points = atoi(fixed_launch_points_str);
+        }else{
+            LOGV("Using default fixed_launch_points: %d for node: %s", fixed_launch_points, node.name().c_str());
+        }
+        
         if (node.op_type() == "SparseConvolution") {
 
             auto x = tensor_map_by_name[node.input(0)];
@@ -128,6 +141,18 @@ std::shared_ptr<Engine> load_engine_from_onnx(const std::string& onnx_file, Prec
             auto weight_dynamic_ranges_proto = get_attribute(node, "weight_dynamic_ranges");
             auto weight_dynamic_ranges = 
                 std::vector<float>(weight_dynamic_ranges_proto.floats().begin(), weight_dynamic_ranges_proto.floats().end());
+
+            unsigned int output_bound = 150000;
+            if(has_attribute(node, "output_bound")){
+                output_bound = get_attribute(node, "output_bound").i();
+            }else{
+                LOGV("using default output_bound: %d", output_bound);
+            }
+
+            std::string rulebook = "";
+            if(has_attribute(node, "rulebook")){
+                rulebook = get_attribute(node, "rulebook").s();
+            }
 
             auto n = builder->push_sparse_conv(
                 node.name().c_str(), x, 
@@ -141,8 +166,9 @@ std::shared_ptr<Engine> load_engine_from_onnx(const std::string& onnx_file, Prec
                 get_attribute_as_intarray(node, "dilation"),
                 get_attribute(node, "input_dynamic_range").f(),
                 get_attribute(node, "subm").i(),
-                get_attribute(node, "output_bound").i(),
-                get_attribute(node, "rulebook").s().c_str(),
+                output_bound,
+                fixed_launch_points,
+                rulebook.c_str(),
                 get_attribute(node, "precision").s() == "int8" ? Precision::Int8 : Precision::Float16,
                 get_attribute(node, "output_precision").s() == "int8" ? Precision::Int8 : Precision::Float16,
                 node.output(0).c_str(),
@@ -164,7 +190,8 @@ std::shared_ptr<Engine> load_engine_from_onnx(const std::string& onnx_file, Prec
                 get_attribute(node, "input1_dynamic_range").f(),
                 node.output(0).c_str(), 
                 get_attribute(node, "precision").s() == "int8" ? Precision::Int8 : Precision::Float16,
-                get_attribute(node, "output_precision").s() == "int8" ? Precision::Int8 : Precision::Float16
+                get_attribute(node, "output_precision").s() == "int8" ? Precision::Int8 : Precision::Float16,
+                fixed_launch_points
             );
             tensor_map_by_name[node.output(0)] = n->output(0);
         } else if (node.op_type() == "Relu") {
@@ -178,7 +205,7 @@ std::shared_ptr<Engine> load_engine_from_onnx(const std::string& onnx_file, Prec
             auto format = get_attribute(node, "format").s();
             auto input_dynamic_range = get_attribute(node, "input_dynamic_range").f();
             auto layout = get_attribute(node, "output_layout").s() == "NCHW32" ? spconv::TensorLayout::NCHW32 : spconv::TensorLayout::NCHW;
-            auto n = builder->push_dense(node.name().c_str(), x, format.c_str(), node.output(0).c_str(), input_spatial_shape, output_shape, layout, input_dynamic_range);
+            auto n = builder->push_dense(node.name().c_str(), x, format.c_str(), node.output(0).c_str(), input_spatial_shape, output_shape, layout, input_dynamic_range, fixed_launch_points);
             tensor_map_by_name[node.output(0)] = n->output(0);
         } else if (node.op_type() == "Reshape") {
             auto x = tensor_map_by_name[node.input(0)];

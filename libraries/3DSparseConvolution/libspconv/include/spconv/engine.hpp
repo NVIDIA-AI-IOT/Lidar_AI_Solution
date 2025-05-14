@@ -24,6 +24,13 @@ namespace spconv {
 
 enum class Precision : int { None = 0, Float16 = 1, Int8 = 2 };
 enum class TensorLayout : int { None = 0, NCHW = 1, NCHW32 = 2 };
+enum class LoggerLevel : int {Verb = 0, Warn = 1, Error = 2, Quiet = 99};
+
+class ILogger{
+public:
+  virtual ~ILogger() = default;
+  virtual void log(const char* message, LoggerLevel level, const char* file, int line) const = 0;
+};
 
 /**
   Storage of data tensor
@@ -37,8 +44,9 @@ class SparseDTensor {
   virtual void set_grid_size(const std::vector<int>& grid_size) = 0;
   virtual std::vector<int> grid_size() const = 0;
   virtual int device() const = 0;
-
   virtual const char* name() const = 0;
+  virtual void set_dds_num_of_points_pointer(uint32_t* pointer) = 0;
+  virtual uint32_t* get_dds_num_of_points_pointer() = 0;
 };
 
 /**
@@ -96,7 +104,7 @@ public:
       float a_dynamic_range,
       float b_dynamic_range,
       const char* output_name,
-      Precision precision, Precision output_precision) = 0;
+      Precision precision, Precision output_precision, uint32_t fixed_launch_points) = 0;
 
   Exported virtual INode* push_relu(
       const char* name, 
@@ -110,7 +118,8 @@ public:
       const std::vector<int>& input_spatial_shape,
       const std::vector<int>& output_shape,
       TensorLayout output_layout = TensorLayout::NCHW,
-      float input_dynamic_range = 0.0f              // Enabled if int8 out
+      float input_dynamic_range = 0.0f ,             // Enabled if int8 output is used,
+      uint32_t input_bound = 0                     
   ) = 0;
 
   Exported virtual INode* push_reshape(
@@ -138,7 +147,8 @@ public:
       const std::vector<int>& dilation,
       float input_dynamic_range,
       bool submanifold,
-      int max_output_points,
+      uint32_t max_output_points,
+      uint32_t fixed_launch_points,
       const char* rulebook,
       Precision precision,
       Precision output_precision,
@@ -156,16 +166,14 @@ public:
 */
 Exported std::shared_ptr<EngineBuilder> create_engine_builder();
 
-/**
-  Enable detailed information output
-
-  enable: You should set this to true if you want to debug the model inference process. default:
-  false
-*/
-Exported void set_verbose(bool enable);
-Exported bool get_verbose();
 Exported const char* get_precision_string(Precision precision);
 Exported const char* get_tensor_layout_string(TensorLayout layout);
+Exported void set_logger_level(LoggerLevel level);
+Exported void set_logger(ILogger* logger);
+Exported LoggerLevel get_logger_level();
+Exported ILogger* get_logger();
+Exported const char* logger_level_string(LoggerLevel level);
+Exported void logger_output(const char* file, int line, LoggerLevel level, const char* fmt, ...);
 
 };  // namespace spconv
 

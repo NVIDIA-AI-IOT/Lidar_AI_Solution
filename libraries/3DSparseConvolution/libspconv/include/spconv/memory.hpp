@@ -161,6 +161,11 @@ class GPUMemory {
 class GPUDataManager {
  public:
   std::shared_ptr<GPUData> query_or_alloc(const std::string &tensor_id) {
+    if(tensor_id == "__no_reuse_policy_here__"){
+      std::shared_ptr<GPUData> output;
+      output.reset(new GPUData(tensor_id));
+      return output;
+    }
     std::shared_ptr<GPUData> &output = data_dict_[tensor_id];
     if (output == nullptr) {
       output.reset(new GPUData(tensor_id));

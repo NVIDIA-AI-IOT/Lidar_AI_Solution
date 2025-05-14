@@ -14,80 +14,87 @@
 #include <google/protobuf/wire_format.h>
 // @@protoc_insertion_point(includes)
 #include <google/protobuf/port_def.inc>
-extern PROTOBUF_INTERNAL_EXPORT_onnx_2dml_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<2> scc_info_FunctionProto_onnx_2dml_2eproto;
-extern PROTOBUF_INTERNAL_EXPORT_onnx_2doperators_2dml_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_OperatorProto_onnx_2doperators_2dml_2eproto;
+
+PROTOBUF_PRAGMA_INIT_SEG
+
+namespace _pb = ::PROTOBUF_NAMESPACE_ID;
+namespace _pbi = _pb::internal;
+
 namespace onnx {
-class OperatorProtoDefaultTypeInternal {
- public:
-  ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<OperatorProto> _instance;
-} _OperatorProto_default_instance_;
-class OperatorSetProtoDefaultTypeInternal {
- public:
-  ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<OperatorSetProto> _instance;
-} _OperatorSetProto_default_instance_;
+PROTOBUF_CONSTEXPR OperatorProto::OperatorProto(
+    ::_pbi::ConstantInitialized): _impl_{
+    /*decltype(_impl_._has_bits_)*/{}
+  , /*decltype(_impl_._cached_size_)*/{}
+  , /*decltype(_impl_.op_type_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
+  , /*decltype(_impl_.doc_string_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
+  , /*decltype(_impl_.since_version_)*/int64_t{0}
+  , /*decltype(_impl_.status_)*/0} {}
+struct OperatorProtoDefaultTypeInternal {
+  PROTOBUF_CONSTEXPR OperatorProtoDefaultTypeInternal()
+      : _instance(::_pbi::ConstantInitialized{}) {}
+  ~OperatorProtoDefaultTypeInternal() {}
+  union {
+    OperatorProto _instance;
+  };
+};
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 OperatorProtoDefaultTypeInternal _OperatorProto_default_instance_;
+PROTOBUF_CONSTEXPR OperatorSetProto::OperatorSetProto(
+    ::_pbi::ConstantInitialized): _impl_{
+    /*decltype(_impl_._has_bits_)*/{}
+  , /*decltype(_impl_._cached_size_)*/{}
+  , /*decltype(_impl_.operator__)*/{}
+  , /*decltype(_impl_.functions_)*/{}
+  , /*decltype(_impl_.magic_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
+  , /*decltype(_impl_.ir_version_prerelease_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
+  , /*decltype(_impl_.domain_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
+  , /*decltype(_impl_.doc_string_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
+  , /*decltype(_impl_.ir_build_metadata_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
+  , /*decltype(_impl_.ir_version_)*/int64_t{0}
+  , /*decltype(_impl_.opset_version_)*/int64_t{0}} {}
+struct OperatorSetProtoDefaultTypeInternal {
+  PROTOBUF_CONSTEXPR OperatorSetProtoDefaultTypeInternal()
+      : _instance(::_pbi::ConstantInitialized{}) {}
+  ~OperatorSetProtoDefaultTypeInternal() {}
+  union {
+    OperatorSetProto _instance;
+  };
+};
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 OperatorSetProtoDefaultTypeInternal _OperatorSetProto_default_instance_;
 }  // namespace onnx
-static void InitDefaultsscc_info_OperatorProto_onnx_2doperators_2dml_2eproto() {
-  GOOGLE_PROTOBUF_VERIFY_VERSION;
+static ::_pb::Metadata file_level_metadata_onnx_2doperators_2dml_2eproto[2];
+static constexpr ::_pb::EnumDescriptor const** file_level_enum_descriptors_onnx_2doperators_2dml_2eproto = nullptr;
+static constexpr ::_pb::ServiceDescriptor const** file_level_service_descriptors_onnx_2doperators_2dml_2eproto = nullptr;
 
-  {
-    void* ptr = &::onnx::_OperatorProto_default_instance_;
-    new (ptr) ::onnx::OperatorProto();
-    ::PROTOBUF_NAMESPACE_ID::internal::OnShutdownDestroyMessage(ptr);
-  }
-  ::onnx::OperatorProto::InitAsDefaultInstance();
-}
-
-::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_OperatorProto_onnx_2doperators_2dml_2eproto =
-    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 0, 0, InitDefaultsscc_info_OperatorProto_onnx_2doperators_2dml_2eproto}, {}};
-
-static void InitDefaultsscc_info_OperatorSetProto_onnx_2doperators_2dml_2eproto() {
-  GOOGLE_PROTOBUF_VERIFY_VERSION;
-
-  {
-    void* ptr = &::onnx::_OperatorSetProto_default_instance_;
-    new (ptr) ::onnx::OperatorSetProto();
-    ::PROTOBUF_NAMESPACE_ID::internal::OnShutdownDestroyMessage(ptr);
-  }
-  ::onnx::OperatorSetProto::InitAsDefaultInstance();
-}
-
-::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<2> scc_info_OperatorSetProto_onnx_2doperators_2dml_2eproto =
-    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 2, 0, InitDefaultsscc_info_OperatorSetProto_onnx_2doperators_2dml_2eproto}, {
-      &scc_info_OperatorProto_onnx_2doperators_2dml_2eproto.base,
-      &scc_info_FunctionProto_onnx_2dml_2eproto.base,}};
-
-static ::PROTOBUF_NAMESPACE_ID::Metadata file_level_metadata_onnx_2doperators_2dml_2eproto[2];
-static constexpr ::PROTOBUF_NAMESPACE_ID::EnumDescriptor const** file_level_enum_descriptors_onnx_2doperators_2dml_2eproto = nullptr;
-static constexpr ::PROTOBUF_NAMESPACE_ID::ServiceDescriptor const** file_level_service_descriptors_onnx_2doperators_2dml_2eproto = nullptr;
-
-const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_onnx_2doperators_2dml_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
-  PROTOBUF_FIELD_OFFSET(::onnx::OperatorProto, _has_bits_),
+const uint32_t TableStruct_onnx_2doperators_2dml_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
+  PROTOBUF_FIELD_OFFSET(::onnx::OperatorProto, _impl_._has_bits_),
   PROTOBUF_FIELD_OFFSET(::onnx::OperatorProto, _internal_metadata_),
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
-  PROTOBUF_FIELD_OFFSET(::onnx::OperatorProto, op_type_),
-  PROTOBUF_FIELD_OFFSET(::onnx::OperatorProto, since_version_),
-  PROTOBUF_FIELD_OFFSET(::onnx::OperatorProto, status_),
-  PROTOBUF_FIELD_OFFSET(::onnx::OperatorProto, doc_string_),
+  ~0u,  // no _inlined_string_donated_
+  PROTOBUF_FIELD_OFFSET(::onnx::OperatorProto, _impl_.op_type_),
+  PROTOBUF_FIELD_OFFSET(::onnx::OperatorProto, _impl_.since_version_),
+  PROTOBUF_FIELD_OFFSET(::onnx::OperatorProto, _impl_.status_),
+  PROTOBUF_FIELD_OFFSET(::onnx::OperatorProto, _impl_.doc_string_),
   0,
   2,
   3,
   1,
-  PROTOBUF_FIELD_OFFSET(::onnx::OperatorSetProto, _has_bits_),
+  PROTOBUF_FIELD_OFFSET(::onnx::OperatorSetProto, _impl_._has_bits_),
   PROTOBUF_FIELD_OFFSET(::onnx::OperatorSetProto, _internal_metadata_),
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
-  PROTOBUF_FIELD_OFFSET(::onnx::OperatorSetProto, magic_),
-  PROTOBUF_FIELD_OFFSET(::onnx::OperatorSetProto, ir_version_),
-  PROTOBUF_FIELD_OFFSET(::onnx::OperatorSetProto, ir_version_prerelease_),
-  PROTOBUF_FIELD_OFFSET(::onnx::OperatorSetProto, ir_build_metadata_),
-  PROTOBUF_FIELD_OFFSET(::onnx::OperatorSetProto, domain_),
-  PROTOBUF_FIELD_OFFSET(::onnx::OperatorSetProto, opset_version_),
-  PROTOBUF_FIELD_OFFSET(::onnx::OperatorSetProto, doc_string_),
-  PROTOBUF_FIELD_OFFSET(::onnx::OperatorSetProto, operator__),
-  PROTOBUF_FIELD_OFFSET(::onnx::OperatorSetProto, functions_),
+  ~0u,  // no _inlined_string_donated_
+  PROTOBUF_FIELD_OFFSET(::onnx::OperatorSetProto, _impl_.magic_),
+  PROTOBUF_FIELD_OFFSET(::onnx::OperatorSetProto, _impl_.ir_version_),
+  PROTOBUF_FIELD_OFFSET(::onnx::OperatorSetProto, _impl_.ir_version_prerelease_),
+  PROTOBUF_FIELD_OFFSET(::onnx::OperatorSetProto, _impl_.ir_build_metadata_),
+  PROTOBUF_FIELD_OFFSET(::onnx::OperatorSetProto, _impl_.domain_),
+  PROTOBUF_FIELD_OFFSET(::onnx::OperatorSetProto, _impl_.opset_version_),
+  PROTOBUF_FIELD_OFFSET(::onnx::OperatorSetProto, _impl_.doc_string_),
+  PROTOBUF_FIELD_OFFSET(::onnx::OperatorSetProto, _impl_.operator__),
+  PROTOBUF_FIELD_OFFSET(::onnx::OperatorSetProto, _impl_.functions_),
   0,
   5,
   1,
@@ -98,14 +105,14 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_onnx_2doperators_2dml_2eproto:
   ~0u,
   ~0u,
 };
-static const ::PROTOBUF_NAMESPACE_ID::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
-  { 0, 9, sizeof(::onnx::OperatorProto)},
-  { 13, 27, sizeof(::onnx::OperatorSetProto)},
+static const ::_pbi::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
+  { 0, 10, -1, sizeof(::onnx::OperatorProto)},
+  { 14, 29, -1, sizeof(::onnx::OperatorSetProto)},
 };
 
-static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] = {
-  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::onnx::_OperatorProto_default_instance_),
-  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::onnx::_OperatorSetProto_default_instance_),
+static const ::_pb::Message* const file_default_instances[] = {
+  &::onnx::_OperatorProto_default_instance_._instance,
+  &::onnx::_OperatorSetProto_default_instance_._instance,
 };
 
 const char descriptor_table_protodef_onnx_2doperators_2dml_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
@@ -121,32 +128,31 @@ const char descriptor_table_protodef_onnx_2doperators_2dml_2eproto[] PROTOBUF_SE
   "OperatorProto\022&\n\tfunctions\030\t \003(\0132\023.onnx."
   "FunctionProto"
   ;
-static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_onnx_2doperators_2dml_2eproto_deps[1] = {
+static const ::_pbi::DescriptorTable* const descriptor_table_onnx_2doperators_2dml_2eproto_deps[1] = {
   &::descriptor_table_onnx_2dml_2eproto,
 };
-static ::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase*const descriptor_table_onnx_2doperators_2dml_2eproto_sccs[2] = {
-  &scc_info_OperatorProto_onnx_2doperators_2dml_2eproto.base,
-  &scc_info_OperatorSetProto_onnx_2doperators_2dml_2eproto.base,
+static ::_pbi::once_flag descriptor_table_onnx_2doperators_2dml_2eproto_once;
+const ::_pbi::DescriptorTable descriptor_table_onnx_2doperators_2dml_2eproto = {
+    false, false, 413, descriptor_table_protodef_onnx_2doperators_2dml_2eproto,
+    "onnx-operators-ml.proto",
+    &descriptor_table_onnx_2doperators_2dml_2eproto_once, descriptor_table_onnx_2doperators_2dml_2eproto_deps, 1, 2,
+    schemas, file_default_instances, TableStruct_onnx_2doperators_2dml_2eproto::offsets,
+    file_level_metadata_onnx_2doperators_2dml_2eproto, file_level_enum_descriptors_onnx_2doperators_2dml_2eproto,
+    file_level_service_descriptors_onnx_2doperators_2dml_2eproto,
 };
-static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_onnx_2doperators_2dml_2eproto_once;
-const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_onnx_2doperators_2dml_2eproto = {
-  false, false, descriptor_table_protodef_onnx_2doperators_2dml_2eproto, "onnx-operators-ml.proto", 413,
-  &descriptor_table_onnx_2doperators_2dml_2eproto_once, descriptor_table_onnx_2doperators_2dml_2eproto_sccs, descriptor_table_onnx_2doperators_2dml_2eproto_deps, 2, 1,
-  schemas, file_default_instances, TableStruct_onnx_2doperators_2dml_2eproto::offsets,
-  file_level_metadata_onnx_2doperators_2dml_2eproto, 2, file_level_enum_descriptors_onnx_2doperators_2dml_2eproto, file_level_service_descriptors_onnx_2doperators_2dml_2eproto,
-};
+PROTOBUF_ATTRIBUTE_WEAK const ::_pbi::DescriptorTable* descriptor_table_onnx_2doperators_2dml_2eproto_getter() {
+  return &descriptor_table_onnx_2doperators_2dml_2eproto;
+}
 
 // Force running AddDescriptors() at dynamic initialization time.
-static bool dynamic_init_dummy_onnx_2doperators_2dml_2eproto = (static_cast<void>(::PROTOBUF_NAMESPACE_ID::internal::AddDescriptors(&descriptor_table_onnx_2doperators_2dml_2eproto)), true);
+PROTOBUF_ATTRIBUTE_INIT_PRIORITY2 static ::_pbi::AddDescriptorsRunner dynamic_init_dummy_onnx_2doperators_2dml_2eproto(&descriptor_table_onnx_2doperators_2dml_2eproto);
 namespace onnx {
 
 // ===================================================================
 
-void OperatorProto::InitAsDefaultInstance() {
-}
 class OperatorProto::_Internal {
  public:
-  using HasBits = decltype(std::declval<OperatorProto>()._has_bits_);
+  using HasBits = decltype(std::declval<OperatorProto>()._impl_._has_bits_);
   static void set_has_op_type(HasBits* has_bits) {
     (*has_bits)[0] |= 1u;
   }
@@ -161,173 +167,195 @@ class OperatorProto::_Internal {
   }
 };
 
-OperatorProto::OperatorProto(::PROTOBUF_NAMESPACE_ID::Arena* arena)
-  : ::PROTOBUF_NAMESPACE_ID::Message(arena) {
-  SharedCtor();
-  RegisterArenaDtor(arena);
+OperatorProto::OperatorProto(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                         bool is_message_owned)
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena, is_message_owned) {
+  SharedCtor(arena, is_message_owned);
   // @@protoc_insertion_point(arena_constructor:onnx.OperatorProto)
 }
 OperatorProto::OperatorProto(const OperatorProto& from)
-  : ::PROTOBUF_NAMESPACE_ID::Message(),
-      _has_bits_(from._has_bits_) {
+  : ::PROTOBUF_NAMESPACE_ID::Message() {
+  OperatorProto* const _this = this; (void)_this;
+  new (&_impl_) Impl_{
+      decltype(_impl_._has_bits_){from._impl_._has_bits_}
+    , /*decltype(_impl_._cached_size_)*/{}
+    , decltype(_impl_.op_type_){}
+    , decltype(_impl_.doc_string_){}
+    , decltype(_impl_.since_version_){}
+    , decltype(_impl_.status_){}};
+
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
-  op_type_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  _impl_.op_type_.InitDefault();
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    _impl_.op_type_.Set("", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
   if (from._internal_has_op_type()) {
-    op_type_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from._internal_op_type(),
-      GetArena());
+    _this->_impl_.op_type_.Set(from._internal_op_type(), 
+      _this->GetArenaForAllocation());
   }
-  doc_string_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  _impl_.doc_string_.InitDefault();
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    _impl_.doc_string_.Set("", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
   if (from._internal_has_doc_string()) {
-    doc_string_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from._internal_doc_string(),
-      GetArena());
+    _this->_impl_.doc_string_.Set(from._internal_doc_string(), 
+      _this->GetArenaForAllocation());
   }
-  ::memcpy(&since_version_, &from.since_version_,
-    static_cast<size_t>(reinterpret_cast<char*>(&status_) -
-    reinterpret_cast<char*>(&since_version_)) + sizeof(status_));
+  ::memcpy(&_impl_.since_version_, &from._impl_.since_version_,
+    static_cast<size_t>(reinterpret_cast<char*>(&_impl_.status_) -
+    reinterpret_cast<char*>(&_impl_.since_version_)) + sizeof(_impl_.status_));
   // @@protoc_insertion_point(copy_constructor:onnx.OperatorProto)
 }
 
-void OperatorProto::SharedCtor() {
-  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&scc_info_OperatorProto_onnx_2doperators_2dml_2eproto.base);
-  op_type_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  doc_string_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  ::memset(&since_version_, 0, static_cast<size_t>(
-      reinterpret_cast<char*>(&status_) -
-      reinterpret_cast<char*>(&since_version_)) + sizeof(status_));
+inline void OperatorProto::SharedCtor(
+    ::_pb::Arena* arena, bool is_message_owned) {
+  (void)arena;
+  (void)is_message_owned;
+  new (&_impl_) Impl_{
+      decltype(_impl_._has_bits_){}
+    , /*decltype(_impl_._cached_size_)*/{}
+    , decltype(_impl_.op_type_){}
+    , decltype(_impl_.doc_string_){}
+    , decltype(_impl_.since_version_){int64_t{0}}
+    , decltype(_impl_.status_){0}
+  };
+  _impl_.op_type_.InitDefault();
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    _impl_.op_type_.Set("", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  _impl_.doc_string_.InitDefault();
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    _impl_.doc_string_.Set("", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
 }
 
 OperatorProto::~OperatorProto() {
   // @@protoc_insertion_point(destructor:onnx.OperatorProto)
+  if (auto *arena = _internal_metadata_.DeleteReturnArena<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>()) {
+  (void)arena;
+    return;
+  }
   SharedDtor();
-  _internal_metadata_.Delete<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
-void OperatorProto::SharedDtor() {
-  GOOGLE_DCHECK(GetArena() == nullptr);
-  op_type_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  doc_string_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+inline void OperatorProto::SharedDtor() {
+  GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
+  _impl_.op_type_.Destroy();
+  _impl_.doc_string_.Destroy();
 }
 
-void OperatorProto::ArenaDtor(void* object) {
-  OperatorProto* _this = reinterpret_cast< OperatorProto* >(object);
-  (void)_this;
-}
-void OperatorProto::RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena*) {
-}
 void OperatorProto::SetCachedSize(int size) const {
-  _cached_size_.Set(size);
+  _impl_._cached_size_.Set(size);
 }
-const OperatorProto& OperatorProto::default_instance() {
-  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&::scc_info_OperatorProto_onnx_2doperators_2dml_2eproto.base);
-  return *internal_default_instance();
-}
-
 
 void OperatorProto::Clear() {
 // @@protoc_insertion_point(message_clear_start:onnx.OperatorProto)
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  cached_has_bits = _has_bits_[0];
+  cached_has_bits = _impl_._has_bits_[0];
   if (cached_has_bits & 0x00000003u) {
     if (cached_has_bits & 0x00000001u) {
-      op_type_.ClearNonDefaultToEmpty();
+      _impl_.op_type_.ClearNonDefaultToEmpty();
     }
     if (cached_has_bits & 0x00000002u) {
-      doc_string_.ClearNonDefaultToEmpty();
+      _impl_.doc_string_.ClearNonDefaultToEmpty();
     }
   }
   if (cached_has_bits & 0x0000000cu) {
-    ::memset(&since_version_, 0, static_cast<size_t>(
-        reinterpret_cast<char*>(&status_) -
-        reinterpret_cast<char*>(&since_version_)) + sizeof(status_));
+    ::memset(&_impl_.since_version_, 0, static_cast<size_t>(
+        reinterpret_cast<char*>(&_impl_.status_) -
+        reinterpret_cast<char*>(&_impl_.since_version_)) + sizeof(_impl_.status_));
   }
-  _has_bits_.Clear();
+  _impl_._has_bits_.Clear();
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
-const char* OperatorProto::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
+const char* OperatorProto::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) {
 #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
   _Internal::HasBits has_bits{};
-  ::PROTOBUF_NAMESPACE_ID::Arena* arena = GetArena(); (void)arena;
   while (!ctx->Done(&ptr)) {
-    ::PROTOBUF_NAMESPACE_ID::uint32 tag;
-    ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
-    CHK_(ptr);
+    uint32_t tag;
+    ptr = ::_pbi::ReadTag(ptr, &tag);
     switch (tag >> 3) {
       // optional string op_type = 1;
       case 1:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 10)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 10)) {
           auto str = _internal_mutable_op_type();
-          ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
-          #ifndef NDEBUG
-          ::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "onnx.OperatorProto.op_type");
-          #endif  // !NDEBUG
+          ptr = ::_pbi::InlineGreedyStringParser(str, ptr, ctx);
           CHK_(ptr);
-        } else goto handle_unusual;
+          #ifndef NDEBUG
+          ::_pbi::VerifyUTF8(str, "onnx.OperatorProto.op_type");
+          #endif  // !NDEBUG
+        } else
+          goto handle_unusual;
         continue;
       // optional int64 since_version = 2;
       case 2:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 16)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 16)) {
           _Internal::set_has_since_version(&has_bits);
-          since_version_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          _impl_.since_version_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
-        } else goto handle_unusual;
+        } else
+          goto handle_unusual;
         continue;
       // optional .onnx.OperatorStatus status = 3;
       case 3:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 24)) {
-          ::PROTOBUF_NAMESPACE_ID::uint64 val = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 24)) {
+          uint64_t val = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
           if (PROTOBUF_PREDICT_TRUE(::onnx::OperatorStatus_IsValid(val))) {
             _internal_set_status(static_cast<::onnx::OperatorStatus>(val));
           } else {
             ::PROTOBUF_NAMESPACE_ID::internal::WriteVarint(3, val, mutable_unknown_fields());
           }
-        } else goto handle_unusual;
+        } else
+          goto handle_unusual;
         continue;
       // optional string doc_string = 10;
       case 10:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 82)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 82)) {
           auto str = _internal_mutable_doc_string();
-          ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
-          #ifndef NDEBUG
-          ::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "onnx.OperatorProto.doc_string");
-          #endif  // !NDEBUG
+          ptr = ::_pbi::InlineGreedyStringParser(str, ptr, ctx);
           CHK_(ptr);
-        } else goto handle_unusual;
+          #ifndef NDEBUG
+          ::_pbi::VerifyUTF8(str, "onnx.OperatorProto.doc_string");
+          #endif  // !NDEBUG
+        } else
+          goto handle_unusual;
         continue;
-      default: {
-      handle_unusual:
-        if ((tag & 7) == 4 || tag == 0) {
-          ctx->SetLastTag(tag);
-          goto success;
-        }
-        ptr = UnknownFieldParse(tag,
-            _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
-            ptr, ctx);
-        CHK_(ptr != nullptr);
-        continue;
-      }
+      default:
+        goto handle_unusual;
     }  // switch
+  handle_unusual:
+    if ((tag == 0) || ((tag & 7) == 4)) {
+      CHK_(ptr);
+      ctx->SetLastTag(tag);
+      goto message_done;
+    }
+    ptr = UnknownFieldParse(
+        tag,
+        _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
+        ptr, ctx);
+    CHK_(ptr != nullptr);
   }  // while
-success:
-  _has_bits_.Or(has_bits);
+message_done:
+  _impl_._has_bits_.Or(has_bits);
   return ptr;
 failure:
   ptr = nullptr;
-  goto success;
+  goto message_done;
 #undef CHK_
 }
 
-::PROTOBUF_NAMESPACE_ID::uint8* OperatorProto::_InternalSerialize(
-    ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+uint8_t* OperatorProto::_InternalSerialize(
+    uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
   // @@protoc_insertion_point(serialize_to_array_start:onnx.OperatorProto)
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
-  cached_has_bits = _has_bits_[0];
+  cached_has_bits = _impl_._has_bits_[0];
   // optional string op_type = 1;
   if (cached_has_bits & 0x00000001u) {
     ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::VerifyUTF8StringNamedField(
@@ -341,13 +369,13 @@ failure:
   // optional int64 since_version = 2;
   if (cached_has_bits & 0x00000004u) {
     target = stream->EnsureSpace(target);
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt64ToArray(2, this->_internal_since_version(), target);
+    target = ::_pbi::WireFormatLite::WriteInt64ToArray(2, this->_internal_since_version(), target);
   }
 
   // optional .onnx.OperatorStatus status = 3;
   if (cached_has_bits & 0x00000008u) {
     target = stream->EnsureSpace(target);
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteEnumToArray(
+    target = ::_pbi::WireFormatLite::WriteEnumToArray(
       3, this->_internal_status(), target);
   }
 
@@ -362,7 +390,7 @@ failure:
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
+    target = ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
   }
   // @@protoc_insertion_point(serialize_to_array_end:onnx.OperatorProto)
@@ -373,11 +401,11 @@ size_t OperatorProto::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:onnx.OperatorProto)
   size_t total_size = 0;
 
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  cached_has_bits = _has_bits_[0];
+  cached_has_bits = _impl_._has_bits_[0];
   if (cached_has_bits & 0x0000000fu) {
     // optional string op_type = 1;
     if (cached_has_bits & 0x00000001u) {
@@ -395,72 +423,51 @@ size_t OperatorProto::ByteSizeLong() const {
 
     // optional int64 since_version = 2;
     if (cached_has_bits & 0x00000004u) {
-      total_size += 1 +
-        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int64Size(
-          this->_internal_since_version());
+      total_size += ::_pbi::WireFormatLite::Int64SizePlusOne(this->_internal_since_version());
     }
 
     // optional .onnx.OperatorStatus status = 3;
     if (cached_has_bits & 0x00000008u) {
       total_size += 1 +
-        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::EnumSize(this->_internal_status());
+        ::_pbi::WireFormatLite::EnumSize(this->_internal_status());
     }
 
   }
-  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
-    return ::PROTOBUF_NAMESPACE_ID::internal::ComputeUnknownFieldsSize(
-        _internal_metadata_, total_size, &_cached_size_);
-  }
-  int cached_size = ::PROTOBUF_NAMESPACE_ID::internal::ToCachedSize(total_size);
-  SetCachedSize(cached_size);
-  return total_size;
+  return MaybeComputeUnknownFieldsSize(total_size, &_impl_._cached_size_);
 }
 
-void OperatorProto::MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
-// @@protoc_insertion_point(generalized_merge_from_start:onnx.OperatorProto)
-  GOOGLE_DCHECK_NE(&from, this);
-  const OperatorProto* source =
-      ::PROTOBUF_NAMESPACE_ID::DynamicCastToGenerated<OperatorProto>(
-          &from);
-  if (source == nullptr) {
-  // @@protoc_insertion_point(generalized_merge_from_cast_fail:onnx.OperatorProto)
-    ::PROTOBUF_NAMESPACE_ID::internal::ReflectionOps::Merge(from, this);
-  } else {
-  // @@protoc_insertion_point(generalized_merge_from_cast_success:onnx.OperatorProto)
-    MergeFrom(*source);
-  }
-}
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData OperatorProto::_class_data_ = {
+    ::PROTOBUF_NAMESPACE_ID::Message::CopyWithSourceCheck,
+    OperatorProto::MergeImpl
+};
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*OperatorProto::GetClassData() const { return &_class_data_; }
 
-void OperatorProto::MergeFrom(const OperatorProto& from) {
-// @@protoc_insertion_point(class_specific_merge_from_start:onnx.OperatorProto)
-  GOOGLE_DCHECK_NE(&from, this);
-  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+
+void OperatorProto::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg) {
+  auto* const _this = static_cast<OperatorProto*>(&to_msg);
+  auto& from = static_cast<const OperatorProto&>(from_msg);
+  // @@protoc_insertion_point(class_specific_merge_from_start:onnx.OperatorProto)
+  GOOGLE_DCHECK_NE(&from, _this);
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
-  cached_has_bits = from._has_bits_[0];
+  cached_has_bits = from._impl_._has_bits_[0];
   if (cached_has_bits & 0x0000000fu) {
     if (cached_has_bits & 0x00000001u) {
-      _internal_set_op_type(from._internal_op_type());
+      _this->_internal_set_op_type(from._internal_op_type());
     }
     if (cached_has_bits & 0x00000002u) {
-      _internal_set_doc_string(from._internal_doc_string());
+      _this->_internal_set_doc_string(from._internal_doc_string());
     }
     if (cached_has_bits & 0x00000004u) {
-      since_version_ = from.since_version_;
+      _this->_impl_.since_version_ = from._impl_.since_version_;
     }
     if (cached_has_bits & 0x00000008u) {
-      status_ = from.status_;
+      _this->_impl_.status_ = from._impl_.status_;
     }
-    _has_bits_[0] |= cached_has_bits;
+    _this->_impl_._has_bits_[0] |= cached_has_bits;
   }
-}
-
-void OperatorProto::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
-// @@protoc_insertion_point(generalized_copy_from_start:onnx.OperatorProto)
-  if (&from == this) return;
-  Clear();
-  MergeFrom(from);
+  _this->_internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
 }
 
 void OperatorProto::CopyFrom(const OperatorProto& from) {
@@ -476,30 +483,37 @@ bool OperatorProto::IsInitialized() const {
 
 void OperatorProto::InternalSwap(OperatorProto* other) {
   using std::swap;
-  _internal_metadata_.Swap<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(&other->_internal_metadata_);
-  swap(_has_bits_[0], other->_has_bits_[0]);
-  op_type_.Swap(&other->op_type_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
-  doc_string_.Swap(&other->doc_string_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  auto* lhs_arena = GetArenaForAllocation();
+  auto* rhs_arena = other->GetArenaForAllocation();
+  _internal_metadata_.InternalSwap(&other->_internal_metadata_);
+  swap(_impl_._has_bits_[0], other->_impl_._has_bits_[0]);
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::InternalSwap(
+      &_impl_.op_type_, lhs_arena,
+      &other->_impl_.op_type_, rhs_arena
+  );
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::InternalSwap(
+      &_impl_.doc_string_, lhs_arena,
+      &other->_impl_.doc_string_, rhs_arena
+  );
   ::PROTOBUF_NAMESPACE_ID::internal::memswap<
-      PROTOBUF_FIELD_OFFSET(OperatorProto, status_)
-      + sizeof(OperatorProto::status_)
-      - PROTOBUF_FIELD_OFFSET(OperatorProto, since_version_)>(
-          reinterpret_cast<char*>(&since_version_),
-          reinterpret_cast<char*>(&other->since_version_));
+      PROTOBUF_FIELD_OFFSET(OperatorProto, _impl_.status_)
+      + sizeof(OperatorProto::_impl_.status_)
+      - PROTOBUF_FIELD_OFFSET(OperatorProto, _impl_.since_version_)>(
+          reinterpret_cast<char*>(&_impl_.since_version_),
+          reinterpret_cast<char*>(&other->_impl_.since_version_));
 }
 
 ::PROTOBUF_NAMESPACE_ID::Metadata OperatorProto::GetMetadata() const {
-  return GetMetadataStatic();
+  return ::_pbi::AssignDescriptors(
+      &descriptor_table_onnx_2doperators_2dml_2eproto_getter, &descriptor_table_onnx_2doperators_2dml_2eproto_once,
+      file_level_metadata_onnx_2doperators_2dml_2eproto[0]);
 }
-
 
 // ===================================================================
 
-void OperatorSetProto::InitAsDefaultInstance() {
-}
 class OperatorSetProto::_Internal {
  public:
-  using HasBits = decltype(std::declval<OperatorSetProto>()._has_bits_);
+  using HasBits = decltype(std::declval<OperatorSetProto>()._impl_._has_bits_);
   static void set_has_magic(HasBits* has_bits) {
     (*has_bits)[0] |= 1u;
   }
@@ -524,213 +538,263 @@ class OperatorSetProto::_Internal {
 };
 
 void OperatorSetProto::clear_functions() {
-  functions_.Clear();
+  _impl_.functions_.Clear();
 }
-OperatorSetProto::OperatorSetProto(::PROTOBUF_NAMESPACE_ID::Arena* arena)
-  : ::PROTOBUF_NAMESPACE_ID::Message(arena),
-  operator__(arena),
-  functions_(arena) {
-  SharedCtor();
-  RegisterArenaDtor(arena);
+OperatorSetProto::OperatorSetProto(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                         bool is_message_owned)
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena, is_message_owned) {
+  SharedCtor(arena, is_message_owned);
   // @@protoc_insertion_point(arena_constructor:onnx.OperatorSetProto)
 }
 OperatorSetProto::OperatorSetProto(const OperatorSetProto& from)
-  : ::PROTOBUF_NAMESPACE_ID::Message(),
-      _has_bits_(from._has_bits_),
-      operator__(from.operator__),
-      functions_(from.functions_) {
+  : ::PROTOBUF_NAMESPACE_ID::Message() {
+  OperatorSetProto* const _this = this; (void)_this;
+  new (&_impl_) Impl_{
+      decltype(_impl_._has_bits_){from._impl_._has_bits_}
+    , /*decltype(_impl_._cached_size_)*/{}
+    , decltype(_impl_.operator__){from._impl_.operator__}
+    , decltype(_impl_.functions_){from._impl_.functions_}
+    , decltype(_impl_.magic_){}
+    , decltype(_impl_.ir_version_prerelease_){}
+    , decltype(_impl_.domain_){}
+    , decltype(_impl_.doc_string_){}
+    , decltype(_impl_.ir_build_metadata_){}
+    , decltype(_impl_.ir_version_){}
+    , decltype(_impl_.opset_version_){}};
+
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
-  magic_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  _impl_.magic_.InitDefault();
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    _impl_.magic_.Set("", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
   if (from._internal_has_magic()) {
-    magic_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from._internal_magic(),
-      GetArena());
+    _this->_impl_.magic_.Set(from._internal_magic(), 
+      _this->GetArenaForAllocation());
   }
-  ir_version_prerelease_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  _impl_.ir_version_prerelease_.InitDefault();
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    _impl_.ir_version_prerelease_.Set("", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
   if (from._internal_has_ir_version_prerelease()) {
-    ir_version_prerelease_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from._internal_ir_version_prerelease(),
-      GetArena());
+    _this->_impl_.ir_version_prerelease_.Set(from._internal_ir_version_prerelease(), 
+      _this->GetArenaForAllocation());
   }
-  domain_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  _impl_.domain_.InitDefault();
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    _impl_.domain_.Set("", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
   if (from._internal_has_domain()) {
-    domain_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from._internal_domain(),
-      GetArena());
+    _this->_impl_.domain_.Set(from._internal_domain(), 
+      _this->GetArenaForAllocation());
   }
-  doc_string_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  _impl_.doc_string_.InitDefault();
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    _impl_.doc_string_.Set("", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
   if (from._internal_has_doc_string()) {
-    doc_string_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from._internal_doc_string(),
-      GetArena());
+    _this->_impl_.doc_string_.Set(from._internal_doc_string(), 
+      _this->GetArenaForAllocation());
   }
-  ir_build_metadata_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  _impl_.ir_build_metadata_.InitDefault();
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    _impl_.ir_build_metadata_.Set("", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
   if (from._internal_has_ir_build_metadata()) {
-    ir_build_metadata_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from._internal_ir_build_metadata(),
-      GetArena());
+    _this->_impl_.ir_build_metadata_.Set(from._internal_ir_build_metadata(), 
+      _this->GetArenaForAllocation());
   }
-  ::memcpy(&ir_version_, &from.ir_version_,
-    static_cast<size_t>(reinterpret_cast<char*>(&opset_version_) -
-    reinterpret_cast<char*>(&ir_version_)) + sizeof(opset_version_));
+  ::memcpy(&_impl_.ir_version_, &from._impl_.ir_version_,
+    static_cast<size_t>(reinterpret_cast<char*>(&_impl_.opset_version_) -
+    reinterpret_cast<char*>(&_impl_.ir_version_)) + sizeof(_impl_.opset_version_));
   // @@protoc_insertion_point(copy_constructor:onnx.OperatorSetProto)
 }
 
-void OperatorSetProto::SharedCtor() {
-  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&scc_info_OperatorSetProto_onnx_2doperators_2dml_2eproto.base);
-  magic_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  ir_version_prerelease_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  domain_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  doc_string_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  ir_build_metadata_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  ::memset(&ir_version_, 0, static_cast<size_t>(
-      reinterpret_cast<char*>(&opset_version_) -
-      reinterpret_cast<char*>(&ir_version_)) + sizeof(opset_version_));
+inline void OperatorSetProto::SharedCtor(
+    ::_pb::Arena* arena, bool is_message_owned) {
+  (void)arena;
+  (void)is_message_owned;
+  new (&_impl_) Impl_{
+      decltype(_impl_._has_bits_){}
+    , /*decltype(_impl_._cached_size_)*/{}
+    , decltype(_impl_.operator__){arena}
+    , decltype(_impl_.functions_){arena}
+    , decltype(_impl_.magic_){}
+    , decltype(_impl_.ir_version_prerelease_){}
+    , decltype(_impl_.domain_){}
+    , decltype(_impl_.doc_string_){}
+    , decltype(_impl_.ir_build_metadata_){}
+    , decltype(_impl_.ir_version_){int64_t{0}}
+    , decltype(_impl_.opset_version_){int64_t{0}}
+  };
+  _impl_.magic_.InitDefault();
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    _impl_.magic_.Set("", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  _impl_.ir_version_prerelease_.InitDefault();
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    _impl_.ir_version_prerelease_.Set("", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  _impl_.domain_.InitDefault();
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    _impl_.domain_.Set("", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  _impl_.doc_string_.InitDefault();
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    _impl_.doc_string_.Set("", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  _impl_.ir_build_metadata_.InitDefault();
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    _impl_.ir_build_metadata_.Set("", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
 }
 
 OperatorSetProto::~OperatorSetProto() {
   // @@protoc_insertion_point(destructor:onnx.OperatorSetProto)
+  if (auto *arena = _internal_metadata_.DeleteReturnArena<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>()) {
+  (void)arena;
+    return;
+  }
   SharedDtor();
-  _internal_metadata_.Delete<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
-void OperatorSetProto::SharedDtor() {
-  GOOGLE_DCHECK(GetArena() == nullptr);
-  magic_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  ir_version_prerelease_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  domain_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  doc_string_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  ir_build_metadata_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+inline void OperatorSetProto::SharedDtor() {
+  GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
+  _impl_.operator__.~RepeatedPtrField();
+  _impl_.functions_.~RepeatedPtrField();
+  _impl_.magic_.Destroy();
+  _impl_.ir_version_prerelease_.Destroy();
+  _impl_.domain_.Destroy();
+  _impl_.doc_string_.Destroy();
+  _impl_.ir_build_metadata_.Destroy();
 }
 
-void OperatorSetProto::ArenaDtor(void* object) {
-  OperatorSetProto* _this = reinterpret_cast< OperatorSetProto* >(object);
-  (void)_this;
-}
-void OperatorSetProto::RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena*) {
-}
 void OperatorSetProto::SetCachedSize(int size) const {
-  _cached_size_.Set(size);
+  _impl_._cached_size_.Set(size);
 }
-const OperatorSetProto& OperatorSetProto::default_instance() {
-  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&::scc_info_OperatorSetProto_onnx_2doperators_2dml_2eproto.base);
-  return *internal_default_instance();
-}
-
 
 void OperatorSetProto::Clear() {
 // @@protoc_insertion_point(message_clear_start:onnx.OperatorSetProto)
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  operator__.Clear();
-  functions_.Clear();
-  cached_has_bits = _has_bits_[0];
+  _impl_.operator__.Clear();
+  _impl_.functions_.Clear();
+  cached_has_bits = _impl_._has_bits_[0];
   if (cached_has_bits & 0x0000001fu) {
     if (cached_has_bits & 0x00000001u) {
-      magic_.ClearNonDefaultToEmpty();
+      _impl_.magic_.ClearNonDefaultToEmpty();
     }
     if (cached_has_bits & 0x00000002u) {
-      ir_version_prerelease_.ClearNonDefaultToEmpty();
+      _impl_.ir_version_prerelease_.ClearNonDefaultToEmpty();
     }
     if (cached_has_bits & 0x00000004u) {
-      domain_.ClearNonDefaultToEmpty();
+      _impl_.domain_.ClearNonDefaultToEmpty();
     }
     if (cached_has_bits & 0x00000008u) {
-      doc_string_.ClearNonDefaultToEmpty();
+      _impl_.doc_string_.ClearNonDefaultToEmpty();
     }
     if (cached_has_bits & 0x00000010u) {
-      ir_build_metadata_.ClearNonDefaultToEmpty();
+      _impl_.ir_build_metadata_.ClearNonDefaultToEmpty();
     }
   }
   if (cached_has_bits & 0x00000060u) {
-    ::memset(&ir_version_, 0, static_cast<size_t>(
-        reinterpret_cast<char*>(&opset_version_) -
-        reinterpret_cast<char*>(&ir_version_)) + sizeof(opset_version_));
+    ::memset(&_impl_.ir_version_, 0, static_cast<size_t>(
+        reinterpret_cast<char*>(&_impl_.opset_version_) -
+        reinterpret_cast<char*>(&_impl_.ir_version_)) + sizeof(_impl_.opset_version_));
   }
-  _has_bits_.Clear();
+  _impl_._has_bits_.Clear();
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
-const char* OperatorSetProto::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
+const char* OperatorSetProto::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) {
 #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
   _Internal::HasBits has_bits{};
-  ::PROTOBUF_NAMESPACE_ID::Arena* arena = GetArena(); (void)arena;
   while (!ctx->Done(&ptr)) {
-    ::PROTOBUF_NAMESPACE_ID::uint32 tag;
-    ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
-    CHK_(ptr);
+    uint32_t tag;
+    ptr = ::_pbi::ReadTag(ptr, &tag);
     switch (tag >> 3) {
       // optional string magic = 1;
       case 1:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 10)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 10)) {
           auto str = _internal_mutable_magic();
-          ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
-          #ifndef NDEBUG
-          ::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "onnx.OperatorSetProto.magic");
-          #endif  // !NDEBUG
+          ptr = ::_pbi::InlineGreedyStringParser(str, ptr, ctx);
           CHK_(ptr);
-        } else goto handle_unusual;
+          #ifndef NDEBUG
+          ::_pbi::VerifyUTF8(str, "onnx.OperatorSetProto.magic");
+          #endif  // !NDEBUG
+        } else
+          goto handle_unusual;
         continue;
       // optional int64 ir_version = 2;
       case 2:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 16)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 16)) {
           _Internal::set_has_ir_version(&has_bits);
-          ir_version_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          _impl_.ir_version_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
-        } else goto handle_unusual;
+        } else
+          goto handle_unusual;
         continue;
       // optional string ir_version_prerelease = 3;
       case 3:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 26)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 26)) {
           auto str = _internal_mutable_ir_version_prerelease();
-          ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
-          #ifndef NDEBUG
-          ::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "onnx.OperatorSetProto.ir_version_prerelease");
-          #endif  // !NDEBUG
+          ptr = ::_pbi::InlineGreedyStringParser(str, ptr, ctx);
           CHK_(ptr);
-        } else goto handle_unusual;
+          #ifndef NDEBUG
+          ::_pbi::VerifyUTF8(str, "onnx.OperatorSetProto.ir_version_prerelease");
+          #endif  // !NDEBUG
+        } else
+          goto handle_unusual;
         continue;
       // optional string domain = 4;
       case 4:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 34)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 34)) {
           auto str = _internal_mutable_domain();
-          ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
-          #ifndef NDEBUG
-          ::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "onnx.OperatorSetProto.domain");
-          #endif  // !NDEBUG
+          ptr = ::_pbi::InlineGreedyStringParser(str, ptr, ctx);
           CHK_(ptr);
-        } else goto handle_unusual;
+          #ifndef NDEBUG
+          ::_pbi::VerifyUTF8(str, "onnx.OperatorSetProto.domain");
+          #endif  // !NDEBUG
+        } else
+          goto handle_unusual;
         continue;
       // optional int64 opset_version = 5;
       case 5:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 40)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 40)) {
           _Internal::set_has_opset_version(&has_bits);
-          opset_version_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          _impl_.opset_version_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
-        } else goto handle_unusual;
+        } else
+          goto handle_unusual;
         continue;
       // optional string doc_string = 6;
       case 6:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 50)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 50)) {
           auto str = _internal_mutable_doc_string();
-          ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
-          #ifndef NDEBUG
-          ::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "onnx.OperatorSetProto.doc_string");
-          #endif  // !NDEBUG
+          ptr = ::_pbi::InlineGreedyStringParser(str, ptr, ctx);
           CHK_(ptr);
-        } else goto handle_unusual;
+          #ifndef NDEBUG
+          ::_pbi::VerifyUTF8(str, "onnx.OperatorSetProto.doc_string");
+          #endif  // !NDEBUG
+        } else
+          goto handle_unusual;
         continue;
       // optional string ir_build_metadata = 7;
       case 7:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 58)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 58)) {
           auto str = _internal_mutable_ir_build_metadata();
-          ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
-          #ifndef NDEBUG
-          ::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "onnx.OperatorSetProto.ir_build_metadata");
-          #endif  // !NDEBUG
+          ptr = ::_pbi::InlineGreedyStringParser(str, ptr, ctx);
           CHK_(ptr);
-        } else goto handle_unusual;
+          #ifndef NDEBUG
+          ::_pbi::VerifyUTF8(str, "onnx.OperatorSetProto.ir_build_metadata");
+          #endif  // !NDEBUG
+        } else
+          goto handle_unusual;
         continue;
       // repeated .onnx.OperatorProto operator = 8;
       case 8:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 66)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 66)) {
           ptr -= 1;
           do {
             ptr += 1;
@@ -738,11 +802,12 @@ const char* OperatorSetProto::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPA
             CHK_(ptr);
             if (!ctx->DataAvailable(ptr)) break;
           } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<66>(ptr));
-        } else goto handle_unusual;
+        } else
+          goto handle_unusual;
         continue;
       // repeated .onnx.FunctionProto functions = 9;
       case 9:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 74)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 74)) {
           ptr -= 1;
           do {
             ptr += 1;
@@ -750,38 +815,40 @@ const char* OperatorSetProto::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPA
             CHK_(ptr);
             if (!ctx->DataAvailable(ptr)) break;
           } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<74>(ptr));
-        } else goto handle_unusual;
+        } else
+          goto handle_unusual;
         continue;
-      default: {
-      handle_unusual:
-        if ((tag & 7) == 4 || tag == 0) {
-          ctx->SetLastTag(tag);
-          goto success;
-        }
-        ptr = UnknownFieldParse(tag,
-            _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
-            ptr, ctx);
-        CHK_(ptr != nullptr);
-        continue;
-      }
+      default:
+        goto handle_unusual;
     }  // switch
+  handle_unusual:
+    if ((tag == 0) || ((tag & 7) == 4)) {
+      CHK_(ptr);
+      ctx->SetLastTag(tag);
+      goto message_done;
+    }
+    ptr = UnknownFieldParse(
+        tag,
+        _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
+        ptr, ctx);
+    CHK_(ptr != nullptr);
   }  // while
-success:
-  _has_bits_.Or(has_bits);
+message_done:
+  _impl_._has_bits_.Or(has_bits);
   return ptr;
 failure:
   ptr = nullptr;
-  goto success;
+  goto message_done;
 #undef CHK_
 }
 
-::PROTOBUF_NAMESPACE_ID::uint8* OperatorSetProto::_InternalSerialize(
-    ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+uint8_t* OperatorSetProto::_InternalSerialize(
+    uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
   // @@protoc_insertion_point(serialize_to_array_start:onnx.OperatorSetProto)
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
-  cached_has_bits = _has_bits_[0];
+  cached_has_bits = _impl_._has_bits_[0];
   // optional string magic = 1;
   if (cached_has_bits & 0x00000001u) {
     ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::VerifyUTF8StringNamedField(
@@ -795,7 +862,7 @@ failure:
   // optional int64 ir_version = 2;
   if (cached_has_bits & 0x00000020u) {
     target = stream->EnsureSpace(target);
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt64ToArray(2, this->_internal_ir_version(), target);
+    target = ::_pbi::WireFormatLite::WriteInt64ToArray(2, this->_internal_ir_version(), target);
   }
 
   // optional string ir_version_prerelease = 3;
@@ -821,7 +888,7 @@ failure:
   // optional int64 opset_version = 5;
   if (cached_has_bits & 0x00000040u) {
     target = stream->EnsureSpace(target);
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt64ToArray(5, this->_internal_opset_version(), target);
+    target = ::_pbi::WireFormatLite::WriteInt64ToArray(5, this->_internal_opset_version(), target);
   }
 
   // optional string doc_string = 6;
@@ -845,23 +912,23 @@ failure:
   }
 
   // repeated .onnx.OperatorProto operator = 8;
-  for (unsigned int i = 0,
-      n = static_cast<unsigned int>(this->_internal_operator__size()); i < n; i++) {
-    target = stream->EnsureSpace(target);
+  for (unsigned i = 0,
+      n = static_cast<unsigned>(this->_internal_operator__size()); i < n; i++) {
+    const auto& repfield = this->_internal_operator_(i);
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
-      InternalWriteMessage(8, this->_internal_operator_(i), target, stream);
+        InternalWriteMessage(8, repfield, repfield.GetCachedSize(), target, stream);
   }
 
   // repeated .onnx.FunctionProto functions = 9;
-  for (unsigned int i = 0,
-      n = static_cast<unsigned int>(this->_internal_functions_size()); i < n; i++) {
-    target = stream->EnsureSpace(target);
+  for (unsigned i = 0,
+      n = static_cast<unsigned>(this->_internal_functions_size()); i < n; i++) {
+    const auto& repfield = this->_internal_functions(i);
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
-      InternalWriteMessage(9, this->_internal_functions(i), target, stream);
+        InternalWriteMessage(9, repfield, repfield.GetCachedSize(), target, stream);
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
+    target = ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
   }
   // @@protoc_insertion_point(serialize_to_array_end:onnx.OperatorSetProto)
@@ -872,25 +939,25 @@ size_t OperatorSetProto::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:onnx.OperatorSetProto)
   size_t total_size = 0;
 
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
   // repeated .onnx.OperatorProto operator = 8;
   total_size += 1UL * this->_internal_operator__size();
-  for (const auto& msg : this->operator__) {
+  for (const auto& msg : this->_impl_.operator__) {
     total_size +=
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(msg);
   }
 
   // repeated .onnx.FunctionProto functions = 9;
   total_size += 1UL * this->_internal_functions_size();
-  for (const auto& msg : this->functions_) {
+  for (const auto& msg : this->_impl_.functions_) {
     total_size +=
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(msg);
   }
 
-  cached_has_bits = _has_bits_[0];
+  cached_has_bits = _impl_._has_bits_[0];
   if (cached_has_bits & 0x0000007fu) {
     // optional string magic = 1;
     if (cached_has_bits & 0x00000001u) {
@@ -929,84 +996,61 @@ size_t OperatorSetProto::ByteSizeLong() const {
 
     // optional int64 ir_version = 2;
     if (cached_has_bits & 0x00000020u) {
-      total_size += 1 +
-        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int64Size(
-          this->_internal_ir_version());
+      total_size += ::_pbi::WireFormatLite::Int64SizePlusOne(this->_internal_ir_version());
     }
 
     // optional int64 opset_version = 5;
     if (cached_has_bits & 0x00000040u) {
-      total_size += 1 +
-        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int64Size(
-          this->_internal_opset_version());
+      total_size += ::_pbi::WireFormatLite::Int64SizePlusOne(this->_internal_opset_version());
     }
 
   }
-  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
-    return ::PROTOBUF_NAMESPACE_ID::internal::ComputeUnknownFieldsSize(
-        _internal_metadata_, total_size, &_cached_size_);
-  }
-  int cached_size = ::PROTOBUF_NAMESPACE_ID::internal::ToCachedSize(total_size);
-  SetCachedSize(cached_size);
-  return total_size;
+  return MaybeComputeUnknownFieldsSize(total_size, &_impl_._cached_size_);
 }
 
-void OperatorSetProto::MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
-// @@protoc_insertion_point(generalized_merge_from_start:onnx.OperatorSetProto)
-  GOOGLE_DCHECK_NE(&from, this);
-  const OperatorSetProto* source =
-      ::PROTOBUF_NAMESPACE_ID::DynamicCastToGenerated<OperatorSetProto>(
-          &from);
-  if (source == nullptr) {
-  // @@protoc_insertion_point(generalized_merge_from_cast_fail:onnx.OperatorSetProto)
-    ::PROTOBUF_NAMESPACE_ID::internal::ReflectionOps::Merge(from, this);
-  } else {
-  // @@protoc_insertion_point(generalized_merge_from_cast_success:onnx.OperatorSetProto)
-    MergeFrom(*source);
-  }
-}
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData OperatorSetProto::_class_data_ = {
+    ::PROTOBUF_NAMESPACE_ID::Message::CopyWithSourceCheck,
+    OperatorSetProto::MergeImpl
+};
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*OperatorSetProto::GetClassData() const { return &_class_data_; }
 
-void OperatorSetProto::MergeFrom(const OperatorSetProto& from) {
-// @@protoc_insertion_point(class_specific_merge_from_start:onnx.OperatorSetProto)
-  GOOGLE_DCHECK_NE(&from, this);
-  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+
+void OperatorSetProto::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg) {
+  auto* const _this = static_cast<OperatorSetProto*>(&to_msg);
+  auto& from = static_cast<const OperatorSetProto&>(from_msg);
+  // @@protoc_insertion_point(class_specific_merge_from_start:onnx.OperatorSetProto)
+  GOOGLE_DCHECK_NE(&from, _this);
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
-  operator__.MergeFrom(from.operator__);
-  functions_.MergeFrom(from.functions_);
-  cached_has_bits = from._has_bits_[0];
+  _this->_impl_.operator__.MergeFrom(from._impl_.operator__);
+  _this->_impl_.functions_.MergeFrom(from._impl_.functions_);
+  cached_has_bits = from._impl_._has_bits_[0];
   if (cached_has_bits & 0x0000007fu) {
     if (cached_has_bits & 0x00000001u) {
-      _internal_set_magic(from._internal_magic());
+      _this->_internal_set_magic(from._internal_magic());
     }
     if (cached_has_bits & 0x00000002u) {
-      _internal_set_ir_version_prerelease(from._internal_ir_version_prerelease());
+      _this->_internal_set_ir_version_prerelease(from._internal_ir_version_prerelease());
     }
     if (cached_has_bits & 0x00000004u) {
-      _internal_set_domain(from._internal_domain());
+      _this->_internal_set_domain(from._internal_domain());
     }
     if (cached_has_bits & 0x00000008u) {
-      _internal_set_doc_string(from._internal_doc_string());
+      _this->_internal_set_doc_string(from._internal_doc_string());
     }
     if (cached_has_bits & 0x00000010u) {
-      _internal_set_ir_build_metadata(from._internal_ir_build_metadata());
+      _this->_internal_set_ir_build_metadata(from._internal_ir_build_metadata());
     }
     if (cached_has_bits & 0x00000020u) {
-      ir_version_ = from.ir_version_;
+      _this->_impl_.ir_version_ = from._impl_.ir_version_;
     }
     if (cached_has_bits & 0x00000040u) {
-      opset_version_ = from.opset_version_;
+      _this->_impl_.opset_version_ = from._impl_.opset_version_;
     }
-    _has_bits_[0] |= cached_has_bits;
+    _this->_impl_._has_bits_[0] |= cached_has_bits;
   }
-}
-
-void OperatorSetProto::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
-// @@protoc_insertion_point(generalized_copy_from_start:onnx.OperatorSetProto)
-  if (&from == this) return;
-  Clear();
-  MergeFrom(from);
+  _this->_internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
 }
 
 void OperatorSetProto::CopyFrom(const OperatorSetProto& from) {
@@ -1022,35 +1066,55 @@ bool OperatorSetProto::IsInitialized() const {
 
 void OperatorSetProto::InternalSwap(OperatorSetProto* other) {
   using std::swap;
-  _internal_metadata_.Swap<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(&other->_internal_metadata_);
-  swap(_has_bits_[0], other->_has_bits_[0]);
-  operator__.InternalSwap(&other->operator__);
-  functions_.InternalSwap(&other->functions_);
-  magic_.Swap(&other->magic_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
-  ir_version_prerelease_.Swap(&other->ir_version_prerelease_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
-  domain_.Swap(&other->domain_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
-  doc_string_.Swap(&other->doc_string_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
-  ir_build_metadata_.Swap(&other->ir_build_metadata_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  auto* lhs_arena = GetArenaForAllocation();
+  auto* rhs_arena = other->GetArenaForAllocation();
+  _internal_metadata_.InternalSwap(&other->_internal_metadata_);
+  swap(_impl_._has_bits_[0], other->_impl_._has_bits_[0]);
+  _impl_.operator__.InternalSwap(&other->_impl_.operator__);
+  _impl_.functions_.InternalSwap(&other->_impl_.functions_);
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::InternalSwap(
+      &_impl_.magic_, lhs_arena,
+      &other->_impl_.magic_, rhs_arena
+  );
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::InternalSwap(
+      &_impl_.ir_version_prerelease_, lhs_arena,
+      &other->_impl_.ir_version_prerelease_, rhs_arena
+  );
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::InternalSwap(
+      &_impl_.domain_, lhs_arena,
+      &other->_impl_.domain_, rhs_arena
+  );
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::InternalSwap(
+      &_impl_.doc_string_, lhs_arena,
+      &other->_impl_.doc_string_, rhs_arena
+  );
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::InternalSwap(
+      &_impl_.ir_build_metadata_, lhs_arena,
+      &other->_impl_.ir_build_metadata_, rhs_arena
+  );
   ::PROTOBUF_NAMESPACE_ID::internal::memswap<
-      PROTOBUF_FIELD_OFFSET(OperatorSetProto, opset_version_)
-      + sizeof(OperatorSetProto::opset_version_)
-      - PROTOBUF_FIELD_OFFSET(OperatorSetProto, ir_version_)>(
-          reinterpret_cast<char*>(&ir_version_),
-          reinterpret_cast<char*>(&other->ir_version_));
+      PROTOBUF_FIELD_OFFSET(OperatorSetProto, _impl_.opset_version_)
+      + sizeof(OperatorSetProto::_impl_.opset_version_)
+      - PROTOBUF_FIELD_OFFSET(OperatorSetProto, _impl_.ir_version_)>(
+          reinterpret_cast<char*>(&_impl_.ir_version_),
+          reinterpret_cast<char*>(&other->_impl_.ir_version_));
 }
 
 ::PROTOBUF_NAMESPACE_ID::Metadata OperatorSetProto::GetMetadata() const {
-  return GetMetadataStatic();
+  return ::_pbi::AssignDescriptors(
+      &descriptor_table_onnx_2doperators_2dml_2eproto_getter, &descriptor_table_onnx_2doperators_2dml_2eproto_once,
+      file_level_metadata_onnx_2doperators_2dml_2eproto[1]);
 }
-
 
 // @@protoc_insertion_point(namespace_scope)
 }  // namespace onnx
 PROTOBUF_NAMESPACE_OPEN
-template<> PROTOBUF_NOINLINE ::onnx::OperatorProto* Arena::CreateMaybeMessage< ::onnx::OperatorProto >(Arena* arena) {
+template<> PROTOBUF_NOINLINE ::onnx::OperatorProto*
+Arena::CreateMaybeMessage< ::onnx::OperatorProto >(Arena* arena) {
   return Arena::CreateMessageInternal< ::onnx::OperatorProto >(arena);
 }
-template<> PROTOBUF_NOINLINE ::onnx::OperatorSetProto* Arena::CreateMaybeMessage< ::onnx::OperatorSetProto >(Arena* arena) {
+template<> PROTOBUF_NOINLINE ::onnx::OperatorSetProto*
+Arena::CreateMaybeMessage< ::onnx::OperatorSetProto >(Arena* arena) {
   return Arena::CreateMessageInternal< ::onnx::OperatorSetProto >(arena);
 }
 PROTOBUF_NAMESPACE_CLOSE

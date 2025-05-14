@@ -15,9 +15,8 @@
 
 #include <assert.h>
 #include <cuda_runtime.h>
-#include <stdarg.h>
-#include <stdio.h>
 #include <string>
+#include <spconv/engine.hpp>
 
 namespace spconv {
 
@@ -30,6 +29,7 @@ namespace spconv {
 #define checkRuntime(call) spconv::check_runtime(call, #call, __LINE__, __FILE__)
 #define checkKernel(...)                                                            \
   do {                                                                              \
+    /*printf("Launch kernel  " #__VA_ARGS__ "  ==== " __FILE__ ":%d ========\n", __LINE__);*/                       \
     __VA_ARGS__;                                                                    \
     spconv::check_runtime(cudaPeekAtLastError(), #__VA_ARGS__, __LINE__, __FILE__); \
   } while (0)
@@ -37,15 +37,15 @@ namespace spconv {
 #define Assertf(cond, fmt, ...)                                                                 \
   do {                                                                                          \
     if (!(cond)) {                                                                              \
-      fprintf(stderr, "Assert failed 💀. %s in file %s:%d, message: " fmt "\n", #cond, __FILE__, \
-              __LINE__, __VA_ARGS__);                                                           \
+      spconv::logger_output(__FILE__, __LINE__, spconv::LoggerLevel::Error, "Assert failed 💀. %s in file %s:%d, message: " fmt, #cond, __FILE__, \
+              __LINE__);                                                           \
       __SPCONV_ABORT__;                                                                                  \
     }                                                                                           \
   } while (false)
 #define Asserts(cond, s)                                                                      \
   do {                                                                                        \
     if (!(cond)) {                                                                            \
-      fprintf(stderr, "Assert failed 💀. %s in file %s:%d, message: " s "\n", #cond, __FILE__, \
+      spconv::logger_output(__FILE__, __LINE__, spconv::LoggerLevel::Error, "Assert failed 💀. %s in file %s:%d, message: " s, #cond, __FILE__, \
               __LINE__);                                                                      \
       __SPCONV_ABORT__;                                                                                \
     }                                                                                         \
@@ -53,30 +53,13 @@ namespace spconv {
 #define Assert(cond)                                                                     \
   do {                                                                                   \
     if (!(cond)) {                                                                       \
-      fprintf(stderr, "Assert failed 💀. %s in file %s:%d\n", #cond, __FILE__, __LINE__); \
+      spconv::logger_output(__FILE__, __LINE__, spconv::LoggerLevel::Error, "Assert failed 💀. %s in file %s:%d", #cond, __FILE__, __LINE__); \
       __SPCONV_ABORT__;                                                                           \
     }                                                                                    \
   } while (false)
 
-static inline std::string format(const char *fmt, ...) {
-  char buffer[2048];
-  va_list vl;
-  va_start(vl, fmt);
-  vsnprintf(buffer, sizeof(buffer), fmt, vl);
-  return buffer;
-}
-
-static inline bool check_runtime(cudaError_t e, const char *call, int line, const char *file) {
-  if (e != cudaSuccess) {
-    fprintf(stderr,
-            "CUDA Runtime error %s # %s, code = %s [ %d ] in file "
-            "%s:%d\n",
-            call, cudaGetErrorString(e), cudaGetErrorName(e), e, file, line);
-    __SPCONV_ABORT__;
-    return false;
-  }
-  return true;
-}
+Exported std::string format(const char *fmt, ...);
+Exported bool check_runtime(cudaError_t e, const char *call, int line, const char *file);
 
 };  // namespace spconv
 
