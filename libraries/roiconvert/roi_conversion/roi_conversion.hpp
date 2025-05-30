@@ -56,7 +56,7 @@ struct Task{
     int output_width, output_height;
 
     float affine_matrix[6];
-    float alpha[3], beta[3];
+    float scales[3], means[3];
     unsigned char fillcolor[3];
 
     void resize_affine();
@@ -72,7 +72,7 @@ public:
 // image = load_image(width, height)
 // roi = image(x0, y0, x1, y1)
 // roi = affine(roi, matrix, fill=fillcolor, dst_size=(width, height), interp=interpolation)
-// roi = roi * alpha + beta
+// roi = (roi - means) * scales
 // store(roi, dest, format=dest_format, dtype=dest_dtype)
 std::shared_ptr<ROIConversion> create();
 

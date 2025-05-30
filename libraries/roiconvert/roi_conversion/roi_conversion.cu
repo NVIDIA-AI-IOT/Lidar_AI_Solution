@@ -239,11 +239,11 @@ template<typename T, OutputFormat output_format>
 struct Normalizer{
     static __device__ void __forceinline__ call(
         uint8_t ir, uint8_t ig, uint8_t ib, T& r, T& g, T& b,
-        float alphas[3], float betas[3]
+        float scales[3], float means[3]
     ){
-        r = Saturate<T>::cast(ir * alphas[0] + betas[0]);
-        g = Saturate<T>::cast(ig * alphas[1] + betas[1]);
-        b = Saturate<T>::cast(ib * alphas[2] + betas[2]);
+        r = Saturate<T>::cast((ir - means[0]) * scales[0]);
+        g = Saturate<T>::cast((ig - means[1]) * scales[1]);
+        b = Saturate<T>::cast((ib - means[2]) * scales[2]);
     }
 };
 
@@ -251,11 +251,11 @@ template<typename T>
 struct Normalizer<T, OutputFormat::Gray>{
     static __device__ void __forceinline__ call(
         uint8_t ir, uint8_t ig, uint8_t ib, T& r, T& g, T& b,
-        float alphas[3], float betas[3]
+        float scales[3], float means[3]
     ){
         // 0.299 ∙ Red + 0.587 ∙ Green + 0.114 ∙ Blue
         float gray = ir * 0.299f + ig * 0.587f + ib * 0.114f;
-        r = Saturate<T>::cast(gray * alphas[0] + betas[0]);
+        r = Saturate<T>::cast((gray - means[0]) * scales[0]);
     }
 };
 
@@ -453,7 +453,7 @@ static __global__ void convert_roi_kernel(Task* tasks, const int num_task, Probl
         }
 
         output_dtype r, g, b;
-        Normalizer<output_dtype, output_format>::call(ir, ig, ib, r, g, b, task.alpha, task.beta);
+        Normalizer<output_dtype, output_format>::call(ir, ig, ib, r, g, b, task.scales, task.means);
         DataWriter<output_dtype, output_format>::call(
             (output_dtype*)task.output, r, g, b, x, y, task.output_width, task.output_height
         );
