@@ -204,7 +204,8 @@ std::shared_ptr<Engine> load_engine_from_onnx(const std::string& onnx_file, Prec
             auto output_shape = get_attribute_as_intarray(node, "output_shape");
             auto format = get_attribute(node, "format").s();
             auto input_dynamic_range = get_attribute(node, "input_dynamic_range").f();
-            auto layout = get_attribute(node, "output_layout").s() == "NCHW32" ? spconv::TensorLayout::NCHW32 : spconv::TensorLayout::NCHW;
+            auto output_layout_string = get_attribute(node, "output_layout").s();
+            auto layout = output_layout_string == "NCHW32" ? spconv::TensorLayout::NCHW32 : (output_layout_string == "NHWzC" ? spconv::TensorLayout::NHWzC : spconv::TensorLayout::NCHW);
             auto n = builder->push_dense(node.name().c_str(), x, format.c_str(), node.output(0).c_str(), input_spatial_shape, output_shape, layout, input_dynamic_range, fixed_launch_points);
             tensor_map_by_name[node.output(0)] = n->output(0);
         } else if (node.op_type() == "Reshape") {

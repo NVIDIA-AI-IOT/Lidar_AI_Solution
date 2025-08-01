@@ -23,7 +23,7 @@ namespace spconv {
 #define Exported __attribute__((visibility("default")))
 
 enum class Precision : int { None = 0, Float16 = 1, Int8 = 2 };
-enum class TensorLayout : int { None = 0, NCHW = 1, NCHW32 = 2 };
+enum class TensorLayout : int { None = 0, NCHW = 1, NCHW32 = 2, NHWzC = 3 };
 enum class LoggerLevel : int {Verb = 0, Warn = 1, Error = 2, Quiet = 99};
 
 class ILogger{
