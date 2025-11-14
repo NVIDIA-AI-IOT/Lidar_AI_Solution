@@ -3,6 +3,10 @@ A tiny inference engine for [3d sparse convolutional networks](https://github.co
 ![title](/assets/3dsparse_conv.png)
 
 ## News
+- (11/14/2025) The libspconv.so 1.3.1 is released now!
+  - Add blackwell kernels (for Thor platform).
+  - Expose the sortmask functionality to users.
+  - Add support for auxiliary stream.
 - (05/14/2025) The libspconv.so 1.2.1 is released now!
   - Add support for cudaGraph. Better performance, Better stability.
 - (09/11/2024) The libspconv.so 1.1.10 is released now!
@@ -39,19 +43,19 @@ Onnx model can be converted from checkpoint and config below using given script.
 1. Download and configure the CenterPoint environment from https://github.com/tianweiy/CenterPoint
 2. Export SCN ONNX
 ```
-$ cp -r tool/centerpoint-export path/to/CenterPoint
-$ cd path/to/CenterPoint
-$ python centerpoint-export/export-scn.py --ckpt=epoch_20.pth --save-onnx=scn.nuscenes.onnx
-$ cp scn.nuscenes.onnx path/to/3DSparseConvolution/workspace/
+>$ cp -r tool/centerpoint-export path/to/CenterPoint
+>$ cd path/to/CenterPoint
+>$ python centerpoint-export/export-scn.py --ckpt=epoch_20.pth --save-onnx=scn.nuscenes.onnx
+>$ cp scn.nuscenes.onnx path/to/3DSparseConvolution/workspace/
 ```
 
 3. ## Compile && Run
 - Build and run test
 ```
-$ sudo apt-get install libprotobuf-dev
-$ cd path/to/3DSparseConvolution
+>$ sudo apt-get install libprotobuf-dev
+>$ cd path/to/3DSparseConvolution
 ->>>>>> modify main.cpp:80 to scn.nuscenes.onnx
-$ CUDA_HOME=/usr/local/cuda SPCONV_USE_CUDAGRAPH=1 SPCONV_CUDA_VERSION=12.8 make fp16 -j
+>$ CUDA_HOME=/usr/local/cuda SPCONV_USE_CUDAGRAPH=1 SPCONV_CUDA_VERSION=12.8 make fp16 -j
 🙌 Output.shape: 1 x 256 x 180 x 180
 [PASSED 🤗], libspconv version is 1.0.0
 To verify the results, you can execute the following command.
@@ -62,7 +66,7 @@ Verify Result:
 
 - Verify output
 ```
-$ python tool/compare.py workspace/centerpoint/out_dense.torch.fp16.tensor workspace/centerpoint/output.zyx.dense --detail
+>$ python tool/compare.py workspace/centerpoint/out_dense.torch.fp16.tensor workspace/centerpoint/output.zyx.dense --detail
 ================ Compare Information =================
  CPP     Tensor: 1 x 256 x 180 x 180, float16 : workspace/centerpoint/out_dense.torch.fp16.tensor
  PyTorch Tensor: 1 x 256 x 180 x 180, float16 : workspace/centerpoint/output.zyx.dense
@@ -79,8 +83,8 @@ Torch: absmax:3.054688, min:0.000000, std:0.034600, mean:0.003279
 ```
 
 ## For Python
-```
-$ SPCONV_CUDA_VERSION=11.4 make pyscn -j
+```bash
+>$ SPCONV_CUDA_VERSION=11.4 make pyscn -j
 Use Python Include: /usr/include/python3.8
 Use Python SO Name: python3.8
 Use Python Library: /usr/lib
@@ -88,10 +92,51 @@ Compile CXX src/pyscn.cpp
 Link tool/pyscn.so
 You can run "python tool/pytest.py" to test
 
-$ python tool/pytest.py
+>$ python tool/pytest.py
 [PASSED 🤗].
 To verify result:
   python tool/compare.py workspace/centerpoint/out_dense.py.fp16.tensor workspace/centerpoint/out_dense.torch.fp16.tensor --detail
+```
+
+## For the infer program
+```bash
+>$ CUDA_HOME=/usr/local/cuda-12.1 SPCONV_CUDA_VERSION=12.8 make infer
+Use spconv_library_path: libspconv/lib/x86_64_cuda12.8
+=====================================================================
+Load inference task from arguments: bevfusion/bevfusion.scn.xyz.onnx
+  onnx: bevfusion/bevfusion.scn.xyz.onnx
+  feature: 17748x5 [Float16] : bevfusion/infer.xyz.voxels
+  indice: 17748x4 [Int32] : bevfusion/infer.xyz.coors
+  grid_size: 1440x1440x41
+  fp16: true
+  int8: false
+  precision: Float16
+  sortmask: true
+  blackwell: false
+  auxiliary_stream: true
+  cudagraph: true
+  fixed_points: 10000
+  profiling: false
+  use_dds: false
+  verbose: false
+  search_best_perf: false
+=====================================================================
+Run inference task: bevfusion/bevfusion.scn.xyz.onnx
+Set DDS num of points (17748) pointer to 0x7f0e0b7fee00
+Save output[0] to output0_40.tensor
+Done inference task: bevfusion/bevfusion.scn.xyz.onnx
+================ Compare Information =================
+ CPP     Tensor: 1 x 256 x 180 x 180, float16 : workspace/bevfusion/infer.xyz.dense
+ PyTorch Tensor: 1 x 128 x 180 x 180 x 2, float16 : workspace/output0_40.tensor
+[absdiff]: max:0.0390625, sum:527.710327, std:0.000441, mean:0.000064
+CPP:   absmax:11.164062, min:0.000000, std:0.117200, mean:0.015906
+Torch: absmax:11.164062, min:0.000000, std:0.117175, mean:0.015901
+[absdiff > m75% --- 0.029297]: 0.000 %, 1
+[absdiff > m50% --- 0.019531]: 0.000 %, 14
+[absdiff > m25% --- 0.009766]: 0.009 %, 776
+[absdiff > 0]: 3.817 %, 316630
+[absdiff = 0]: 96.183 %, 7977770
+[cosine]: 99.999 %
 ```
 
 ## Performance on ORIN

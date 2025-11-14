@@ -55,12 +55,12 @@ class SCNModel {
 
   virtual ~SCNModel() {
     if (output_features_) {
-      checkRuntime(cudaFreeHost(output_features_));
+      check_cuda_api(cudaFreeHost(output_features_));
       output_features_ = nullptr;
     }
 
     if (output_indices_) {
-      checkRuntime(cudaFreeHost(output_indices_));
+      check_cuda_api(cudaFreeHost(output_indices_));
       output_indices_ = nullptr;
     }
   }
@@ -77,9 +77,9 @@ class SCNModel {
     indices_.alloc_or_resize_to(num * 4);
 
     cudaStream_t stream = (cudaStream_t)stream_;
-    checkRuntime(cudaMemcpyAsync(features_.ptr(), features.data(0), features_.bytes(),
+    check_cuda_api(cudaMemcpyAsync(features_.ptr(), features.data(0), features_.bytes(),
                                  cudaMemcpyHostToDevice, stream));
-    checkRuntime(cudaMemcpyAsync(indices_.ptr(), indices.data(0), indices_.bytes(),
+    check_cuda_api(cudaMemcpyAsync(indices_.ptr(), indices.data(0), indices_.bytes(),
                                  cudaMemcpyHostToDevice, stream));
 
     instance_->input(0)->set_data(
@@ -92,22 +92,22 @@ class SCNModel {
     auto out_features = result->features();
     auto out_indices = result->indices();
     if (output_features_bytes_ < out_features.bytes()) {
-      if (output_features_) checkRuntime(cudaFreeHost(output_features_));
+      if (output_features_) check_cuda_api(cudaFreeHost(output_features_));
       output_features_bytes_ = out_features.bytes();
-      checkRuntime(cudaMallocHost(&output_features_, output_features_bytes_));
+      check_cuda_api(cudaMallocHost(&output_features_, output_features_bytes_));
     }
 
     if (output_indices_bytes_ < out_indices.bytes()) {
-      if (output_indices_) checkRuntime(cudaFreeHost(output_indices_));
+      if (output_indices_) check_cuda_api(cudaFreeHost(output_indices_));
       output_indices_bytes_ = out_indices.bytes();
-      checkRuntime(cudaMallocHost(&output_indices_, output_indices_bytes_));
+      check_cuda_api(cudaMallocHost(&output_indices_, output_indices_bytes_));
     }
 
-    checkRuntime(cudaMemcpyAsync(output_features_, out_features.ptr(), out_features.bytes(),
+    check_cuda_api(cudaMemcpyAsync(output_features_, out_features.ptr(), out_features.bytes(),
                                  cudaMemcpyDeviceToHost, stream));
-    checkRuntime(cudaMemcpyAsync(output_indices_, out_indices.ptr(), out_indices.bytes(),
+    check_cuda_api(cudaMemcpyAsync(output_indices_, out_indices.ptr(), out_indices.bytes(),
                                  cudaMemcpyDeviceToHost, stream));
-    checkRuntime(cudaStreamSynchronize(stream));
+    check_cuda_api(cudaStreamSynchronize(stream));
 
     py::array result_features(py::dtype("float16"), out_features.shape, output_features_);
     py::array result_indices(py::dtype("float16"), out_indices.shape, output_indices_);

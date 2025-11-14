@@ -19,9 +19,12 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 # DEALINGS IN THE SOFTWARE.
 
+# For example:
+# CUDA_HOME=/usr/local/cuda SPCONV_CUDA_VERSION=12.8 make fp16 -j
+
 optimize  := -O3
 cc        := g++
-stdcpp    := c++11
+stdcpp    := c++17
 arch      := $(shell arch)
 pwd       := $(abspath .)
 cppstrict := #-Wall -Werror -Wextra -Werror=all-warnings
@@ -64,6 +67,12 @@ endif
 all   : pro pyscn
 pro   : workspace/pro
 pyscn : tool/pyscn.so
+infer : workspace/infer
+	@cd workspace && ./infer --onnx=bevfusion/bevfusion.scn.xyz.onnx --feature=bevfusion/infer.xyz.voxels --indice=bevfusion/infer.xyz.coors --grid_size=1440,1440,41 --cudagraph --sortmask --auxiliary_stream
+	@python tool/compare.py workspace/bevfusion/infer.xyz.dense workspace/output0_40.tensor --detail
+
+best_perf : workspace/infer
+	@cd workspace && ./infer --onnx=bevfusion/bevfusion.scn.xyz.onnx --feature=bevfusion/infer.xyz.voxels --indice=bevfusion/infer.xyz.coors --grid_size=1440,1440,41 --search_best_perf
 
 int8      : pro
 	@cd workspace && ./pro int8
@@ -83,6 +92,10 @@ tool/pyscn.so : objs/pyscn.o objs/onnx-parser.o objs/onnx/onnx-ml.pb.o objs/onnx
 	@echo You can run \"python tool/pytest.py\" to test
 
 workspace/pro : objs/main.o objs/onnx-parser.o objs/voxelization.uo objs/onnx/onnx-ml.pb.o objs/onnx/onnx-operators-ml.pb.o
+	@echo Link $@
+	@$(cc) -o $@ $^ $(link_flags)
+
+workspace/infer : objs/infer.o objs/onnx-parser.o objs/voxelization.uo objs/onnx/onnx-ml.pb.o objs/onnx/onnx-operators-ml.pb.o
 	@echo Link $@
 	@$(cc) -o $@ $^ $(link_flags)
 

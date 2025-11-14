@@ -28,21 +28,16 @@
 
 namespace spconv{
 
-/**
-  Create an engine and load the weights from onnx file
-
-  onnx_file: Store the onnx of model structure, please use tool/deploy/export-scn.py to export the
-corresponding onnx precision: What precision to use for model inference. For each layer's precision
-should be stored in the "precision" attribute of the layer
-            - Model inference will ignore the "precision" attribute of each layer what if set to
-Float16
-**/
+// Create an engine and load the weights from onnx file
 std::shared_ptr<Engine> load_engine_from_onnx(
-    const std::string& onnx_file,
-    Precision precision = Precision::Float16,
-    void* stream = nullptr,
-    bool mark_all_output = false);
-
+    const std::string& onnx_file,                         // the path to the onnx file that is exported by the specific script compatible with spconv, such as tools/deploy/export-scn.py.
+    Precision inference_precision = Precision::Float16,   // the precision to use for model inference. It has high priority than the precision of each layer.
+    bool sortmask = false,                        // only for ampere kernels.
+    bool enable_blackwell = false,                // enable blackwell kernels for better performance. requires SM >= 100.
+    bool with_auxiliary_stream = false,           // enable auxiliary stream to run the inference in a separate stream for better performance. better for blackwell kernels.
+    unsigned int fixed_launch_points = 10000,     // only for cudagraph.
+    void* stream = nullptr                        // the stream to use for the inference. Please avoid using the default stream.
+);
 
 }; // namespace spconv
 

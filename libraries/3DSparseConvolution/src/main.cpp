@@ -88,7 +88,7 @@ Task load_task(const string& name, spconv::Precision precision) {
     task.compare_cmd =
         "python tool/compare.py workspace/centerpoint/out_dense.torch.fp16.tensor workspace/centerpoint/output.zyx.dense --detail";
   } else {
-    Assertf(false, "Unsupport task name: %s", name.c_str());
+    spconv_assertf(false, "Unsupport task name: %s", name.c_str());
   }
   return task;
 }
@@ -142,8 +142,8 @@ void run_task(const std::string& task_name, spconv::Precision precision, cudaStr
   if(use_cudagraph || (dds != nullptr && strcmp(dds, "1") == 0)){
     uint32_t* num_inputs_pointer = nullptr;
     uint32_t real_num_inputs = task.features.size(0);
-    checkRuntime(cudaMalloc(&num_inputs_pointer, sizeof(uint32_t)));
-    checkRuntime(cudaMemcpy(num_inputs_pointer, &real_num_inputs, sizeof(uint32_t) , cudaMemcpyHostToDevice));
+    check_cuda_api(cudaMalloc(&num_inputs_pointer, sizeof(uint32_t)));
+    check_cuda_api(cudaMemcpy(num_inputs_pointer, &real_num_inputs, sizeof(uint32_t) , cudaMemcpyHostToDevice));
     task.engine->input(0)->set_dds_num_of_points_pointer(num_inputs_pointer);
     printf("Set DDS num of points (%d) pointer to %p\n", real_num_inputs, num_inputs_pointer);
   }
@@ -151,18 +151,18 @@ void run_task(const std::string& task_name, spconv::Precision precision, cudaStr
   cudaGraph_t spconv_cuda_graph = nullptr;
   cudaGraphExec_t spconv_cuda_graph_instance = nullptr;
   if(use_cudagraph){
-    checkRuntime(cudaStreamBeginCapture(stream, cudaStreamCaptureModeGlobal));
+    check_cuda_api(cudaStreamBeginCapture(stream, cudaStreamCaptureModeGlobal));
     task.engine->forward(stream);
-    checkRuntime(cudaStreamEndCapture(stream, &spconv_cuda_graph));
-    checkRuntime(cudaGraphInstantiate(&spconv_cuda_graph_instance, spconv_cuda_graph, nullptr, nullptr, 0));
+    check_cuda_api(cudaStreamEndCapture(stream, &spconv_cuda_graph));
+    check_cuda_api(cudaGraphInstantiate(&spconv_cuda_graph_instance, spconv_cuda_graph, nullptr, nullptr, 0));
   }
 
-  checkRuntime(cudaMemcpyAsync(features.ptr(), task.features.ptr(), features.bytes(), cudaMemcpyDeviceToDevice, stream));
-  checkRuntime(cudaMemcpyAsync(indices.ptr(), task.indices.ptr(), indices.bytes(), cudaMemcpyDeviceToDevice, stream));
+  check_cuda_api(cudaMemcpyAsync(features.ptr(), task.features.ptr(), features.bytes(), cudaMemcpyDeviceToDevice, stream));
+  check_cuda_api(cudaMemcpyAsync(indices.ptr(), task.indices.ptr(), indices.bytes(), cudaMemcpyDeviceToDevice, stream));
 
   auto forward_func = [&](){
     if(use_cudagraph){
-      checkRuntime(cudaGraphLaunch(spconv_cuda_graph_instance, stream));
+      check_cuda_api(cudaGraphLaunch(spconv_cuda_graph_instance, stream));
     }else{
       task.engine->forward(stream);
     }
@@ -199,8 +199,8 @@ void run_task(const std::string& task_name, spconv::Precision precision, cudaStr
   }
 
   if(use_cudagraph){
-    checkRuntime(cudaGraphDestroy(spconv_cuda_graph));
-    checkRuntime(cudaGraphExecDestroy(spconv_cuda_graph_instance));
+    check_cuda_api(cudaGraphDestroy(spconv_cuda_graph));
+    check_cuda_api(cudaGraphExecDestroy(spconv_cuda_graph_instance));
   }
 }
 
@@ -211,9 +211,9 @@ int main(int argc, char** argv) {
   if (argc > 2) task_name = argv[2];
 
   cudaStream_t stream = nullptr;
-  checkRuntime(cudaStreamCreateWithFlags(&stream, cudaStreamNonBlocking));
+  check_cuda_api(cudaStreamCreateWithFlags(&stream, cudaStreamNonBlocking));
   if (strcmp(cmd, "int8") == 0) run_task(task_name, spconv::Precision::Int8, stream);
   if (strcmp(cmd, "fp16") == 0) run_task(task_name, spconv::Precision::Float16, stream);
-  checkRuntime(cudaStreamDestroy(stream));
+  check_cuda_api(cudaStreamDestroy(stream));
   return 0;
 }

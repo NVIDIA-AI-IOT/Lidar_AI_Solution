@@ -11,3 +11,5 @@ workspace/centerpoint/out_dense.py.fp16.tensor
 workspace/bevfusion/output.zyx.dense
 workspace/bevfusion/output.xyz.dense
 src/pybind11.hpp
+workspace/*.tensor
+workspace/infer

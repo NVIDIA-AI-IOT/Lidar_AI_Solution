@@ -158,7 +158,7 @@ public:
   Exported virtual void push_output(ITensor* value) = 0;
 
   // build engine
-  Exported virtual std::shared_ptr<Engine> build(Precision precision, void* stream = nullptr) = 0;
+  Exported virtual std::shared_ptr<Engine> build(Precision precision, bool sortmask=false, bool enable_blackwell=false, bool with_auxiliary_stream=false, void* stream = nullptr) = 0;
 };
 
 /**

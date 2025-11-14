@@ -32,9 +32,8 @@ class PinnedMemoryData {
 
   void alloc_or_resize_to(size_t nbytes, cudaStream_t stream) {
     if (capacity_ < nbytes) {
-      // dprintf("%s Free old %d, malloc new %d bytes.\n", name_.c_str(), capacity_, nbytes);
       free_memory(stream);
-      checkRuntime(cudaMallocHost(&ptr_, nbytes));
+      check_cuda_api(cudaMallocHost(&ptr_, nbytes));
       capacity_ = nbytes;
     }
     bytes_ = nbytes;
@@ -44,7 +43,7 @@ class PinnedMemoryData {
 
   void resize(size_t nbytes) {
     if (capacity_ < nbytes) {
-      Assertf(false, "%s Failed to resize memory to %ld bytes. capacity = %ld", name_.c_str(),
+      spconv_assertf(false, "%s Failed to resize memory to %ld bytes. capacity = %ld", name_.c_str(),
               nbytes, capacity_);
     }
     bytes_ = nbytes;
@@ -52,7 +51,7 @@ class PinnedMemoryData {
 
   void free_memory(cudaStream_t stream) {
     if (ptr_) {
-      checkRuntime(cudaFreeHost(ptr_));
+      check_cuda_api(cudaFreeHost(ptr_));
       ptr_ = nullptr;
       capacity_ = 0;
       bytes_ = 0;
@@ -77,9 +76,8 @@ class GPUData {
 
   void alloc_or_resize_to(size_t nbytes, cudaStream_t stream) {
     if (capacity_ < nbytes) {
-      // dprintf("%s Free old %d, malloc new %d bytes.\n", name_.c_str(), capacity_, nbytes);
       free_memory(stream);
-      checkRuntime(cudaMalloc(&ptr_, nbytes));
+      check_cuda_api(cudaMalloc(&ptr_, nbytes));
       capacity_ = nbytes;
     }
     bytes_ = nbytes;
@@ -89,7 +87,7 @@ class GPUData {
 
   void resize(size_t nbytes) {
     if (capacity_ < nbytes) {
-      Assertf(false, "%s Failed to resize memory to %ld bytes. capacity = %ld", name_.c_str(),
+      spconv_assertf(false, "%s Failed to resize memory to %ld bytes. capacity = %ld", name_.c_str(),
               nbytes, capacity_);
     }
     bytes_ = nbytes;
@@ -100,12 +98,12 @@ class GPUData {
 
 #ifdef __WITH_QNX
       if(stream){
-        checkRuntime(cudaFreeAsync(ptr_, (cudaStream_t)stream));
+        check_cuda_api(cudaFreeAsync(ptr_, (cudaStream_t)stream));
       }else{
-        checkRuntime(cudaFree(ptr_));
+        check_cuda_api(cudaFree(ptr_));
       }
 #else
-      checkRuntime(cudaFree(ptr_));
+      check_cuda_api(cudaFree(ptr_));
 #endif // __WITH_QNX
 
       ptr_ = nullptr;
@@ -129,7 +127,6 @@ class GPUMemory {
   size_t bytes() const { return data_ ? data_->bytes() : 0; }
   bool empty() const { return data_ == nullptr || data_->empty(); }
   bool unset() const { return data_ == nullptr; }
-  // GPUMemory() { data_.reset(new GPUData()); }
   virtual ~GPUMemory() { data_.reset(); }
   void set_gpudata(std::shared_ptr<GPUData> data) { this->data_ = data; }
 
@@ -138,7 +135,7 @@ class GPUMemory {
       size_ = size;
       data_->alloc_or_resize_to(size * sizeof(T), stream);
     } else {
-      Asserts(false, "Failed to alloc or resize memory that because data is nullptr.");
+      spconv_asserts(false, "Failed to alloc or resize memory that because data is nullptr.");
     }
   }
 
@@ -149,7 +146,7 @@ class GPUMemory {
       size_ = size;
       data_->resize(size * sizeof(T));
     } else {
-      Asserts(false, "Failed to resize memory that because data is nullptr.");
+      spconv_asserts(false, "Failed to resize memory that because data is nullptr.");
     }
   }
 
@@ -160,7 +157,11 @@ class GPUMemory {
 
 class GPUDataManager {
  public:
-  std::shared_ptr<GPUData> query_or_alloc(const std::string &tensor_id) {
+  GPUDataManager(size_t max_bytes_for_io_tensor = 0){
+    this->max_bytes_for_io_tensor_ = max_bytes_for_io_tensor;
+  }
+
+  std::shared_ptr<GPUData> query_or_alloc(const std::string &tensor_id, bool is_iotensor = false, cudaStream_t stream = nullptr) {
     if(tensor_id == "__no_reuse_policy_here__"){
       std::shared_ptr<GPUData> output;
       output.reset(new GPUData(tensor_id));
@@ -169,11 +170,15 @@ class GPUDataManager {
     std::shared_ptr<GPUData> &output = data_dict_[tensor_id];
     if (output == nullptr) {
       output.reset(new GPUData(tensor_id));
+      if(is_iotensor && max_bytes_for_io_tensor_ > 0){
+        output->alloc(max_bytes_for_io_tensor_, stream);
+      }
     }
     return output;
   }
 
  private:
+  size_t max_bytes_for_io_tensor_ = 0;
   std::unordered_map<std::string, std::shared_ptr<GPUData>> data_dict_;
 };
 
