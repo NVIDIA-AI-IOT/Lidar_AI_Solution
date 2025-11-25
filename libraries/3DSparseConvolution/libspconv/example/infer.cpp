@@ -120,7 +120,7 @@
        if(argument_description_type == "required"){
          printf("   --%s=value\t%s\n", argument_name.c_str(), argument_description_description.c_str());
        }else if(argument_description_type == "optional"){
-         printf("   --%s=[default: %s]\t%s\n", argument_name.c_str(), argument_description_value.c_str(), argument_description_description.c_str());
+         printf("   --%s [default: %s]\t%s\n", argument_name.c_str(), argument_description_value.c_str(), argument_description_description.c_str());
        }
      }
    }
@@ -160,6 +160,7 @@
     bool profiling;
     bool verbosity;
     bool search_best_perf;
+    bool stress_test;
     float profiling_latency;
 };
 
@@ -194,6 +195,7 @@ InferenceTask load_task_from_arguments(const ArgumentsMap& args, cudaStream_t st
     task.use_dds = args.at("dds") == "true";
     task.profiling = args.at("profiling") == "true";
     task.verbosity = args.at("verbose") == "true";
+    task.stress_test = args.at("stress") == "true";
     task.fixed_launch_points = stoi(args.at("fixed_points").c_str());
     task.search_best_perf = args.at("search_best_perf") == "true";
     task.valid = true;
@@ -208,6 +210,11 @@ InferenceTask load_task_from_arguments(const ArgumentsMap& args, cudaStream_t st
         printf("Disable verbosity mode because --search_best_perf or --profiling is specified.\n");
         task.verbosity = false;
       }
+    }
+
+    if((task.search_best_perf || task.profiling) && task.stress_test){
+      printf("Ignore the stress_test flag because --search_best_perf or --profiling is specified.\n");
+      task.stress_test = false;
     }
 
     if(!file_exists(task.onnx_file)){
@@ -245,6 +252,7 @@ InferenceTask load_task_from_arguments(const ArgumentsMap& args, cudaStream_t st
     printf("  profiling: %s\n", task.profiling ? "true" : "false");
     printf("  use_dds: %s\n", task.use_dds ? "true" : "false");
     printf("  verbose: %s\n", task.verbosity ? "true" : "false");
+    printf("  stress: %s\n", task.stress_test ? "true" : "false");
     printf("  search_best_perf: %s\n", task.search_best_perf ? "true" : "false");
     printf("=====================================================================\n");
     return task;
@@ -309,11 +317,11 @@ void run_task(InferenceTask& task, cudaStream_t stream) {
     check_cuda_api(cudaMemcpyAsync(indices.ptr(), task.indices.ptr(), indices.bytes(), cudaMemcpyDeviceToDevice, stream));
 
     auto forward_func = [&](){
-        if(task.use_cudagraph){
-            check_cuda_api(cudaGraphLaunch(spconv_cuda_graph_instance, stream));
-        }else{
-            engine->forward(stream);
-        }
+      if(task.use_cudagraph){
+          check_cuda_api(cudaGraphLaunch(spconv_cuda_graph_instance, stream));
+      }else{
+          engine->forward(stream);
+      }
     };
 
     if(task.profiling){
@@ -333,10 +341,33 @@ void run_task(InferenceTask& task, cudaStream_t stream) {
               task.profiling_latency);
         }
     }else{
-        forward_func();
+        if(task.stress_test){
+          if(task.use_cudagraph || task.use_dds){
+            int32_t real_num_inputs = (int32_t)task.features.size(0);
+            for(int i = 0; i < 1000 && real_num_inputs > 0; ++i){
+              if((i + 1) % 100 == 0) printf("Stress test: %d / 1000, num_inputs: %d\n", i + 1, real_num_inputs);
+              check_cuda_api(cudaMemcpyAsync(num_inputs_pointer, &real_num_inputs, sizeof(uint32_t) , cudaMemcpyHostToDevice, stream));
+              forward_func();
+              check_cuda_api(cudaStreamSynchronize(stream));
+              real_num_inputs -= rand() % 200;
+            }
+          }else{
+            int32_t real_num_inputs = (int32_t)task.features.size(0);
+            for(int i = 0; i < 1000 && real_num_inputs >= 0; ++i){
+              if((i + 1) % 100 == 0) printf("Stress test: %d / 1000, num_inputs: %d\n", i + 1, real_num_inputs);
+              engine->input(0)->features().reference(features.ptr(), {real_num_inputs, task.features.size(1)}, features.dtype(), true);
+              engine->input(0)->indices().reference(indices.ptr(), {real_num_inputs, task.indices.size(1)}, indices.dtype(), true);
+              forward_func();
+              check_cuda_api(cudaStreamSynchronize(stream));
+              real_num_inputs -= rand() % 200;
+            }
+          }
+        }else{
+          forward_func();
+        }
     }
 
-    if(!task.profiling){
+    if(!task.profiling && !task.stress_test && !task.search_best_perf){
         for(int i = 0; i < engine->num_output(); ++i){
             std::string output_name = "output" + std::to_string(i) + "_" + std::string(engine->output(i)->name()) + ".tensor";
             printf("Save output[%d] to %s\n", i, output_name.c_str());
@@ -345,7 +376,7 @@ void run_task(InferenceTask& task, cudaStream_t stream) {
     }
     engine.reset();
 
-    if(!task.profiling){
+    if(!task.profiling && !task.stress_test){
         printf("Done inference task: %s\n", task.onnx_file.c_str());
     }
 
@@ -465,6 +496,62 @@ void search_best_perf(InferenceTask& task, cudaStream_t stream){
   }
 }
 
+void stress_test(InferenceTask& task, cudaStream_t stream){
+  std::vector<bool> blackwell_flags = {true, false};
+  unsigned int num_proposed_fixed_launch_points = task.features.size(0);
+  unsigned int current_cuda_arch = get_current_device_arch();
+  std::vector<std::tuple<uint32_t, bool, bool, bool, bool>> config_list;
+
+  if(current_cuda_arch < 1000){
+    blackwell_flags = {false};
+    printf("Turn off profiling for blackwell kernels on current device (arch=%d).\n", current_cuda_arch);
+  }
+
+  for(bool cudagraph : {true, false}){
+    uint32_t num_fixed_launch_points_iters = 32;
+    if(!cudagraph){
+      num_fixed_launch_points_iters = 1;  // fixed launch points is only effective when cudagraph is disabled
+    }
+
+    for(uint32_t i_fixed_launch_points = 0; i_fixed_launch_points < num_fixed_launch_points_iters; ++i_fixed_launch_points){
+      uint32_t num_fixed_launch_points = (float)(i_fixed_launch_points + 1) / (float)num_fixed_launch_points_iters * num_proposed_fixed_launch_points;
+      for(bool blackwell : blackwell_flags){
+        for(bool sortmask : {true, false}){
+          for(bool auxiliary_stream : {true, false}){
+            config_list.push_back(std::make_tuple(num_fixed_launch_points, blackwell, sortmask, auxiliary_stream, cudagraph));
+          }
+        }
+      }
+    }
+  }
+
+  int current_iteration = 0;
+  printf("Stress test the model: %s with %d configurations\n", task.onnx_file.c_str(), (int)config_list.size());
+  for(const auto& config : config_list){
+    task.fixed_launch_points = std::get<0>(config);
+    task.enable_blackwell = std::get<1>(config);
+    task.sortmask = std::get<2>(config);
+    task.with_auxiliary_stream = std::get<3>(config);
+    task.use_cudagraph = std::get<4>(config);
+
+    current_iteration++;
+    int seed = time(nullptr);
+    srand(seed);
+    printf("  Iteration %d / %d: Cudagraph: %s, Fixed Launch Points: %d, Blackwell: %s, Sortmask: %s, Auxiliary Stream: %s, seed: %d\n", 
+      current_iteration, (int)config_list.size(),
+      task.use_cudagraph ? "yes" : "no",
+      task.fixed_launch_points,
+      task.enable_blackwell ? "yes" : "no", 
+      task.sortmask ? "yes" : "no", 
+      task.with_auxiliary_stream ? "yes" : "no", 
+      seed
+    );
+    run_task(task, stream);
+  }
+
+  printf("Done stress test the model: %s\n", task.onnx_file.c_str());
+}
+
 int main(int argc, char** argv) {
     ArgumentsMap args;
     if(!args.parse(argc, argv, "./infer", {
@@ -482,6 +569,7 @@ int main(int argc, char** argv) {
         {std::tuple("profiling", "optional", "false", "\tEnable profiling to measure the inference latency.")},
         {std::tuple("verbose", "optional", "false", "\tEnable verbosity to print the inference details.")},
         {std::tuple("dds", "optional", "false", "\tEnable data dependency shape feature to the inference.")},
+        {std::tuple("stress", "optional", "false", "\tEnable stress test to loop the different input number of points.")},
         {std::tuple("search_best_perf", "optional", "false", "Search the best performance configuration for the inference. This flag will be ignored if profiling is enabled.")},
     })){
         return 0;
@@ -498,6 +586,8 @@ int main(int argc, char** argv) {
 
     if(task.search_best_perf && !task.profiling){
       search_best_perf(task, stream);
+    }else if(task.stress_test){
+      stress_test(task, stream);
     }else{
       run_task(task, stream);
     }

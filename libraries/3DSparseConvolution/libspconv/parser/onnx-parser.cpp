@@ -94,7 +94,7 @@ static std::vector<int> get_attribute_as_intarray(const onnx::NodeProto& node, c
     auto ints = get_attribute(node, name).ints();
     std::vector<int> output(ints.size());
     for (size_t i = 0; i < ints.size(); ++i) 
-        output[i] = ints[i];
+        output[i] = static_cast<int>(ints[i]);
     return output;
 };
 
@@ -224,7 +224,7 @@ std::shared_ptr<Engine> load_engine_from_onnx(const std::string& onnx_file, Prec
         collect_outputs.push_back(tensor_map_by_name[name]);
     }
 
-    for (int i = 0; i < collect_outputs.size(); ++i) {
+    for (int i = 0; i < (int)collect_outputs.size(); ++i) {
         builder->push_output(collect_outputs[i]);
     }
     return builder->build(precision, sortmask, enable_blackwell, with_auxiliary_stream, stream);
