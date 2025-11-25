@@ -32,6 +32,7 @@ class PinnedMemoryData {
 
   void alloc_or_resize_to(size_t nbytes, cudaStream_t stream) {
     if (capacity_ < nbytes) {
+      // dprintf("%s Free old %d, malloc new %d bytes.\n", name_.c_str(), capacity_, nbytes);
       free_memory(stream);
       check_cuda_api(cudaMallocHost(&ptr_, nbytes));
       capacity_ = nbytes;
