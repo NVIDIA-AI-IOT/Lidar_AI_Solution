@@ -1,0 +1,5 @@
+libraries/3DSparseConvolution/libspconv/lib/aarch64_cuda12.8/libspconv.so filter=lfs diff=lfs merge=lfs -text
+libraries/3DSparseConvolution/libspconv/lib/x86_64_cuda12.8/libspconv.so filter=lfs diff=lfs merge=lfs -text
+libraries/3DSparseConvolution/libspconv/lib/x86_64_cuda11.4/libspconv.so filter=lfs diff=lfs merge=lfs -text
+libraries/3DSparseConvolution/libspconv/lib/x86_64_cuda13.0/libspconv.so filter=lfs diff=lfs merge=lfs -text
+libraries/3DSparseConvolution/libspconv/lib/aarch64_cuda11.4/libspconv.so filter=lfs diff=lfs merge=lfs -text
