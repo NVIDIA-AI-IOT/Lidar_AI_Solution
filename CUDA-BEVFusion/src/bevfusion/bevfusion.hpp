@@ -56,6 +56,11 @@ class Core {
                                                                          const nvtype::half *lidar_points, int num_points,
                                                                          void *stream) = 0;
 
+  // FP16 [x,y,z,intensity,time-lag] already on the device. No host staging/upload.
+  virtual std::vector<head::transbbox::BoundingBox> forward_device_lidar(const unsigned char **camera_images,
+                                                                         const nvtype::half *lidar_points_device,
+                                                                         int num_points, void *stream) = 0;
+
   virtual void print() = 0;
   virtual void set_timer(bool enable) = 0;
 

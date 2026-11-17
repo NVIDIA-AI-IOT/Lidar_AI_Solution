@@ -24,6 +24,7 @@
 #include "bevfusion.hpp"
 
 #include <numeric>
+#include <stdexcept>
 
 #include "common/check.hpp"
 #include "common/timer.hpp"
@@ -102,7 +103,8 @@ class CoreImplement : public Core {
   }
 
   std::vector<head::transbbox::BoundingBox> forward_only(const void* camera_images, const nvtype::half* lidar_points,
-                                                         int num_points, void* stream, bool do_normalization) {
+                                                         int num_points, void* stream, bool do_normalization,
+                                                         bool device_lidar = false) {
     int cappoints = static_cast<int>(capacity_points_);
     if (num_points > cappoints) {
       printf("If it exceeds %d points, the default processing will simply crop it out.\n", cappoints);
@@ -112,15 +114,20 @@ class CoreImplement : public Core {
 
     cudaStream_t _stream = static_cast<cudaStream_t>(stream);
     size_t bytes_points = num_points * param_.lidar_scn.voxelization.num_feature * sizeof(nvtype::half);
-    checkRuntime(cudaMemcpyAsync(lidar_points_host_, lidar_points, bytes_points, cudaMemcpyHostToHost, _stream));
-    checkRuntime(cudaMemcpyAsync(lidar_points_device_, lidar_points_host_, bytes_points, cudaMemcpyHostToDevice, _stream));
+    const nvtype::half* device_points = lidar_points;
+    if (!device_lidar) {
+      checkRuntime(cudaMemcpyAsync(lidar_points_host_, lidar_points, bytes_points, cudaMemcpyHostToHost, _stream));
+      checkRuntime(
+          cudaMemcpyAsync(lidar_points_device_, lidar_points_host_, bytes_points, cudaMemcpyHostToDevice, _stream));
+      device_points = lidar_points_device_;
+    }
 
-    const nvtype::half* lidar_feature = this->lidar_scn_->forward(lidar_points_device_, num_points, stream);
+    const nvtype::half* lidar_feature = this->lidar_scn_->forward(device_points, num_points, stream);
     nvtype::half* normed_images = (nvtype::half*)camera_images;
     if (do_normalization) {
       normed_images = (nvtype::half*)this->normalizer_->forward((const unsigned char**)(camera_images), stream);
     }
-    const nvtype::half* depth = this->camera_depth_->forward(lidar_points_device_, num_points, 5, stream);
+    const nvtype::half* depth = this->camera_depth_->forward(device_points, num_points, 5, stream);
 
     this->camera_backbone_->forward(normed_images, depth, stream);
     const nvtype::half* camera_bev = this->camera_bevpool_->forward(
@@ -134,7 +141,8 @@ class CoreImplement : public Core {
   }
 
   std::vector<head::transbbox::BoundingBox> forward_timer(const void* camera_images, const nvtype::half* lidar_points,
-                                                          int num_points, void* stream, bool do_normalization) {
+                                                          int num_points, void* stream, bool do_normalization,
+                                                          bool device_lidar = false) {
     int cappoints = static_cast<int>(capacity_points_);
     if (num_points > cappoints) {
       printf("If it exceeds %d points, the default processing will simply crop it out.\n", cappoints);
@@ -148,8 +156,13 @@ class CoreImplement : public Core {
     timer_.start(_stream);
 
     size_t bytes_points = num_points * param_.lidar_scn.voxelization.num_feature * sizeof(nvtype::half);
-    checkRuntime(cudaMemcpyAsync(lidar_points_host_, lidar_points, bytes_points, cudaMemcpyHostToHost, _stream));
-    checkRuntime(cudaMemcpyAsync(lidar_points_device_, lidar_points_host_, bytes_points, cudaMemcpyHostToDevice, _stream));
+    const nvtype::half* device_points = lidar_points;
+    if (!device_lidar) {
+      checkRuntime(cudaMemcpyAsync(lidar_points_host_, lidar_points, bytes_points, cudaMemcpyHostToHost, _stream));
+      checkRuntime(
+          cudaMemcpyAsync(lidar_points_device_, lidar_points_host_, bytes_points, cudaMemcpyHostToDevice, _stream));
+      device_points = lidar_points_device_;
+    }
     timer_.stop("[NoSt] CopyLidar");
 
     nvtype::half* normed_images = (nvtype::half*)camera_images;
@@ -160,11 +173,11 @@ class CoreImplement : public Core {
     }
 
     timer_.start(_stream);
-    const nvtype::half* lidar_feature = this->lidar_scn_->forward(lidar_points_device_, num_points, stream);
+    const nvtype::half* lidar_feature = this->lidar_scn_->forward(device_points, num_points, stream);
     times.emplace_back(timer_.stop("Lidar Backbone"));
 
     timer_.start(_stream);
-    const nvtype::half* depth = this->camera_depth_->forward(lidar_points_device_, num_points, 5, stream);
+    const nvtype::half* depth = this->camera_depth_->forward(device_points, num_points, 5, stream);
     times.emplace_back(timer_.stop("Camera Depth"));
 
     timer_.start(_stream);
@@ -213,6 +226,16 @@ class CoreImplement : public Core {
     } else {
       return this->forward_only(camera_normed_images_device, lidar_points, num_points, stream, false);
     }
+  }
+
+  std::vector<head::transbbox::BoundingBox> forward_device_lidar(const unsigned char** camera_images,
+                                                                 const nvtype::half* lidar_points_device,
+                                                                 int num_points, void* stream) override {
+    if (!lidar_points_device || num_points <= 0 || size_t(num_points) > capacity_points_) {
+      throw std::invalid_argument("Invalid device lidar input or point count");
+    }
+    if (enable_timer_) return forward_timer(camera_images, lidar_points_device, num_points, stream, true, true);
+    return forward_only(camera_images, lidar_points_device, num_points, stream, true, true);
   }
 
   virtual void set_timer(bool enable) override { enable_timer_ = enable; }

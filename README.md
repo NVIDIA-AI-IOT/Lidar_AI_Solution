@@ -138,3 +138,26 @@ This project makes use of a number of awesome open source libraries, including:
 - and others! See the dependencies folder.
 
 Many thanks to the authors of these brilliant projects!
+
+
+## GPU lidar input
+
+The CUDA-BEVFusion core retains the existing host-input `forward` API and adds
+`forward_device_lidar` for FP16 `[x,y,z,intensity,time_lag]` features already in device
+memory. The device path skips host staging and upload in both normal and timed
+execution. The caller owns input buffers and must keep them alive until all reads
+on the supplied stream complete. Camera pointers can still refer to host or device
+memory through the existing normalization path.
+
+`bevfusion/lidar-preprocess.hpp` exposes a ROS-independent `PointCloudLayout` and
+preprocessor. Initialize it once with raw-input and valid-output capacities. Supply
+scalar FLOAT32 x/y/z/intensity offsets and point/row strides. `forward` performs
+stable finite-value filtering, truncation, and FP16 packing with zero sweep time lag.
+Workspace is reused; only the valid-point count is downloaded. Calls on a preprocessor
+instance must be serialized, and the returned device buffer is valid until its next
+call. Raw inputs exceeding the configured capacity throw instead of losing points.
+
+For the model-independent regression test, configure CUDA-BEVFusion with
+`-DBUILD_LIDAR_PREPROCESS_TESTS=ON`, build `test_lidar_preprocess`, then run
+`ctest -R lidar_preprocess --output-on-failure`. Use a CUDA toolkit and architecture
+supported by your GPU. The test does not require TensorRT engines or calibration.

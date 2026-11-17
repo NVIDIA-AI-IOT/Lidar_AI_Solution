@@ -149,3 +149,12 @@ if("${CMAKE_BUILD_PYTHON}" STREQUAL "ON")
   )
 endif()
 #######################################################################
+
+# Model-independent regression test; build with -DBUILD_LIDAR_PREPROCESS_TESTS=ON.
+option(BUILD_LIDAR_PREPROCESS_TESTS "Build CUDA lidar preprocessing regression test" OFF)
+if(BUILD_LIDAR_PREPROCESS_TESTS)
+  enable_testing()
+  cuda_add_executable(test_lidar_preprocess test/test_lidar_preprocess.cu src/bevfusion/lidar-preprocess.cu)
+  add_test(NAME lidar_preprocess COMMAND test_lidar_preprocess)
+  set_tests_properties(lidar_preprocess PROPERTIES SKIP_RETURN_CODE 77)
+endif()
